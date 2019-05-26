@@ -1,0 +1,27 @@
+{
+  "name": "@algolia/renderscript",
+  "version": "1.0.0",
+  "description": "A custom JavaScript rendering engine based on puppeteer",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/algolia/renderscript.git"
+  },
+  "keywords": [
+    "algolia",
+    "puppeteer",
+    "js",
+    "renderer",
+    "rendertron",
+    "prerender"
+  ],
+  "author": "Algolia <contact@algolia.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/algolia/renderscript/issues"
+  },
+  "homepage": "https://github.com/algolia/renderscript#readme"
+}
