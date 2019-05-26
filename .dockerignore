@@ -1,0 +1,19 @@
+# Only ignore files / folders here that are also in .gitgnore
+#
+# This file uses the same format as .gitgnore,
+#   except that it's not recursive by default
+#
+#   | .gitignore | .dockerignore |
+#   |------------|---------------|
+#   | .DS_Store  | **/.DS_Store  |
+#   | /.env      | .env          |
+#
+# Only bother including:
+#   * big files / folder to lower the build context
+#   * often updated files to help the docker cache
+
+# Dockerfile itself
+Dockerfile
+
+# Dependencies
+**/node_modules
