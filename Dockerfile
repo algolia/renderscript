@@ -74,4 +74,4 @@ WORKDIR /app/renderscript
 
 COPY --from=base /app/renderscript /app/renderscript
 
-ENTRYPOINT [ "./scripts/start.sh" ]
+ENTRYPOINT [ "yarn", "docker:start" ]

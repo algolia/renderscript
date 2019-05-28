@@ -4,11 +4,11 @@
   "description": "A custom JavaScript rendering engine based on puppeteer",
   "main": "dist/api/index.js",
   "scripts": {
-    "start": "./scripts/test.sh",
-    "dev": "nodemon",
-    "dev:run": "yarn build && node dist/api/index.js",
     "build": "yarn clean && ttsc",
     "clean": "rm -rf dist/",
+    "dev": "nodemon",
+    "dev:run": "yarn build && node dist/api/index.js",
+    "docker:start": "./scripts/test.sh",
     "docker:install": "node dist/lib/install.js"
   },
   "repository": {
