@@ -12,8 +12,5 @@
 #   * big files / folder to lower the build context
 #   * often updated files to help the docker cache
 
-# Dockerfile itself
-Dockerfile
-
 # Dependencies
 **/node_modules
