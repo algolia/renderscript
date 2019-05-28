@@ -45,7 +45,6 @@ FROM node:10-slim
 
 ENV NODE_ENV production
 ENV IN_DOCKER true
-ENV DISPLAY :99
 
 # Install:
 # - Chromium (so that we get its dependencies)
