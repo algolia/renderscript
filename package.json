@@ -5,7 +5,8 @@
   "main": "dist/api/index.js",
   "scripts": {
     "start": "./scripts/test.sh",
-    "dev": "yarn clean && ttsc && concurrently --kill-others \"ttsc -w --preserveWatchOutput\" \"PORT=${PORT:-3000} nodemon -w dist/\"",
+    "dev": "nodemon",
+    "dev:run": "yarn build && node dist/api/index.js",
     "build": "yarn clean && ttsc",
     "clean": "rm -rf dist/",
     "docker:install": "node dist/lib/install.js"
