@@ -8,7 +8,7 @@ import getExtensionPath, { EXTENSIONS } from "lib/helpers/getExtensionPath";
 const WIDTH = 1280;
 const HEIGHT = 1024;
 const IGNORED_RESOURCES = ["font", "image"];
-const PAGE_BUFFER_SIZE = 8;
+const PAGE_BUFFER_SIZE = 2;
 const TIMEOUT = 20000;
 
 export interface taskParams {
