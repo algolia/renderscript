@@ -8,7 +8,8 @@
     "clean": "rm -rf dist/",
     "dev": "nodemon",
     "dev:run": "yarn build && node dist/api/index.js",
-    "docker:install": "node dist/lib/install.js"
+    "docker:install": "node dist/lib/install.js",
+    "release": "docker build -t algolia/renderscript . && docker push algolia/renderscript"
   },
   "repository": {
     "type": "git",
