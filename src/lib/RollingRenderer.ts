@@ -1,27 +1,46 @@
-import * as uuid from "uuid/v4";
 import Renderer, { taskParams } from "lib/Renderer";
 
-const MAX_RENDERER_TASKS = 1000;
+const MAX_RENDERER_TASKS = 200;
 
 class RollingRenderer {
-  private _currentRendererId: string;
   private _currentRenderer: Renderer;
-  private _stoppingPromises: { id: string; promise: Promise<void> }[];
+  private _futureRenderer: Renderer | null;
+  private _previousStopPromise: Promise<void> | null;
 
   constructor() {
-    this._currentRendererId = uuid();
     this._currentRenderer = new Renderer();
-    this._stoppingPromises = [];
+    this._futureRenderer = null;
+    this._previousStopPromise = null;
   }
 
   get renderer() {
-    if (this._currentRenderer.nbTotalTasks < MAX_RENDERER_TASKS) {
+    const { nbTotalTasks } = this._currentRenderer;
+    // Do not rely on nbTotalTasks incrementing 1 by 1
+
+    // Before the limit, use the current renderer
+    if (nbTotalTasks < MAX_RENDERER_TASKS) {
       return this._currentRenderer;
     }
-    // Create new renderer if current dealt with more than MAX_RENDERER_TASKS tasks
+
+    // On the limit, create a new one
+    if (!this._futureRenderer) {
+      this._futureRenderer = new Renderer();
+    }
+
+    // After the limit, send back the old one until the new one is ready
+
+    // This should never happen, but this is to make sure we **never**
+    // lose the reference to a stopping browser
+    const previousStopped = this._previousStopPromise === null;
+    if (!previousStopped) return this._currentRenderer;
+
+    // Only use the future one if it's ready
+    const { ready: futureReady } = this._futureRenderer as Renderer;
+    if (!futureReady) return this._currentRenderer;
+
     this._stopCurrentRenderer();
-    this._currentRendererId = uuid();
-    this._currentRenderer = new Renderer();
+    this._currentRenderer = this._futureRenderer as Renderer;
+    this._futureRenderer = null;
     return this._currentRenderer;
   }
 
@@ -30,20 +49,15 @@ class RollingRenderer {
   }
 
   async stop() {
-    this._stopCurrentRenderer();
-    await this._stoppingPromises.map(({ promise }) => promise);
+    if (this._previousStopPromise) {
+      await this._previousStopPromise;
+    }
+    await this._currentRenderer.stop();
   }
 
   private _stopCurrentRenderer() {
-    const id = this._currentRendererId;
-    const promise = this._currentRenderer.stop().then(() => {
-      this._stoppingPromises.splice(
-        this._stoppingPromises.findIndex(({ id: _id }) => id === _id),
-        1
-      );
-    });
-
-    this._stoppingPromises.push({ id, promise });
+    this._previousStopPromise = this._currentRenderer.stop();
+    this._previousStopPromise = null;
   }
 }
 

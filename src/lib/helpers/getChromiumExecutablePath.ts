@@ -1,6 +1,6 @@
 import * as puppeteer from "puppeteer-core";
 
-export default async () => {
+export default async function getChromiumExecutablePath() {
   const pkg = require("puppeteer-core/package.json");
   const { chromium_revision: revision } = pkg.puppeteer;
 
@@ -18,4 +18,4 @@ export default async () => {
   }
 
   return revisionInfo.executablePath;
-};
+}

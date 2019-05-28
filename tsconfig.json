@@ -2,13 +2,13 @@
   "compilerOptions": {
     "target": "es5",
     "strict": true,
-    "baseUrl": "src/",
     "outDir": "dist/",
     "types": ["node"],
     "baseUrl": ".",
     "paths": {
       "api/*": ["src/api/*"],
-      "lib/*": ["src/lib/*"]
+      "lib/*": ["src/lib/*"],
+      "projectRoot": ["src/projectRoot"]
     },
     "plugins": [{ "transform": "typescript-transform-paths" }]
   },

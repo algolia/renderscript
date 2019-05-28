@@ -5,7 +5,7 @@ import bodyParser = require("body-parser");
 import gracefulClose from "api/helpers/gracefulClose";
 import requestLogger from "api/helpers/requestLogger";
 
-import { render, validateRender } from "api/routes/render";
+import * as render from "api/routes/render";
 
 import renderer from "lib/rendererSingleton";
 
@@ -24,8 +24,8 @@ app.use(requestLogger);
 
 app
   .route("/render")
-  .get(validateRender, render)
-  .post(validateRender, render);
+  .get(render.getURLFromQuery, render.validateURL, render.render)
+  .post(render.getURLFromBody, render.validateURL, render.render);
 
 /* Error handling */
 

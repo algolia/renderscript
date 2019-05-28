@@ -8,17 +8,17 @@ interface Params {
 
 export default async ({ server, renderer }: Params) => {
   const webServerPromise = new Promise(resolve => {
-    console.info("[API] Shutting down...");
+    console.info("[API] Shutting down");
     server.close(() => {
-      console.info("[API] ...Shut down");
+      console.info("[API] Shut down");
       resolve();
     });
   });
 
   const rendererPromise = new Promise(async resolve => {
-    console.info("[Renderer] Shutting down...");
+    console.info("[Renderer] Shutting down");
     await renderer.stop();
-    console.info("[Renderer] ...Shut down");
+    console.info("[Renderer] Shut down");
   });
 
   await Promise.all([webServerPromise, rendererPromise]);

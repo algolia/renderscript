@@ -1,8 +1,8 @@
 # Base image
-FROM node:10-alpine AS base
+FROM node:10-slim AS base
 
-# Install dependencies
-RUN  --update git bash
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends git
 
 # Create tmp directory
 RUN mkdir -p /tmp/renderscript
@@ -35,36 +35,43 @@ RUN \
   yarn install --production=false && \
   yarn build && \
   yarn install --production=true && \
-  yarn cache clean
+  yarn cache clean && \
+  yarn docker:install
 
 # Resulting image
 # New, minimal image
 # This image must have the minimum amount of layers
-FROM node:10-alpine
+FROM node:10-slim
 
 ENV NODE_ENV production
 ENV IN_DOCKER true
+ENV DISPLAY :99
+
+# Install:
+# - Chromium (so that we get its dependencies)
+# - Extra needed dependencies
+# - A few fonts
+# Then remove Chromium to use puppeteer's bundled Chromium
+# Also install xfvb to run Chromium in Headful mode (necessary for extensions)
+RUN \
+  apt-get update && \
+  apt-get install -y --no-install-recommends \
+    chromium \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    fonts-ipafont-gothic \
+    fonts-wqy-zenhei \
+    fonts-thai-tlwg \
+    fonts-kacst \
+    ttf-freefont \
+    xvfb \
+    && \
+  apt-get remove -y chromium && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app/renderscript
 
 COPY --from=base /app/renderscript /app/renderscript
 
-# Git is used for version getting (last commit hash)
-# Bash is just to be able to log inside the image and have a decent shell
-# Curl can always be useful
-# The rest is Chromium and its dependencies
-RUN \
-  mkdir -p /app/renderscript && \
-  echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
-  echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
-  apk add --no-cache \
-    git@edge \
-    bash@edge \
-    curl@edge \
-    chromium@edge \
-    nss@edge \
-    freetype@edge \
-    harfbuzz@edge \
-    ttf-freefont@edge
-
-CMD [ "yarn", "start"]
+ENTRYPOINT [ "./scripts/start.sh" ]
