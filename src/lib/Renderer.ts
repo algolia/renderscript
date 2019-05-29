@@ -74,6 +74,7 @@ class Renderer {
   async stop() {
     console.info(`Browser ${this.id} stopping...`);
     await Promise.all(this._currentTasks.map(({ promise }) => promise));
+    await Promise.all(this._pageBuffer);
     const browser = await this._getBrowser();
     await browser.close();
     console.info(`Browser ${this.id} stopped`);
