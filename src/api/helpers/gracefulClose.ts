@@ -6,22 +6,35 @@ interface Params {
   renderer: RollingRenderer;
 }
 
-export default async ({ server, renderer }: Params) => {
-  const webServerPromise = new Promise(resolve => {
-    console.info("[API] Shutting down");
-    server.close(() => {
-      console.info("[API] Shut down");
+let gracefullyClosing = false;
+
+export default ({ server, renderer }: Params) => {
+  // If we receive multiple signals, swallow them
+  if (gracefullyClosing) return;
+  gracefullyClosing = true;
+
+  (async () => {
+    const rendererPromise = new Promise(async resolve => {
+      console.info("[Renderer] Shutting down");
+      await renderer.stop();
+      console.info("[Renderer] Shut down");
       resolve();
     });
-  });
 
-  const rendererPromise = new Promise(async resolve => {
-    console.info("[Renderer] Shutting down");
-    await renderer.stop();
-    console.info("[Renderer] Shut down");
-  });
+    await rendererPromise;
 
-  await Promise.all([webServerPromise, rendererPromise]);
+    const webServerPromise = new Promise(resolve => {
+      console.info("[API] Shutting down");
+      server.close(() => {
+        console.info("[API] Shut down");
+        resolve();
+      });
+    });
 
-  process.exit(0); // eslint-disable-line no-process-exit
+    await webServerPromise;
+
+    console.info("Gracefully stopped everything");
+
+    process.exit(0);
+  })();
 };

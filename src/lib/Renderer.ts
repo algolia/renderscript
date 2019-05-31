@@ -31,12 +31,17 @@ class Renderer {
   ready: boolean;
   nbTotalTasks: number;
   private _browser: puppeteer.Browser | null;
+  private _stopping: boolean;
   private _pageBuffer: Promise<{
     page: puppeteer.Page;
     context: puppeteer.BrowserContext;
   }>[];
   private _currentTasks: { id: string; promise: taskObject["promise"] }[];
-  private _extensionIds: string[];
+  private _extensionsData: {
+    [id: string]: {
+      name: string;
+    };
+  };
   private _createBrowserPromise: Promise<void> | null;
 
   constructor() {
@@ -44,12 +49,13 @@ class Renderer {
     this.ready = false;
     this.nbTotalTasks = 0;
     this._browser = null;
+    this._stopping = false;
     this._createBrowserPromise = this._createBrowser();
     this._pageBuffer = Array.from(new Array(PAGE_BUFFER_SIZE), () =>
       this._createNewPage()
     );
     this._currentTasks = [];
-    this._extensionIds = [];
+    this._extensionsData = {};
 
     Promise.all(this._pageBuffer).then(() => {
       this.ready = true;
@@ -73,11 +79,26 @@ class Renderer {
 
   async stop() {
     console.info(`Browser ${this.id} stopping...`);
+    this._stopping = true;
+    while (!this.ready) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
     await Promise.all(this._currentTasks.map(({ promise }) => promise));
     await Promise.all(this._pageBuffer);
     const browser = await this._getBrowser();
     await browser.close();
     console.info(`Browser ${this.id} stopped`);
+  }
+
+  async healthy() {
+    if (this._stopping) return false;
+    try {
+      const browser = await this._getBrowser();
+      await browser.version();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   private async _createBrowser() {
@@ -152,22 +173,22 @@ class Renderer {
     await extensionsPage.goto("chrome://extensions", {
       waitUntil: "networkidle0"
     });
-    const getExtensionIdsCode = `
+    const getExtensionsDataCode = `
       Array.from(
         document
           .querySelector("body > extensions-manager")
           .shadowRoot.querySelector("#items-list")
           .shadowRoot.querySelectorAll('extensions-item')
-      ).map(n => n.id)
+      ).reduce((res, $ext) => ({
+        [$ext.id]: {
+          name: $ext.shadowRoot.querySelector('#name').innerText.trim()
+        }
+      }), {});
     `;
     await extensionsPage.waitForFunction(
-      `(() => { try { ${getExtensionIdsCode}; return true; } catch (e) { return false; } })`
+      `(() => { try { ${getExtensionsDataCode}; return true; } catch (e) { return false; } })`
     );
-    const extensionIds: [string] = await extensionsPage.evaluate(
-      getExtensionIdsCode
-    );
-    this._extensionIds = extensionIds;
-    await extensionsPage.close();
+    this._extensionsData = await extensionsPage.evaluate(getExtensionsDataCode);
 
     const getIncognitoButtonCode = `
       document
@@ -175,37 +196,53 @@ class Renderer {
         .shadowRoot.querySelector("#viewManager > extensions-detail-view")
         .shadowRoot.querySelector("#allow-incognito")
         .shadowRoot.querySelector("#crToggle")
-        .shadowRoot.querySelector("#knob")
     `;
     await Promise.all(
-      extensionIds.map(async id => {
-        const extensionPage = await browser.newPage();
-        await extensionPage.goto(`chrome://extensions/?id=${id}`, {
-          waitUntil: "networkidle0"
-        });
-        await extensionPage.waitForFunction(
-          `(() => { try { ${getIncognitoButtonCode}; return true; } catch (e) { return false; } })`
-        );
-        await extensionPage.evaluate(`${getIncognitoButtonCode}.click()`);
-        await extensionPage.close();
+      Object.keys(this._extensionsData).map(async id => {
+        // Do this in a loop because sometimes Chrome doesn't correctly save the incognito status
+        while (true) {
+          const extensionPage = await browser.newPage();
+          await extensionPage.goto(`chrome://extensions/?id=${id}`, {
+            waitUntil: "networkidle0"
+          });
+          await extensionPage.waitForFunction(
+            `(() => { try { ${getIncognitoButtonCode}; return true; } catch (e) { return false; } })`
+          );
+
+          const toggled = await extensionPage.evaluate(
+            `${getIncognitoButtonCode}.attributes['aria-pressed'].value === 'true'`
+          );
+          if (toggled) break;
+
+          await extensionPage.evaluate(`${getIncognitoButtonCode}.click()`);
+          // Wait a bit to leave time for the setting to be saved
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          await extensionPage.close();
+        }
       })
     );
+
+    await extensionsPage.close();
   }
 
   private async _createNewPage() {
     const browser = await this._getBrowser();
     const context = await browser.createIncognitoBrowserContext();
     const pagePromise = context.newPage();
+
     // This is hacky, but we need to run the background process for uBlock manually
     // See https://github.com/GoogleChrome/puppeteer/issues/4479
-    const extensionsPromise = Promise.all(
-      this._extensionIds.map(async extensionId => {
-        const extensionPage = await context.newPage();
-        const extensionUrl = `chrome-extension://${extensionId}/background.html`;
-        extensionPage.goto(extensionUrl);
-      })
-    );
-    const [page] = await Promise.all([pagePromise, extensionsPromise]);
+    const ublockPromise = (async () => {
+      const extensionId = Object.keys(this._extensionsData).find(
+        id => this._extensionsData[id].name === "uBlock Origin"
+      );
+      const extensionUrl = `chrome-extension://${extensionId}/background.html`;
+      const extensionPage = await context.newPage();
+      await extensionPage.goto(extensionUrl);
+    })();
+
+    const [page] = await Promise.all([pagePromise, ublockPromise]);
     await page.setUserAgent("Algolia Crawler Renderscript");
     return { page, context };
   }

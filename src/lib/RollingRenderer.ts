@@ -55,9 +55,18 @@ class RollingRenderer {
     await this._currentRenderer.stop();
   }
 
+  get ready() {
+    return this.renderer.ready;
+  }
+
+  async healthy() {
+    return await this.renderer.healthy();
+  }
+
   private _stopCurrentRenderer() {
-    this._previousStopPromise = this._currentRenderer.stop();
-    this._previousStopPromise = null;
+    this._previousStopPromise = this._currentRenderer.stop().then(() => {
+      this._previousStopPromise = null;
+    });
   }
 }
 

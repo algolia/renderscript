@@ -1,11 +1,13 @@
-import http = require("http");
+import * as http from "http";
 import * as express from "express";
-import bodyParser = require("body-parser");
+import * as bodyParser from "body-parser";
 
 import gracefulClose from "api/helpers/gracefulClose";
 import requestLogger from "api/helpers/requestLogger";
 
 import * as render from "api/routes/render";
+import ready from "api/routes/ready";
+import healthy from "api/routes/healthy";
 
 import renderer from "lib/rendererSingleton";
 
@@ -23,23 +25,26 @@ app.use(requestLogger);
 /* Routes setup */
 
 app
-  .route("/render")
-  .get(render.getURLFromQuery, render.validateURL, render.render)
-  .post(render.getURLFromBody, render.validateURL, render.render);
+  .get("/ready", ready)
+  .get("/healthy", healthy)
+  .get("/render", render.getURLFromQuery, render.validateURL, render.render)
+  .post("/render", render.getURLFromBody, render.validateURL, render.render);
 
 /* Error handling */
 
 // Uncaught Promise Rejection
-process.on("unhandledRejection", reason => {
+process.on("unhandledRejection", async reason => {
+  console.error("Unhandled rejection");
   console.error(reason);
+
   process.exit(1);
 });
 
 // Handle SIGINT
 const gracefulCloseParams = { server, renderer };
 const boundGracefulClose = gracefulClose.bind(null, gracefulCloseParams);
-process.once("SIGINT", boundGracefulClose);
-process.once("SIGTERM", boundGracefulClose);
+process.on("SIGINT", boundGracefulClose);
+process.on("SIGTERM", boundGracefulClose);
 
 /* Run the server */
 
