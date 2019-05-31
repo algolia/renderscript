@@ -1,14 +1,18 @@
 #! /bin/sh
 
-set -e
-
 cleanup() {
+  echo "start.sh: Gracefully exiting"
+
   # Kill the API first, then XVFB
   kill -TERM $api_pid
   wait $api_pid >/dev/null || true
 
+  echo "start.sh: Gracefully exited node process"
+
   kill -TERM $xvfb_pid
   wait $xvfb_pid >/dev/null || true
+
+  echo "start.sh: Gracefully exited xfvb"
 }
 
 trap cleanup INT
@@ -21,9 +25,5 @@ xvfb_pid=$!
 DISPLAY="$DISPLAY" node dist/api/index.js &
 api_pid=$!
 
-# Endless until killed
-while true; do
-  sleep 1
-  # Allows to catch signals before sleep has completed
-  wait $!
-done
+wait $api_pid
+wait $xvfb_pid
