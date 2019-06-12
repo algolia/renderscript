@@ -2,14 +2,16 @@
   "name": "@algolia/renderscript",
   "version": "1.0.0",
   "description": "A custom JavaScript rendering engine based on puppeteer",
-  "main": "dist/api/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "yarn clean && ttsc",
     "clean": "rm -rf dist/",
     "dev": "nodemon",
-    "dev:run": "yarn build && node dist/api/index.js",
+    "dev:run": "yarn build && NODE_ENV=development node dist/index.js",
     "docker:install": "node dist/lib/install.js",
-    "release": "docker build -t algolia/renderscript . && docker push algolia/renderscript"
+    "docker:build": "./scripts/build.sh",
+    "docker:release": "docker push algolia/renderscript",
+    "release": "yarn docker:build && yarn docker:release"
   },
   "repository": {
     "type": "git",
@@ -36,6 +38,7 @@
     "@types/uuid": "^3.4.4",
     "@types/yauzl-promise": "^2.1.0",
     "concurrently": "^4.1.0",
+    "dotenv-safe": "^6.1.0",
     "nodemon": "^1.19.0",
     "prettier": "^1.17.1",
     "tslint": "^5.16.0",
@@ -44,6 +47,7 @@
     "typescript-transform-paths": "^1.1.2"
   },
   "dependencies": {
+    "ad-block": "^4.1.7",
     "body-parser": "^1.19.0",
     "express": "^4.17.0",
     "node-fetch": "^2.6.0",

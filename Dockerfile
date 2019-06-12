@@ -1,8 +1,14 @@
 # Base image
 FROM node:10-slim AS base
 
+# Install git
+# Others are dependencies of our gyp dependencies
 RUN apt-get update && \
-  apt-get install -y --no-install-recommends git
+  apt-get install -y --no-install-recommends \
+    g++ \
+    git \
+    make \
+    python
 
 # Create tmp directory
 RUN mkdir -p /tmp/renderscript
@@ -13,10 +19,10 @@ WORKDIR /tmp/renderscript
 # Useful if you want to deploy from a branch without needing to commit
 RUN \
   if [ -n "$(git status --porcelain)" ]; then \
-  git config --global user.email "docker@renderscript.algolia.com" && \
-  git config --global user.name "Renderscript Dockerfile" && \
-  git add -A . && \
-  git commit -a -m "dockerfile-temp-commit"; \
+    git config --global user.email "docker@renderscript.algolia.com" && \
+    git config --global user.name "Renderscript Dockerfile" && \
+    git add -A . && \
+    git commit -a -m "dockerfile-temp-commit"; \
   fi
 
 # Use git to only get what's not gitignored in /app/renderscript
@@ -35,8 +41,16 @@ RUN \
   yarn install --production=false && \
   yarn build && \
   yarn install --production=true && \
-  yarn cache clean && \
-  yarn docker:install
+  yarn cache clean
+
+# Pre-install some extensions and block lists
+ARG extensions_cache
+ARG adblock_lists_cache
+
+ENV EXTENSIONS=$extensions_cache
+ENV ADBLOCK_LISTS=$adblock_lists_cache
+
+RUN yarn docker:install
 
 # Resulting image
 # New, minimal image
@@ -52,9 +66,9 @@ ENV IN_DOCKER true
 # - A few fonts
 # Then remove Chromium to use puppeteer's bundled Chromium
 # Also install xfvb to run Chromium in Headful mode (necessary for extensions)
-RUN \
-  apt-get update && \
-  apt-get install -y --no-install-recommends \
+RUN true \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends \
     chromium \
     libatk-bridge2.0-0 \
     libgtk-3-0 \
@@ -64,13 +78,22 @@ RUN \
     fonts-kacst \
     ttf-freefont \
     xvfb \
-    && \
-  apt-get remove -y chromium && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
+  && apt-get remove -y chromium \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* \
+  && true
 
 WORKDIR /app/renderscript
 
 COPY --from=base /app/renderscript /app/renderscript
 
-ENTRYPOINT [ "./scripts/start.sh" ]
+RUN true \
+  && groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
+  && mkdir -p /home/pptruser/ \
+  && chown -R pptruser:pptruser /home/pptruser \
+  && chown -R pptruser:pptruser /app/renderscript \
+  && true
+
+USER pptruser
+
+CMD [ "node", "dist/index.js" ]

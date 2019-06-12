@@ -2,52 +2,50 @@ import * as http from "http";
 import * as express from "express";
 import * as bodyParser from "body-parser";
 
-import gracefulClose from "api/helpers/gracefulClose";
 import requestLogger from "api/helpers/requestLogger";
 
 import * as render from "api/routes/render";
 import ready from "api/routes/ready";
 import healthy from "api/routes/healthy";
 
-import renderer from "lib/rendererSingleton";
+export default class Api {
+  server: http.Server;
+  private _app: express.Express;
 
-const PORT = process.env.PORT || 3000;
+  constructor() {
+    this._app = express();
+    this.server = http.createServer(this._app);
+  }
 
-const app = express();
-const server = http.createServer(app);
+  start(port: number) {
+    this._setup();
+    this._routes();
 
-/* App setup */
+    this.server.listen(port, () => {
+      console.info(`Server started on port ${port}`);
+    });
+  }
 
-app.disable("x-powered-by");
-app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
-app.use(requestLogger);
+  async stop(cb: () => any) {
+    this.server.close(cb);
+  }
 
-/* Routes setup */
+  private _setup() {
+    this._app.disable("x-powered-by");
+    this._app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
+    this._app.use(requestLogger);
+  }
 
-app
-  .get("/ready", ready)
-  .get("/healthy", healthy)
-  .get("/render", render.getURLFromQuery, render.validateURL, render.render)
-  .post("/render", render.getURLFromBody, render.validateURL, render.render);
-
-/* Error handling */
-
-// Uncaught Promise Rejection
-process.on("unhandledRejection", async reason => {
-  console.error("Unhandled rejection");
-  console.error(reason);
-
-  process.exit(1);
-});
-
-// Handle SIGINT
-const gracefulCloseParams = { server, renderer };
-const boundGracefulClose = gracefulClose.bind(null, gracefulCloseParams);
-process.on("SIGINT", boundGracefulClose);
-process.on("SIGTERM", boundGracefulClose);
-
-/* Run the server */
-
-server.listen(PORT, () => {
-  console.info(`Server started on port ${PORT}`);
-});
+  private _routes() {
+    this._app
+      .get("/ready", ready)
+      .get("/healthy", healthy)
+      .get("/render", render.getURLFromQuery, render.validateURL, render.render)
+      .post(
+        "/render",
+        render.getURLFromBody,
+        render.validateURL,
+        render.render
+      );
+  }
+}

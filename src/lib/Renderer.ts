@@ -1,9 +1,13 @@
+import * as path from "path";
+
 import * as puppeteer from "puppeteer-core";
 import * as uuid from "uuid/v4";
 
 import injectBaseHref from "lib/helpers/injectBaseHref";
 import getChromiumExecutablePath from "lib/helpers/getChromiumExecutablePath";
 import getExtensionPath, { EXTENSIONS } from "lib/helpers/getExtensionPath";
+
+import adBlocker from "lib/adBlockerSingleton";
 
 const WIDTH = 1280;
 const HEIGHT = 1024;
@@ -64,10 +68,13 @@ class Renderer {
   }
 
   async task(job: taskParams) {
+    if (this._stopping) {
+      throw new Error("Called task on a stopping Renderer");
+    }
     ++this.nbTotalTasks;
 
     const id = uuid();
-    const promise = this._processPage(job);
+    const promise = this._processPage(job, id);
     this._addTask({ id, promise });
 
     const res = await promise;
@@ -78,8 +85,8 @@ class Renderer {
   }
 
   async stop() {
-    console.info(`Browser ${this.id} stopping...`);
     this._stopping = true;
+    console.info(`Browser ${this.id} stopping...`);
     while (!this.ready) {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
@@ -102,10 +109,22 @@ class Renderer {
   }
 
   private async _createBrowser() {
+    console.info(`Browser ${this.id} creating...`);
+
     const extensions = await Promise.all(EXTENSIONS.map(getExtensionPath));
+
+    // Call this before launching the browser,
+    // otherwise the launch call might timeout
+    await adBlocker.waitForReadyness();
+
+    const env: { [s: string]: string } = {};
+    if (process.env.DISPLAY) {
+      env.DISPLAY = process.env.DISPLAY;
+    }
+
     const browser = await puppeteer.launch({
-      headless: false,
-      env: { DISPLAY: process.env.DISPLAY || "" },
+      headless: extensions.length === 0,
+      env,
       executablePath: await getChromiumExecutablePath(),
       defaultViewport: {
         width: 1920,
@@ -113,10 +132,10 @@ class Renderer {
       },
       handleSIGINT: false,
       handleSIGTERM: false,
+      pipe: true,
       args: [
-        // Couldn't find a way to keep the sandbox inside Docker
+        // Disable sandboxing when not available
         "--no-sandbox",
-        "--disable-setuid-sandbox",
         // No GPU available inside Docker
         "--disable-gpu",
         // Seems like a powerful hack, not sure why
@@ -138,12 +157,20 @@ class Renderer {
         // See https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#tips
         "--disable-dev-shm-usage",
         // Extensions
-        `--disable-extensions-except=${extensions.join(",")}`,
-        ...extensions.map(e => `--load-extension=${e}`)
+        ...(extensions.length === 0
+          ? []
+          : [
+              `--disable-extensions-except=${extensions.join(",")}`,
+              ...extensions.map(e => `--load-extension=${e}`)
+            ])
       ].filter(e => e !== "")
     });
 
     await this._activateIncognitoExtensions({ browser, extensions });
+
+    // Try to load a test page first
+    const testPage = await browser.newPage();
+    await testPage.goto("about://settings", { waitUntil: "networkidle0" });
 
     this._browser = browser;
     this._createBrowserPromise = null;
@@ -227,42 +254,35 @@ class Renderer {
   }
 
   private async _createNewPage() {
+    if (this._stopping) {
+      throw new Error("Called _createNewPage on a stopping Renderer");
+    }
+
     const browser = await this._getBrowser();
     const context = await browser.createIncognitoBrowserContext();
-    const pagePromise = context.newPage();
+    const page = await context.newPage();
 
-    // This is hacky, but we need to run the background process for uBlock manually
-    // See https://github.com/GoogleChrome/puppeteer/issues/4479
-    const ublockPromise = (async () => {
-      const extensionId = Object.keys(this._extensionsData).find(
-        id => this._extensionsData[id].name === "uBlock Origin"
-      );
-      const extensionUrl = `chrome-extension://${extensionId}/background.html`;
-      const extensionPage = await context.newPage();
-      await extensionPage.goto(extensionUrl);
-    })();
-
-    const [page] = await Promise.all([pagePromise, ublockPromise]);
     await page.setUserAgent("Algolia Crawler Renderscript");
-    return { page, context };
-  }
-
-  private async _newPage() {
-    this._pageBuffer.push(this._createNewPage());
-    return await this._pageBuffer.shift()!;
-  }
-
-  private async _processPage({ url }: taskParams) {
-    /* Setup */
-    const { context, page } = await this._newPage();
-
-    await page.setViewport({ width: 1920, height: 1080 });
+    await page.setCacheEnabled(false);
+    await page.setViewport({ width: WIDTH, height: HEIGHT });
 
     /* Ignore useless resources */
     await page.setRequestInterception(true);
     page.on("request", async req => {
       try {
+        // Ignore some type of resources
         if (IGNORED_RESOURCES.includes(req.resourceType())) {
+          await req.abort();
+          return;
+        }
+        // Use AdBlocker to ignore more resources
+        if (
+          await adBlocker.test(
+            req.url(),
+            req.resourceType(),
+            new URL(page.url()).host
+          )
+        ) {
           await req.abort();
           return;
         }
@@ -274,6 +294,18 @@ class Renderer {
       }
     });
 
+    return { page, context };
+  }
+
+  private async _newPage() {
+    this._pageBuffer.push(this._createNewPage());
+    return await this._pageBuffer.shift()!;
+  }
+
+  private async _processPage({ url }: taskParams, taskId: string) {
+    /* Setup */
+    const { context, page } = await this._newPage();
+
     let response: puppeteer.Response | null = null;
     page.addListener("response", (r: puppeteer.Response) => {
       if (!response) response = r;
@@ -284,7 +316,7 @@ class Renderer {
         waitUntil: "networkidle0"
       });
     } catch (e) {
-      console.error(e);
+      console.error("Caught error when loading page", e);
     }
 
     /* Fetch errors */
@@ -310,10 +342,10 @@ class Renderer {
   }
 
   private _removeTask({ id }: Pick<taskObject, "id">) {
-    this._currentTasks.splice(
-      this._currentTasks.findIndex(({ id: _id }) => id === id),
-      1
-    );
+    const idx = this._currentTasks.findIndex(({ id: _id }) => id === _id);
+    // Should never happen
+    if (idx === -1) throw new Error("Could not find task");
+    this._currentTasks.splice(idx, 1);
   }
 }
 

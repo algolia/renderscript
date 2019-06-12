@@ -1,20 +1,24 @@
 import { promises as fs } from "fs";
 import * as path from "path";
+
 import fetch from "node-fetch";
 import * as yauzl from "yauzl-promise";
 import * as streamToString from "stream-to-string";
 
-import projectRoot from "projectRoot";
+import projectRoot from "helpers/projectRoot";
 
-const EXTENSION_SOURCES: { [s: string]: string } = {
-  "ublock@1.19.6":
-    "https://github.com/gorhill/uBlock/releases/download/1.19.6/uBlock0_1.19.6.chromium.zip"
-};
+const EXTENSION_SOURCES: string[] = process.env.EXTENSIONS
+  ? process.env.EXTENSIONS.split(",").map(src => decodeURIComponent(src.trim()))
+  : [];
+const EXTENSION_SOURCES_MAP: { [s: string]: string } = EXTENSION_SOURCES.reduce(
+  (res, src) => ({ ...res, [path.basename(src, ".zip")]: src }),
+  {}
+);
 
-export const EXTENSIONS = Object.keys(EXTENSION_SOURCES);
+export const EXTENSIONS = Object.keys(EXTENSION_SOURCES_MAP);
 
-export default async (name: string) => {
-  const modulesPath = path.resolve(projectRoot, "node_modules", ".extensions");
+export default async function getExtensionPath(name: string) {
+  const modulesPath = path.resolve(projectRoot, "vendors", "extensions");
   await fs.mkdir(modulesPath).catch(() => {});
   const dirPath = path.resolve(modulesPath, name);
   try {
@@ -24,7 +28,7 @@ export default async (name: string) => {
     return dirPath;
   } catch (e) {
     console.info(`Downloading extension ${name}...`);
-    const res = await fetch(EXTENSION_SOURCES[name]);
+    const res = await fetch(EXTENSION_SOURCES_MAP[name]);
     const buffer = Buffer.from(await res.arrayBuffer());
 
     // Unzip extension
@@ -52,4 +56,4 @@ export default async (name: string) => {
     console.info(`Downloaded extension ${name}`);
     return dirPath;
   }
-};
+}
