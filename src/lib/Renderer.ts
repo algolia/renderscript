@@ -13,7 +13,7 @@ const WIDTH = 1280;
 const HEIGHT = 1024;
 const IGNORED_RESOURCES = ["font", "image"];
 const PAGE_BUFFER_SIZE = 2;
-const TIMEOUT = 20000;
+const TIMEOUT = 10000;
 
 export interface taskParams {
   url: URL;
