@@ -96,4 +96,4 @@ RUN true \
 
 USER pptruser
 
-CMD [ "node", "dist/index.js" ]
+CMD [ "node", "--max-old-space-size=128", "dist/index.js" ]
