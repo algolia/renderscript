@@ -1,6 +1,6 @@
 import Renderer, { taskParams } from "lib/Renderer";
 
-const MAX_RENDERER_TASKS = 10;
+const MAX_RENDERER_TASKS = 256;
 
 class RollingRenderer {
   private _stopping: boolean;
