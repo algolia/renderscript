@@ -6,7 +6,21 @@ If you'd like to use it, you most likely should check out [`GoogleChrome/rendert
 
 # Renderscript
 
-> An API to render a page inside a real Chromium (with JavaScript enabled) and return the HTML.
+> An API to render a page inside a real Chromium (with JavaScript enabled) and send back the raw HTML.
+
+This project is heavily inspired by Google's [`rendertron`](https://github.com/GoogleChrome/rendertron) project.
+The aim is to make a more reliable and more flexible version for long-term use.
+
+* **Security**:
+  * Leverages `puppeteer`'s [`createIncognitoBrowserContext`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#browsercreateincognitobrowsercontext) to isolate each page and prevent cookie sharing.
+* **Performance**:
+  * Tries to disable as many useless features as possible
+  * Ignores useless resources for rendering HTML (e.g. `images`)
+  * Has adblocking support backed in (thanks to Brave's [`ad-block`](https://github.com/brave/ad-block)) for huge resource consumption gains
+* **Features**:
+  * Allows for extension injection (*discouraged* - this requires running the browser in headful mode, which consumes way more resources)
+* **Misc**:
+  * Bundles an optimized `Dockerfile` for easy deployment
 
 ## API
 
@@ -37,6 +51,7 @@ Returns `text/html`.
 Simply run:
 ```sh
 docker run -p 23000:3000 algolia/renderscript
+open http://localhost:3000/render?url=https%3A%2F%2Fwww.algolia.com
 ```
 
 ### Parameters
@@ -50,5 +65,5 @@ See `.env.prod` to see which ones are installed by default (they still need to b
 
 ## Credits
 
-This project is functionally a clone (and heavily inspired) of [`GoogleChrome/rendertron`](https://github.com/GoogleChrome/rendertron).
+This project is heavily inspired by [`GoogleChrome/rendertron`](https://github.com/GoogleChrome/rendertron).
 It is based on [`puppeteer-core`](https://github.com/GoogleChrome/puppeteer).
