@@ -1,5 +1,5 @@
 import * as express from "express";
-import renderer from "lib/rendererSingleton";
+import isReady from 'lib/helpers/isReady';
 
 export async function isReady() {
   return await renderer.ready;
