@@ -20,10 +20,11 @@ export interface taskParams {
 }
 
 export interface taskResult {
-  statusCode: number;
+  statusCode?: number;
   body?: string;
   headers?: { [s: string]: string };
   timeout?: boolean;
+  error?: string;
 }
 
 interface taskObject {
@@ -326,7 +327,7 @@ class Renderer {
     }
 
     /* Fetch errors */
-    if (!response) return { statusCode: 400 };
+    if (!response) return { error: 'no_response' };
 
     /* Transforming */
     let statusCode = response.status();

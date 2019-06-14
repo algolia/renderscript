@@ -50,22 +50,32 @@ export async function render(
   next: express.NextFunction
 ) {
   const { url } = res.locals;
-  const { statusCode, headers, body } = await renderer.task({ url });
-  res
-    .status(statusCode)
-    .header("Content-Type", "text/html")
-    // Only whitelist loading styles resources when testing
-    // (will not change programmatic use of this system)
-    .header(
-      "Content-Security-Policy",
-      [
-        "default-src 'none'",
-        "style-src * 'unsafe-inline'",
-        "img-src * data:",
-        "font-src *"
-      ].join("; ")
-    )
-    .send(body);
+  try {
+    const { error, statusCode, body } = await renderer.task({ url });
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+    res
+      .status(statusCode!)
+      .header("Content-Type", "text/html")
+      // Only whitelist loading styles resources when testing
+      // (will not change programmatic use of this system)
+      .header(
+        "Content-Security-Policy",
+        [
+          "default-src 'none'",
+          "style-src * 'unsafe-inline'",
+          "img-src * data:",
+          "font-src *"
+        ].join("; ")
+      )
+      .send(body);
+  } catch (e) {
+    res.status(500).json({
+      error: e.message
+    });
+  }
 }
 
 export async function renderJSON(
@@ -75,7 +85,11 @@ export async function renderJSON(
 ) {
   const { url } = res.locals;
   try {
-    const { statusCode, headers, body, timeout } = await renderer.task({ url });
+    const { error, statusCode, headers, body, timeout } = await renderer.task({ url });
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
     res.status(200).json({
       statusCode,
       headers,
