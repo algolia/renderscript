@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as http from "http";
 import * as express from "express";
 import * as bodyParser from "body-parser";
@@ -7,6 +8,8 @@ import requestLogger from "api/helpers/requestLogger";
 import * as render from "api/routes/render";
 import ready from "api/routes/ready";
 import healthy from "api/routes/healthy";
+
+import projectRoot from 'helpers/projectRoot';
 
 export default class Api {
   server: http.Server;
@@ -47,5 +50,7 @@ export default class Api {
         render.validateURL,
         render.renderJSON
       );
+
+    this._app.use(express.static(path.join(projectRoot, '/public')));
   }
 }
