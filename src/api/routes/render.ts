@@ -50,7 +50,7 @@ export async function render(
   next: express.NextFunction
 ) {
   const { url } = res.locals;
-  const { statusCode, headers, content } = await renderer.task({ url });
+  const { statusCode, headers, body } = await renderer.task({ url });
   res
     .status(statusCode)
     .header("Content-Type", "text/html")
@@ -65,7 +65,7 @@ export async function render(
         "font-src *"
       ].join("; ")
     )
-    .send(content);
+    .send(body);
 }
 
 export async function renderJSON(
@@ -75,11 +75,11 @@ export async function renderJSON(
 ) {
   const { url } = res.locals;
   try {
-    const { statusCode, headers, content } = await renderer.task({ url });
+    const { statusCode, headers, body } = await renderer.task({ url });
     res.status(200).json({
       statusCode,
       headers,
-      content
+      body
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

@@ -35,7 +35,7 @@ Body parameters:
 Returns `application/json`:
 - `statusCode <number>`: HTTP Status Code
 - `headers <{ [key: string]: string }>`: Page headers (keys are lowercase)
-- `content <string>`: Page raw HTML content
+- `body <string>`: Page raw HTML content
 
 > GET `/render`
 

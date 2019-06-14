@@ -21,7 +21,7 @@ export interface taskParams {
 
 export interface taskResult {
   statusCode: number;
-  content?: string;
+  body?: string;
   headers?: { [s: string]: string };
 }
 
@@ -328,13 +328,13 @@ class Renderer {
     await page.evaluate(injectBaseHref, baseHref);
 
     /* Serialize */
-    const content = await page.evaluate("document.firstElementChild.outerHTML");
+    const body = await page.evaluate("document.firstElementChild.outerHTML");
     const headers = response.headers();
 
     /* Cleanup */
     await context.close();
 
-    return { statusCode, headers, content };
+    return { statusCode, headers, body };
   }
 
   private _addTask({ id, promise }: taskObject) {
