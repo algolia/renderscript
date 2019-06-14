@@ -75,11 +75,12 @@ export async function renderJSON(
 ) {
   const { url } = res.locals;
   try {
-    const { statusCode, headers, body } = await renderer.task({ url });
+    const { statusCode, headers, body, timeout } = await renderer.task({ url });
     res.status(200).json({
       statusCode,
       headers,
-      body
+      body,
+      timeout
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

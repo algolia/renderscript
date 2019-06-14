@@ -23,6 +23,7 @@ export interface taskResult {
   statusCode: number;
   body?: string;
   headers?: { [s: string]: string };
+  timeout?: boolean;
 }
 
 interface taskObject {
@@ -307,6 +308,7 @@ class Renderer {
     const { context, page } = await this._newPage();
 
     let response: puppeteer.Response | null = null;
+    let timeout = false;
     page.addListener("response", (r: puppeteer.Response) => {
       if (!response) response = r;
     });
@@ -316,7 +318,11 @@ class Renderer {
         waitUntil: "networkidle0"
       });
     } catch (e) {
-      console.error("Caught error when loading page", e);
+      if (e.message.match(/Navigation Timeout Exceeded/)) {
+        timeout = true;
+      } else {
+        console.error("Caught error when loading page", e);
+      }
     }
 
     /* Fetch errors */
@@ -334,7 +340,7 @@ class Renderer {
     /* Cleanup */
     await context.close();
 
-    return { statusCode, headers, body };
+    return { statusCode, headers, body, timeout };
   }
 
   private _addTask({ id, promise }: taskObject) {
