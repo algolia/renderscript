@@ -14,9 +14,10 @@ The aim is to make a more reliable and more flexible version for long-term use.
 * **Security**:
   * Leverages `puppeteer`'s [`createIncognitoBrowserContext`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#browsercreateincognitobrowsercontext) to isolate each page and prevent cookie sharing.
 * **Performance**:
-  * Tries to disable as many useless features as possible
   * Ignores useless resources for rendering HTML (e.g. `images`)
   * Has adblocking support backed in (thanks to Brave's [`ad-block`](https://github.com/brave/ad-block)) for huge resource consumption gains
+* **Resilience**:
+  * Has a rolling system to spawn a new Chrome after a specific amount of pages processed to lower RAM usage
 * **Features**:
   * Allows for extension injection (*discouraged* - this requires running the browser in headful mode, which consumes way more resources)
 * **Misc**:
@@ -58,9 +59,9 @@ open http://localhost:3000/render?url=https%3A%2F%2Fwww.algolia.com
 
 See `.env.prod` to see which ones are installed by default (they still need to be provided to `docker run` to be enabled).
 
-- `ADBLOCK_LISTS`: Comma separated list of adblocking lists download link
+- `ADBLOCK_LISTS`: Comma separated list of adblocking lists download link  
   Example: `https://easylist.to/easylist/easylist.txt`
-- `EXTENSIONS`: Comma separated list of extensions download link (expects a `.zip` file).
+- `EXTENSIONS`: Comma separated list of extensions download link (expects a `.zip` file)  
   Example: `https://github.com/gorhill/uBlock/releases/download/1.19.6/uBlock0_1.19.6.chromium.zip`
 
 ## Credits
