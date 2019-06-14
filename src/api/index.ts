@@ -45,7 +45,7 @@ export default class Api {
         "/render",
         render.getURLFromBody,
         render.validateURL,
-        render.render
+        render.renderJSON
       );
   }
 }

@@ -26,7 +26,7 @@ export function getURLFromBody(
     badRequest({ res, message: "Missing URL in body" });
     return;
   }
-  res.locals.url = req.body.url;
+  res.locals.url = new URL(req.body.url);
   next();
 }
 
@@ -74,10 +74,15 @@ export async function renderJSON(
   next: express.NextFunction
 ) {
   const { url } = res.locals;
-  const { statusCode, headers, content } = await renderer.task({ url });
-  res.status(200).json({
-    statusCode,
-    headers,
-    content
-  });
+  try {
+    const { statusCode, headers, content } = await renderer.task({ url });
+    res.status(200).json({
+      statusCode,
+      headers,
+      content
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    return;
+  }
 }
