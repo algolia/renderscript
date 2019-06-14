@@ -5,6 +5,8 @@ import getAdblockListPath, {
   ADBLOCK_LISTS
 } from "lib/helpers/getAdBlockListPath";
 
+const CHUNK_SIZE = 1000;
+
 export default class AdBlocker {
   private _client: AdBlockClient;
   private _initPromise: Promise<void> | null;
@@ -34,7 +36,16 @@ export default class AdBlocker {
     );
     if (filterLists.length > 0) {
       console.info("Parsing blocker lists...");
-      filterLists.map(list => this._client.parse(list));
+      for (let listAsStr of filterLists) {
+        // Split into chunks to not block the main thread too much
+        const listAsArr = listAsStr.split('\n');
+        for (let i = 0; i < listAsArr.length; i += CHUNK_SIZE) {
+          const chunk = listAsArr.slice(i, i + CHUNK_SIZE);
+          this._client.parse(chunk.join('\n'));
+          // Give back to main thread
+          await new Promise(resolve => setTimeout(resolve, 0));
+        }
+      }
       console.info("Parsed blocker lists");
     }
     this._initPromise = null;
