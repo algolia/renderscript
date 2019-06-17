@@ -2,6 +2,7 @@ import * as express from "express";
 import renderer from "lib/rendererSingleton";
 
 import { badRequest } from "api/helpers/errors";
+import buildUrl from 'api/helpers/buildUrl';
 
 export function getURLFromQuery(
   req: express.Request,
@@ -13,7 +14,12 @@ export function getURLFromQuery(
     badRequest({ res, message: "Missing URL in query params" });
     return;
   }
-  res.locals.url = new URL(decodeURIComponent(req.query.url));
+  try {
+    res.locals.url = buildUrl(decodeURIComponent(req.query.url));
+  } catch (e) {
+    res.status(400).json({ error: 'invalid_url' });
+    return;
+  }
   next();
 }
 
@@ -26,7 +32,12 @@ export function getURLFromBody(
     badRequest({ res, message: "Missing URL in body" });
     return;
   }
-  res.locals.url = new URL(req.body.url);
+  try {
+    res.locals.url = buildUrl(req.body.url);
+  } catch (e) {
+    res.status(400).json({ error: 'invalid_url' });
+    return;
+  }
   next();
 }
 
