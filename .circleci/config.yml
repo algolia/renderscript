@@ -20,6 +20,8 @@ defaults: &defaults
   environment:
     NODE_ENV: 'test'
 
+version: 2
+
 jobs:
   checkout:
     docker:
