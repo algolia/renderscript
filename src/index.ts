@@ -17,7 +17,7 @@ process.on("unhandledRejection", async reason => {
   console.error("Unhandled rejection");
   console.error(reason);
 
-  process.exit(1);
+  // process.exit(1);
 });
 
 // Handle SIGINT
