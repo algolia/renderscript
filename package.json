@@ -47,7 +47,7 @@
     "semantic-release": "15.13.18",
     "tslint": "5.18.0",
     "ttypescript": "1.5.7",
-    "typescript": "3.5.2",
+    "typescript": "3.5.3",
     "typescript-transform-paths": "1.1.4"
   },
   "dependencies": {
