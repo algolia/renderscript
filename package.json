@@ -48,7 +48,7 @@
     "tslint": "5.18.0",
     "ttypescript": "1.5.7",
     "typescript": "3.5.3",
-    "typescript-transform-paths": "1.1.6"
+    "typescript-transform-paths": "1.1.8"
   },
   "dependencies": {
     "ad-block": "4.1.7",
