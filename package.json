@@ -44,7 +44,7 @@
     "dotenv-safe": "6.1.0",
     "nodemon": "1.19.1",
     "prettier": "1.18.2",
-    "semantic-release": "15.13.21",
+    "semantic-release": "15.13.24",
     "tslint": "5.18.0",
     "ttypescript": "1.5.7",
     "typescript": "3.5.3",
