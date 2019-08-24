@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/algolia/renderscript/compare/v1.0.3...v1.0.4) (2019-08-24)
+
+
+### Bug Fixes
+
+* **deps:** update dependency uuid to v3.3.3 ([56b7989](https://github.com/algolia/renderscript/commit/56b7989))
+
 ## [1.0.3](https://github.com/algolia/renderscript/compare/v1.0.2...v1.0.3) (2019-07-27)
 
 
