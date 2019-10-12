@@ -40,7 +40,7 @@
     "@types/puppeteer-core": "1.9.0",
     "@types/uuid": "3.4.5",
     "@types/yauzl-promise": "2.1.0",
-    "concurrently": "4.1.2",
+    "concurrently": "5.0.0",
     "dotenv-safe": "8.1.0",
     "nodemon": "1.19.3",
     "prettier": "1.18.2",
