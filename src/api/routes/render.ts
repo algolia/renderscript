@@ -96,9 +96,13 @@ export async function renderJSON(
 ) {
   const { url } = res.locals;
   try {
-    const { error, statusCode, headers, body, timeout } = await renderer.task({ url });
+    const { error, statusCode, headers, body, timeout, resolvedUrl } = await renderer.task({ url });
     if (error) {
       res.status(400).json({ error });
+      return;
+    }
+    if (resolvedUrl !== url.href) {
+      res.status(307).header('Location', resolvedUrl).send();
       return;
     }
     res.status(200).json({

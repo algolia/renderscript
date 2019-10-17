@@ -335,13 +335,19 @@ class Renderer {
     await page.evaluate(injectBaseHref, baseHref);
 
     /* Serialize */
+    let preSerializationUrl = page.url();
     const body = await page.evaluate("document.firstElementChild.outerHTML");
     const headers = response.headers();
-
+    const resolvedUrl = page.url();
     /* Cleanup */
     await context.close();
 
-    return { statusCode, headers, body, timeout };
+    if (preSerializationUrl !== resolvedUrl) {
+      // something super shady happened where the page url changed during evaluation
+      return { error: 'unsafe_redirect' };
+    }
+
+    return { statusCode, headers, body, timeout, resolvedUrl };
   }
 
   private _addTask({ id, promise }: taskObject) {
