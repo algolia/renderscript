@@ -335,6 +335,7 @@ class Renderer {
     await page.evaluate(injectBaseHref, baseHref);
 
     /* Serialize */
+    await page.evaluate( () => { debugger; } );
     let preSerializationUrl = page.url();
     const body = await page.evaluate("document.firstElementChild.outerHTML");
     const headers = response.headers();
