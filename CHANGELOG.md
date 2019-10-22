@@ -1,3 +1,12 @@
+# [1.1.0](https://github.com/algolia/renderscript/compare/v1.0.5...v1.1.0) (2019-10-22)
+
+
+### Features
+
+* **detect-js-redirect:** add additional failsafe against js shenaningans ([5173968](https://github.com/algolia/renderscript/commit/5173968))
+* **detect-js-redirect:** return 307 when evaluated page url is different from initial url ([f5d4bb7](https://github.com/algolia/renderscript/commit/f5d4bb7))
+* **detect-js-redirect:** return 307 when evaluated page url is different from initial url ([7e86629](https://github.com/algolia/renderscript/commit/7e86629))
+
 ## [1.0.5](https://github.com/algolia/renderscript/compare/v1.0.4...v1.0.5) (2019-09-14)
 
 
