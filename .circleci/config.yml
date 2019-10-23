@@ -7,7 +7,7 @@ aliases:
     paths: .
 
   - &attach-work-dir
-    at: ~/crawler/
+    at: ~/app/
 
   # Dependencies
   - &yarn
@@ -16,7 +16,7 @@ aliases:
       yarn install --non-interactive --cache-folder ~/.cache/yarn
 
 defaults: &defaults
-  working_directory: ~/crawler
+  working_directory: ~/app
   environment:
     NODE_ENV: 'test'
 
