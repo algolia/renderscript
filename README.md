@@ -63,6 +63,8 @@ See `.env.prod` to see which ones are installed by default (they still need to b
   Example: `https://easylist.to/easylist/easylist.txt`
 - `EXTENSIONS`: Comma separated list of extensions download link (expects a `.zip` file)  
   Example: `https://github.com/gorhill/uBlock/releases/download/1.19.6/uBlock0_1.19.6.chromium.zip`
+- `ALLOW_LOCALHOST`: Allow calls on localhost IPs
+  Example: `ALLOW_LOCALHOST=true`
 
 ## Credits
 
