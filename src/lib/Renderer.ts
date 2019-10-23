@@ -2,6 +2,11 @@ import * as path from "path";
 
 import * as puppeteer from "puppeteer-core";
 import * as uuid from "uuid/v4";
+import { validateURL, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
+
+const RESTRICTED_IPS = process.env.NODE_ENV === 'development'
+  ? PRIVATE_IP_PREFIXES.filter((prefix: string) => !['127.', '0.', '::1'].includes(prefix)) // allow everything in dev
+  : PRIVATE_IP_PREFIXES; // no private IPs otherwise
 
 import injectBaseHref from "lib/helpers/injectBaseHref";
 import getChromiumExecutablePath from "lib/helpers/getChromiumExecutablePath";
@@ -271,6 +276,19 @@ class Renderer {
     /* Ignore useless resources */
     await page.setRequestInterception(true);
     page.on("request", async req => {
+      // check for ssrf attempts
+      try {
+        await validateURL({
+          url: req.url(),
+          ipPrefixes: RESTRICTED_IPS,
+        });
+      }
+      catch (err) {
+        // log.error(err);
+        // report(err);
+        req.abort();
+      }
+
       try {
         // Ignore some type of resources
         if (IGNORED_RESOURCES.includes(req.resourceType())) {
