@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/algolia/renderscript/compare/v1.1.0...v1.2.0) (2019-10-23)
+
+
+### Features
+
+* **dns-filter:** reject requests to private IPs ([#10](https://github.com/algolia/renderscript/issues/10)) ([c1ff729](https://github.com/algolia/renderscript/commit/c1ff729))
+
 # [1.1.0](https://github.com/algolia/renderscript/compare/v1.0.5...v1.1.0) (2019-10-22)
 
 
