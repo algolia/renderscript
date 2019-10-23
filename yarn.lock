@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@algolia/dns-filter@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@algolia/dns-filter/-/dns-filter-0.0.3.tgz#c86620723f2891f02eb4076d8092a2f4adba3d52"
+  integrity sha512-TwZQJWIcH2OxId9Fmb8nHGzxjGUr+bnzP4tZLSc3R2PwUIC0TBSqDJ1P4wKjQclWtIWlHv4DmVTCcbW6cXwqLw==
+
 "@babel/code-frame@^7.0.0":
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.0.0.tgz#06e2ab19bdb535385559aabb5ba59729482800f8"

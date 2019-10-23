@@ -2,7 +2,7 @@ import * as path from "path";
 
 import * as puppeteer from "puppeteer-core";
 import * as uuid from "uuid/v4";
-import { validateURL, NetworkError, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
+import { validateURL, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
 
 const RESTRICTED_IPS = process.env.NODE_ENV === 'development'
   ? PRIVATE_IP_PREFIXES.filter((prefix: string) => !['127.', '0.', '::1'].includes(prefix)) // allow everything in dev
