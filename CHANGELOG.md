@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/algolia/renderscript/compare/v1.2.0...v1.2.1) (2019-10-23)
+
+
+### Bug Fixes
+
+* **dev-setup:** use USE_DOCKER_LOCALHOST as condition for lax filtering ([d826226](https://github.com/algolia/renderscript/commit/d826226))
+
 # [1.2.0](https://github.com/algolia/renderscript/compare/v1.1.0...v1.2.0) (2019-10-23)
 
 
