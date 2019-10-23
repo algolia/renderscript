@@ -4,7 +4,7 @@ import * as puppeteer from "puppeteer-core";
 import * as uuid from "uuid/v4";
 import { validateURL, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
 
-const RESTRICTED_IPS = process.env.NODE_ENV === 'development'
+const RESTRICTED_IPS = process.env.USE_DOCKER_LOCALHOST === 'true'
   ? PRIVATE_IP_PREFIXES.filter((prefix: string) => !['127.', '0.', '::1'].includes(prefix)) // allow everything in dev
   : PRIVATE_IP_PREFIXES; // no private IPs otherwise
 
