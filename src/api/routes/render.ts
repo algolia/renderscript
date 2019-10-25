@@ -106,7 +106,7 @@ export async function renderJSON(
       res.status(400).json({ error });
       return;
     }
-    if (resolvedUrl && revertUrl(resolvedUrl)  !== url.href) {
+    if (resolvedUrl && revertUrl(resolvedUrl).href !== url.href) {
       const location = revertUrl(resolvedUrl).href;
       res.status(307).header('Location', location).send();
       return;
