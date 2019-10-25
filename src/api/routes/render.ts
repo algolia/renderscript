@@ -2,7 +2,7 @@ import * as express from "express";
 import renderer from "lib/rendererSingleton";
 
 import { badRequest } from "api/helpers/errors";
-import buildUrl from 'api/helpers/buildUrl';
+import { revertUrl, buildUrl } from 'api/helpers/buildUrl';
 
 export function getURLFromQuery(
   req: express.Request,
@@ -62,9 +62,14 @@ export async function render(
 ) {
   const { url } = res.locals;
   try {
-    const { error, statusCode, body } = await renderer.task({ url });
+    const { error, statusCode, body, resolvedUrl } = await renderer.task({ url });
     if (error) {
       res.status(400).json({ error });
+      return;
+    }
+    if (resolvedUrl && revertUrl(resolvedUrl)  !== url.href) {
+      const location = revertUrl(resolvedUrl).href;
+      res.status(307).header('Location', location).send();
       return;
     }
     res
@@ -101,8 +106,9 @@ export async function renderJSON(
       res.status(400).json({ error });
       return;
     }
-    if (resolvedUrl !== url.href) {
-      res.status(307).header('Location', resolvedUrl).send();
+    if (resolvedUrl && revertUrl(resolvedUrl)  !== url.href) {
+      const location = revertUrl(resolvedUrl).href;
+      res.status(307).header('Location', location).send();
       return;
     }
     res.status(200).json({
