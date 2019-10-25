@@ -4,8 +4,12 @@ import * as puppeteer from "puppeteer-core";
 import * as uuid from "uuid/v4";
 import { validateURL, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
 
+const IP_PREFIXES_WHITELIST = process.env.IP_PREFIXES_WHITELIST 
+  ? process.env.IP_PREFIXES_WHITELIST.split(',') 
+  : ['127.', '0.', '::1'];
+
 const RESTRICTED_IPS = process.env.ALLOW_LOCALHOST === 'true'
-  ? PRIVATE_IP_PREFIXES.filter((prefix: string) => !['127.', '0.', '::1'].includes(prefix)) // relax filtering
+  ? PRIVATE_IP_PREFIXES.filter((prefix: string) => !IP_PREFIXES_WHITELIST.includes(prefix)) // relax filtering
   : PRIVATE_IP_PREFIXES; // no private IPs otherwise
 
 import injectBaseHref from "lib/helpers/injectBaseHref";

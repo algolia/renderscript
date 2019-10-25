@@ -65,6 +65,8 @@ See `.env.prod` to see which ones are installed by default (they still need to b
   Example: `https://github.com/gorhill/uBlock/releases/download/1.19.6/uBlock0_1.19.6.chromium.zip`
 - `ALLOW_LOCALHOST`: Allow calls on localhost IPs
   Example: `ALLOW_LOCALHOST=true`
+- `IP_PREFIXES_WHITELIST`: a comma-separated list of prefixes to whitelist when `ALLOW_LOCALHOST` is set to true.
+  Example: `IP_PREFIXES_WHITELIST=127.,0.,::1` (these are the default values used when the variable is not provided alongside `ALLOW_LOCALHOST`)
 
 ## Credits
 
