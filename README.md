@@ -67,7 +67,7 @@ See `.env.prod` to see which ones are installed by default (they still need to b
   Example: `ALLOW_LOCALHOST=true`
 - `IP_PREFIXES_WHITELIST`: Comma-separated list of prefixes to whitelist when `ALLOW_LOCALHOST` is set to true.
   Example: `IP_PREFIXES_WHITELIST=127.,0.,::1` (these are the default values used when the variable is not provided alongside `ALLOW_LOCALHOST`)
-- `HEADERS_TO_FORWARD`: Comma-separated list of headers to forward on request
+- `HEADERS_TO_FORWARD`: Comma-separated list of headers to forward on navigation request
   Example: `HEADERS_TO_FORWARD=Cookie,Authorization` (default value)
 
 ## Credits

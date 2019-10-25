@@ -267,7 +267,15 @@ class Renderer {
     await extensionsPage.close();
   }
 
-  private async _defineRequestContextForPage(page: puppeteer.Page, { url, headersToForward }: taskParams) {
+  private async _defineRequestContextForPage({
+    page,
+    task
+  }: {
+    page: puppeteer.Page,
+    task: taskParams
+  }) {
+    const { url, headersToForward } = task;
+
     await page.setRequestInterception(true);
     if (headersToForward.cookie) {
       const cookies = headersToForward.cookie.split('; ').map(c => {
@@ -317,11 +325,15 @@ class Renderer {
           return;
         }
         // console.log(req.resourceType(), req.url());
-        const headers = req.headers();
-        await req.continue({
-          // headers ignore values set for `Cookie`, relies to page.setCookie instead
-          headers: { ...headers, ...headersToForward }
-        });
+        if (req.isNavigationRequest()) {
+          const headers = req.headers();
+          await req.continue({
+            // headers ignore values set for `Cookie`, relies to page.setCookie instead
+            headers: { ...headers, ...headersToForward }
+          });
+          return;
+        }
+        await req.continue();
       } catch (e) {
         if (!e.message.match(/Request is already handled/)) throw e;
         // Ignore Request is already handled error
@@ -350,11 +362,12 @@ class Renderer {
     return await this._pageBuffer.shift()!;
   }
 
-  private async _processPage({ url, headersToForward }: taskParams, taskId: string) {
+  private async _processPage(task: taskParams, taskId: string) {
     /* Setup */
+    const { url } = task;
     const { context, page } = await this._newPage();
 
-    await this._defineRequestContextForPage(page, { url, headersToForward });
+    await this._defineRequestContextForPage({ page, task });
 
     let response: puppeteer.Response | null = null;
     let timeout = false;
