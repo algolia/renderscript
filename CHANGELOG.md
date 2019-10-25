@@ -1,3 +1,11 @@
+## [1.2.2](https://github.com/algolia/renderscript/compare/v1.2.1...v1.2.2) (2019-10-25)
+
+
+### Bug Fixes
+
+* **allow-ip-prefixes:** add environment variable to control which ips to whitelist ([#13](https://github.com/algolia/renderscript/issues/13)) ([c3fe02a](https://github.com/algolia/renderscript/commit/c3fe02a))
+* **dev-setup:** use ALLOW_LOCALHOST as condition for lax filtering ([98b09eb](https://github.com/algolia/renderscript/commit/98b09eb))
+
 ## [1.2.1](https://github.com/algolia/renderscript/compare/v1.2.0...v1.2.1) (2019-10-23)
 
 
