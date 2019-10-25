@@ -114,7 +114,6 @@ export async function renderJSON(
 ) {
   const { url } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
-  console.log('headersToForward', headersToForward);
   try {
     const { error, statusCode, headers, body, timeout, resolvedUrl } = await renderer.task({ url, headersToForward });
     if (error) {
