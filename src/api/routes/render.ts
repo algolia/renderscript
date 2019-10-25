@@ -4,6 +4,22 @@ import renderer from "lib/rendererSingleton";
 import { badRequest } from "api/helpers/errors";
 import buildUrl from 'api/helpers/buildUrl';
 
+const HEADERS_TO_FORWARD = process.env.HEADERS_TO_FORWARD
+  ? process.env.HEADERS_TO_FORWARD.split(',')
+  : ['Cookie', 'Authorization']
+
+export function getForwardedHeadersFromRequest(req: express.Request) {
+  const headersToForward = HEADERS_TO_FORWARD.reduce((partial, headerName) => {
+    const name = headerName.toLowerCase();
+    if (req.headers[name]) {
+      return { ...partial, [name]: req.headers[name] }
+    }
+    return partial;
+  }, {});
+
+  return headersToForward;
+}
+
 export function getURLFromQuery(
   req: express.Request,
   res: express.Response,
@@ -61,8 +77,10 @@ export async function render(
   next: express.NextFunction
 ) {
   const { url } = res.locals;
+  const headersToForward = getForwardedHeadersFromRequest(req);
+
   try {
-    const { error, statusCode, body } = await renderer.task({ url });
+    const { error, statusCode, body } = await renderer.task({ url, headersToForward });
     if (error) {
       res.status(400).json({ error });
       return;
@@ -95,8 +113,10 @@ export async function renderJSON(
   next: express.NextFunction
 ) {
   const { url } = res.locals;
+  const headersToForward = getForwardedHeadersFromRequest(req);
+  console.log('headersToForward', headersToForward);
   try {
-    const { error, statusCode, headers, body, timeout, resolvedUrl } = await renderer.task({ url });
+    const { error, statusCode, headers, body, timeout, resolvedUrl } = await renderer.task({ url, headersToForward });
     if (error) {
       res.status(400).json({ error });
       return;
