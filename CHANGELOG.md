@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/algolia/renderscript/compare/v1.2.2...v1.2.3) (2019-10-25)
+
+
+### Bug Fixes
+
+* **deps:** pin dependency @algolia/dns-filter to 1.1.3 ([40d307f](https://github.com/algolia/renderscript/commit/40d307f))
+
 ## [1.2.2](https://github.com/algolia/renderscript/compare/v1.2.1...v1.2.2) (2019-10-25)
 
 
