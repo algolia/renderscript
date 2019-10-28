@@ -26,6 +26,9 @@ const TIMEOUT = 10000;
 
 export interface taskParams {
   url: URL;
+  headersToForward: {
+    [s: string]: string;
+  }
 }
 
 export interface taskResult {
@@ -264,22 +267,33 @@ class Renderer {
     await extensionsPage.close();
   }
 
-  private async _createNewPage() {
-    if (this._stopping) {
-      throw new Error("Called _createNewPage on a stopping Renderer");
+  private async _defineRequestContextForPage({
+    page,
+    task
+  }: {
+    page: puppeteer.Page,
+    task: taskParams
+  }) {
+    const { url, headersToForward } = task;
+
+    await page.setRequestInterception(true);
+    if (headersToForward.cookie) {
+      const cookies = headersToForward.cookie.split('; ').map(c => {
+        const [ key, ...v ] = c.split('=');
+        // url attribute is required because it is not possible set cookies on a blank page
+        // so page.setCookie would crash if no url is provided, since we start with a blank page
+        return { url: url.href, name: key, value: v.join('=') };
+      });
+      try {
+        await page.setCookie(...cookies)
+      }
+      catch (e) {
+        console.error('failed to set cookie on page', url);
+      }
     }
 
-    const browser = await this._getBrowser();
-    const context = await browser.createIncognitoBrowserContext();
-    const page = await context.newPage();
-
-    await page.setUserAgent("Algolia Crawler Renderscript");
-    await page.setCacheEnabled(false);
-    await page.setViewport({ width: WIDTH, height: HEIGHT });
-
-    /* Ignore useless resources */
-    await page.setRequestInterception(true);
-    page.on("request", async req => {
+    /* Ignore useless/dangerous resources */
+    page.on('request', async (req: puppeteer.Request) => {
       // check for ssrf attempts
       try {
         await validateURL({
@@ -311,12 +325,34 @@ class Renderer {
           return;
         }
         // console.log(req.resourceType(), req.url());
+        if (req.isNavigationRequest()) {
+          const headers = req.headers();
+          await req.continue({
+            // headers ignore values set for `Cookie`, relies to page.setCookie instead
+            headers: { ...headers, ...headersToForward }
+          });
+          return;
+        }
         await req.continue();
       } catch (e) {
         if (!e.message.match(/Request is already handled/)) throw e;
         // Ignore Request is already handled error
       }
     });
+  }
+
+  private async _createNewPage() {
+    if (this._stopping) {
+      throw new Error("Called _createNewPage on a stopping Renderer");
+    }
+
+    const browser = await this._getBrowser();
+    const context = await browser.createIncognitoBrowserContext();
+    const page = await context.newPage();
+
+    await page.setUserAgent("Algolia Crawler Renderscript");
+    await page.setCacheEnabled(false);
+    await page.setViewport({ width: WIDTH, height: HEIGHT });
 
     return { page, context };
   }
@@ -326,9 +362,12 @@ class Renderer {
     return await this._pageBuffer.shift()!;
   }
 
-  private async _processPage({ url }: taskParams, taskId: string) {
+  private async _processPage(task: taskParams, taskId: string) {
     /* Setup */
+    const { url } = task;
     const { context, page } = await this._newPage();
+
+    await this._defineRequestContextForPage({ page, task });
 
     let response: puppeteer.Response | null = null;
     let timeout = false;
