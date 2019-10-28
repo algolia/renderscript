@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/algolia/renderscript/compare/v1.2.3...v1.3.0) (2019-10-28)
+
+
+### Features
+
+* **forward-headers:** handle forwarding of generic headers and cookie ([#14](https://github.com/algolia/renderscript/issues/14)) ([af45367](https://github.com/algolia/renderscript/commit/af45367))
+
 ## [1.2.3](https://github.com/algolia/renderscript/compare/v1.2.2...v1.2.3) (2019-10-25)
 
 
