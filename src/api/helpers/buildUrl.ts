@@ -1,7 +1,7 @@
 const DOCKER_LOCALHOST = 'host.docker.internal';
 
 export function replaceHost(url: URL, from: string, to: string) {
-  const fromRegex = new RegExp(`/^${from}(:|$)/`)
+  const fromRegex = new RegExp(`^${from}(:|$)`)
   const host = url.host || '';
   url.host = host.replace(fromRegex, `${to}$1`);
   return url;
