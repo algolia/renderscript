@@ -2,7 +2,7 @@ import * as express from "express";
 import renderer from "lib/rendererSingleton";
 
 import { badRequest } from "api/helpers/errors";
-import buildUrl from 'api/helpers/buildUrl';
+import { revertUrl, buildUrl } from 'api/helpers/buildUrl';
 
 const HEADERS_TO_FORWARD = process.env.HEADERS_TO_FORWARD
   ? process.env.HEADERS_TO_FORWARD.split(',')
@@ -80,9 +80,14 @@ export async function render(
   const headersToForward = getForwardedHeadersFromRequest(req);
 
   try {
-    const { error, statusCode, body } = await renderer.task({ url, headersToForward });
+    const { error, statusCode, body, resolvedUrl } = await renderer.task({ url, headersToForward });
     if (error) {
       res.status(400).json({ error });
+      return;
+    }
+    if (resolvedUrl && revertUrl(resolvedUrl)  !== url.href) {
+      const location = revertUrl(resolvedUrl).href;
+      res.status(307).header('Location', location).send();
       return;
     }
     res
@@ -120,8 +125,9 @@ export async function renderJSON(
       res.status(400).json({ error });
       return;
     }
-    if (resolvedUrl !== url.href) {
-      res.status(307).header('Location', resolvedUrl).send();
+    if (resolvedUrl && revertUrl(resolvedUrl).href !== url.href) {
+      const location = revertUrl(resolvedUrl).href;
+      res.status(307).header('Location', location).send();
       return;
     }
     res.status(200).json({
