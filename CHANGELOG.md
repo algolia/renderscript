@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/algolia/renderscript/compare/v1.3.1...v1.3.2) (2019-10-29)
+
+
+### Bug Fixes
+
+* **consistent-localhost:** revert url translation when checking for redirection ([#15](https://github.com/algolia/renderscript/issues/15)) ([146897b](https://github.com/algolia/renderscript/commit/146897b))
+
 ## [1.3.1](https://github.com/algolia/renderscript/compare/v1.3.0...v1.3.1) (2019-10-28)
 
 
