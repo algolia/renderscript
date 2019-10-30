@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/algolia/renderscript/compare/v1.3.2...v1.3.3) (2019-10-30)
+
+
+### Bug Fixes
+
+* **docker-revert-url:** revert only after comparison ([#17](https://github.com/algolia/renderscript/issues/17)) ([74c6025](https://github.com/algolia/renderscript/commit/74c6025))
+
 ## [1.3.2](https://github.com/algolia/renderscript/compare/v1.3.1...v1.3.2) (2019-10-29)
 
 
