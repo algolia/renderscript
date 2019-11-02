@@ -38,7 +38,7 @@
     "@types/node": "12.12.5",
     "@types/node-fetch": "2.5.3",
     "@types/puppeteer-core": "1.9.0",
-    "@types/uuid": "3.4.5",
+    "@types/uuid": "3.4.6",
     "@types/yauzl-promise": "2.1.0",
     "concurrently": "5.0.0",
     "dotenv-safe": "8.1.0",
