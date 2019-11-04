@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/algolia/renderscript/compare/v1.3.4...v1.3.5) (2019-11-04)
+
+
+### Bug Fixes
+
+* **stale-yarn-lock:** upgrade package that is an undeclared dep o… ([#20](https://github.com/algolia/renderscript/issues/20)) ([ad52065](https://github.com/algolia/renderscript/commit/ad52065))
+
 ## [1.3.4](https://github.com/algolia/renderscript/compare/v1.3.3...v1.3.4) (2019-11-04)
 
 
