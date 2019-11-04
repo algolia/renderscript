@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/algolia/renderscript/compare/v1.3.3...v1.3.4) (2019-11-04)
+
+
+### Bug Fixes
+
+* **url-hash-redirect:** use window.location.href instead of page.url ([#19](https://github.com/algolia/renderscript/issues/19)) ([fcbe621](https://github.com/algolia/renderscript/commit/fcbe621))
+
 ## [1.3.3](https://github.com/algolia/renderscript/compare/v1.3.2...v1.3.3) (2019-10-30)
 
 
