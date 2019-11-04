@@ -397,10 +397,10 @@ class Renderer {
 
     /* Serialize */
     await page.evaluate( () => { debugger; } );
-    let preSerializationUrl = page.url();
+    const preSerializationUrl = await page.evaluate('window.location.href');
     const body = await page.evaluate("document.firstElementChild.outerHTML");
     const headers = response.headers();
-    const resolvedUrl = page.url();
+    const resolvedUrl = await page.evaluate('window.location.href');
     /* Cleanup */
     await context.close();
 
