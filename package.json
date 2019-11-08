@@ -33,7 +33,7 @@
   "homepage": "https://github.com/algolia/renderscript#readme",
   "devDependencies": {
     "@semantic-release/changelog": "3.0.5",
-    "@semantic-release/git": "7.0.17",
+    "@semantic-release/git": "7.0.18",
     "@types/express": "4.17.2",
     "@types/node": "12.12.5",
     "@types/node-fetch": "2.5.3",
