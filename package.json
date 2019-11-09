@@ -45,7 +45,7 @@
     "nodemon": "1.19.4",
     "prettier": "1.19.0",
     "semantic-release": "15.13.30",
-    "tslint": "5.20.0",
+    "tslint": "5.20.1",
     "ttypescript": "1.5.7",
     "typescript": "3.6.4",
     "typescript-transform-paths": "1.1.11"
