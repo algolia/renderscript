@@ -48,7 +48,7 @@
     "tslint": "5.20.1",
     "ttypescript": "1.5.8",
     "typescript": "3.7.2",
-    "typescript-transform-paths": "1.1.12"
+    "typescript-transform-paths": "1.1.13"
   },
   "dependencies": {
     "@algolia/dns-filter": "1.1.3",

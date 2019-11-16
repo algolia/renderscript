@@ -5646,10 +5646,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript-transform-paths@1.1.12:
-  version "1.1.12"
-  resolved "https://registry.yarnpkg.com/typescript-transform-paths/-/typescript-transform-paths-1.1.12.tgz#a4d27b7e144785d9898ed1b8d4ee3542ac910a04"
-  integrity sha512-7GDRpNIt1L2R9DWkLPSWSly6dMqeNa39s7B0/f+cTv6YyAmda4td4UgwxgjglJBGeNaQ/Un5+wZJCFZceJ1k7g==
+typescript-transform-paths@1.1.13:
+  version "1.1.13"
+  resolved "https://registry.yarnpkg.com/typescript-transform-paths/-/typescript-transform-paths-1.1.13.tgz#3d4f7d0c9b7dacfb957514fd156774f064b4699b"
+  integrity sha512-4E4mtRXw04YgqCPBdiVg5ZNVf8hv3R/1mGpCJjI970+pWuNjdkhivG2kVlpxiH7yScXTaAJDBp6CC/6AZgoz4g==
   dependencies:
     slash "^3.0.0"
 
