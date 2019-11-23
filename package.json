@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/algolia/renderscript#readme",
   "devDependencies": {
-    "@semantic-release/changelog": "3.0.5",
+    "@semantic-release/changelog": "3.0.6",
     "@semantic-release/git": "7.0.18",
     "@types/express": "4.17.2",
     "@types/node": "12.12.12",
@@ -44,7 +44,7 @@
     "dotenv-safe": "8.2.0",
     "nodemon": "1.19.4",
     "prettier": "1.19.1",
-    "semantic-release": "15.13.30",
+    "semantic-release": "15.13.31",
     "tslint": "5.20.1",
     "ttypescript": "1.5.8",
     "typescript": "3.7.2",
