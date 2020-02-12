@@ -1,5 +1,5 @@
 # Base image
-FROM node:10-slim AS base
+FROM node:12-slim AS base
 
 # Install git
 # Others are dependencies of our gyp dependencies
@@ -55,7 +55,7 @@ RUN yarn docker:install
 # Resulting image
 # New, minimal image
 # This image must have the minimum amount of layers
-FROM node:10-slim
+FROM node:12-slim
 
 ENV NODE_ENV production
 ENV IN_DOCKER true
