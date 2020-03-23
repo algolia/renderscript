@@ -11,6 +11,7 @@
     "docker:install": "node dist/lib/install.js",
     "docker:build": "./scripts/build.sh",
     "docker:release": "docker push algolia/renderscript",
+    "lint": "prettier --check src/",
     "release": "yarn docker:build && yarn docker:release",
     "semantic-release": "semantic-release"
   },
