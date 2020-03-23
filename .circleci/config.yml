@@ -33,6 +33,16 @@ jobs:
 
       - persist-to-workspace: *persist-work-dir
 
+  lint:
+    <<: *defaults
+    docker:
+      - image: circleci/node:10.19.0
+
+    steps:
+      - attach-workspace: *attach-work-dir
+
+      - run: yarn lint
+
   release:
     <<: *defaults
     docker:
@@ -48,6 +58,9 @@ workflows:
   suite:
     jobs:
       - checkout
-      - release:
+      - lint:
           requires:
             - checkout
+      - release:
+          requires:
+            - lint

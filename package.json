@@ -11,6 +11,7 @@
     "docker:install": "node dist/lib/install.js",
     "docker:build": "./scripts/build.sh",
     "docker:release": "docker push algolia/renderscript",
+    "lint": "prettier --check src/",
     "release": "yarn docker:build && yarn docker:release",
     "semantic-release": "semantic-release"
   },
@@ -43,7 +44,7 @@
     "concurrently": "5.1.0",
     "dotenv-safe": "8.2.0",
     "nodemon": "2.0.2",
-    "prettier": "1.19.1",
+    "prettier": "2.0.1",
     "semantic-release": "17.0.4",
     "tslint": "6.1.0",
     "ttypescript": "1.5.10",

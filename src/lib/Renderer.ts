@@ -1,26 +1,29 @@
-import * as path from "path";
+import * as path from 'path';
 
-import * as puppeteer from "puppeteer-core";
-import * as uuid from "uuid/v4";
+import * as puppeteer from 'puppeteer-core';
+import * as uuid from 'uuid/v4';
 import { validateURL, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
 
-const IP_PREFIXES_WHITELIST = process.env.IP_PREFIXES_WHITELIST 
-  ? process.env.IP_PREFIXES_WHITELIST.split(',') 
+const IP_PREFIXES_WHITELIST = process.env.IP_PREFIXES_WHITELIST
+  ? process.env.IP_PREFIXES_WHITELIST.split(',')
   : ['127.', '0.', '::1'];
 
-const RESTRICTED_IPS = process.env.ALLOW_LOCALHOST === 'true'
-  ? PRIVATE_IP_PREFIXES.filter((prefix: string) => !IP_PREFIXES_WHITELIST.includes(prefix)) // relax filtering
-  : PRIVATE_IP_PREFIXES; // no private IPs otherwise
+const RESTRICTED_IPS =
+  process.env.ALLOW_LOCALHOST === 'true'
+    ? PRIVATE_IP_PREFIXES.filter(
+        (prefix: string) => !IP_PREFIXES_WHITELIST.includes(prefix)
+      ) // relax filtering
+    : PRIVATE_IP_PREFIXES; // no private IPs otherwise
 
-import injectBaseHref from "lib/helpers/injectBaseHref";
-import getChromiumExecutablePath from "lib/helpers/getChromiumExecutablePath";
-import getExtensionPath, { EXTENSIONS } from "lib/helpers/getExtensionPath";
+import injectBaseHref from 'lib/helpers/injectBaseHref';
+import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
+import getExtensionPath, { EXTENSIONS } from 'lib/helpers/getExtensionPath';
 
-import adBlocker from "lib/adBlockerSingleton";
+import adBlocker from 'lib/adBlockerSingleton';
 
 const WIDTH = 1280;
 const HEIGHT = 1024;
-const IGNORED_RESOURCES = ["font", "image"];
+const IGNORED_RESOURCES = ['font', 'image'];
 const PAGE_BUFFER_SIZE = 2;
 const TIMEOUT = 10000;
 
@@ -28,7 +31,7 @@ export interface taskParams {
   url: URL;
   headersToForward: {
     [s: string]: string;
-  }
+  };
 }
 
 export interface taskResult {
@@ -54,7 +57,7 @@ class Renderer {
     page: puppeteer.Page;
     context: puppeteer.BrowserContext;
   }>[];
-  private _currentTasks: { id: string; promise: taskObject["promise"] }[];
+  private _currentTasks: { id: string; promise: taskObject['promise'] }[];
   private _extensionsData: {
     [id: string]: {
       name: string;
@@ -83,7 +86,7 @@ class Renderer {
 
   async task(job: taskParams) {
     if (this._stopping) {
-      throw new Error("Called task on a stopping Renderer");
+      throw new Error('Called task on a stopping Renderer');
     }
     ++this.nbTotalTasks;
 
@@ -102,7 +105,7 @@ class Renderer {
     this._stopping = true;
     console.info(`Browser ${this.id} stopping...`);
     while (!this.ready) {
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
     await Promise.all(this._currentTasks.map(({ promise }) => promise));
     await Promise.all(this._pageBuffer);
@@ -142,49 +145,49 @@ class Renderer {
       executablePath: await getChromiumExecutablePath(),
       defaultViewport: {
         width: 1920,
-        height: 1080
+        height: 1080,
       },
       handleSIGINT: false,
       handleSIGTERM: false,
       pipe: true,
       args: [
         // Disable sandboxing when not available
-        "--no-sandbox",
+        '--no-sandbox',
         // No GPU available inside Docker
-        "--disable-gpu",
+        '--disable-gpu',
         // Seems like a powerful hack, not sure why
         // https://github.com/Codeception/CodeceptJS/issues/561
         "--proxy-server='direct://'",
-        "--proxy-bypass-list=*",
+        '--proxy-bypass-list=*',
         // Disable cache
-        "--disk-cache-dir=/dev/null",
-        "--media-cache-size=1",
-        "--disk-cache-size=1",
+        '--disk-cache-dir=/dev/null',
+        '--media-cache-size=1',
+        '--disk-cache-size=1',
         // Disable useless UI features
-        "--no-first-run",
-        "--noerrdialogs",
-        "--disable-notifications",
-        "--disable-translate",
-        "--disable-infobars",
-        "--disable-features=TranslateUI",
+        '--no-first-run',
+        '--noerrdialogs',
+        '--disable-notifications',
+        '--disable-translate',
+        '--disable-infobars',
+        '--disable-features=TranslateUI',
         // Disable dev-shm
         // See https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#tips
-        "--disable-dev-shm-usage",
+        '--disable-dev-shm-usage',
         // Extensions
         ...(extensions.length === 0
           ? []
           : [
-              `--disable-extensions-except=${extensions.join(",")}`,
-              ...extensions.map(e => `--load-extension=${e}`)
-            ])
-      ].filter(e => e !== "")
+              `--disable-extensions-except=${extensions.join(',')}`,
+              ...extensions.map((e) => `--load-extension=${e}`),
+            ]),
+      ].filter((e) => e !== ''),
     });
 
     await this._activateIncognitoExtensions({ browser, extensions });
 
     // Try to load a test page first
     const testPage = await browser.newPage();
-    await testPage.goto("about://settings", { waitUntil: "networkidle0" });
+    await testPage.goto('about://settings', { waitUntil: 'networkidle0' });
 
     this._browser = browser;
     this._createBrowserPromise = null;
@@ -202,7 +205,7 @@ class Renderer {
 
   private async _activateIncognitoExtensions({
     browser,
-    extensions
+    extensions,
   }: {
     browser: puppeteer.Browser;
     extensions: string[];
@@ -211,8 +214,8 @@ class Renderer {
 
     // Allow extensions in incognito mode
     const extensionsPage = await browser.newPage();
-    await extensionsPage.goto("chrome://extensions", {
-      waitUntil: "networkidle0"
+    await extensionsPage.goto('chrome://extensions', {
+      waitUntil: 'networkidle0',
     });
     const getExtensionsDataCode = `
       Array.from(
@@ -239,12 +242,12 @@ class Renderer {
         .shadowRoot.querySelector("#crToggle")
     `;
     await Promise.all(
-      Object.keys(this._extensionsData).map(async id => {
+      Object.keys(this._extensionsData).map(async (id) => {
         // Do this in a loop because sometimes Chrome doesn't correctly save the incognito status
         while (true) {
           const extensionPage = await browser.newPage();
           await extensionPage.goto(`chrome://extensions/?id=${id}`, {
-            waitUntil: "networkidle0"
+            waitUntil: 'networkidle0',
           });
           await extensionPage.waitForFunction(
             `(() => { try { ${getIncognitoButtonCode}; return true; } catch (e) { return false; } })`
@@ -257,7 +260,7 @@ class Renderer {
 
           await extensionPage.evaluate(`${getIncognitoButtonCode}.click()`);
           // Wait a bit to leave time for the setting to be saved
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           await extensionPage.close();
         }
@@ -269,25 +272,24 @@ class Renderer {
 
   private async _defineRequestContextForPage({
     page,
-    task
+    task,
   }: {
-    page: puppeteer.Page,
-    task: taskParams
+    page: puppeteer.Page;
+    task: taskParams;
   }) {
     const { url, headersToForward } = task;
 
     await page.setRequestInterception(true);
     if (headersToForward.cookie) {
-      const cookies = headersToForward.cookie.split('; ').map(c => {
-        const [ key, ...v ] = c.split('=');
+      const cookies = headersToForward.cookie.split('; ').map((c) => {
+        const [key, ...v] = c.split('=');
         // url attribute is required because it is not possible set cookies on a blank page
         // so page.setCookie would crash if no url is provided, since we start with a blank page
         return { url: url.href, name: key, value: v.join('=') };
       });
       try {
-        await page.setCookie(...cookies)
-      }
-      catch (e) {
+        await page.setCookie(...cookies);
+      } catch (e) {
         console.error('failed to set cookie on page', url);
       }
     }
@@ -300,8 +302,7 @@ class Renderer {
           url: req.url(),
           ipPrefixes: RESTRICTED_IPS,
         });
-      }
-      catch (err) {
+      } catch (err) {
         // log.error(err);
         // report(err);
         req.abort();
@@ -329,7 +330,7 @@ class Renderer {
           const headers = req.headers();
           await req.continue({
             // headers ignore values set for `Cookie`, relies to page.setCookie instead
-            headers: { ...headers, ...headersToForward }
+            headers: { ...headers, ...headersToForward },
           });
           return;
         }
@@ -343,14 +344,14 @@ class Renderer {
 
   private async _createNewPage() {
     if (this._stopping) {
-      throw new Error("Called _createNewPage on a stopping Renderer");
+      throw new Error('Called _createNewPage on a stopping Renderer');
     }
 
     const browser = await this._getBrowser();
     const context = await browser.createIncognitoBrowserContext();
     const page = await context.newPage();
 
-    await page.setUserAgent("Algolia Crawler Renderscript");
+    await page.setUserAgent('Algolia Crawler Renderscript');
     await page.setCacheEnabled(false);
     await page.setViewport({ width: WIDTH, height: HEIGHT });
 
@@ -371,19 +372,19 @@ class Renderer {
 
     let response: puppeteer.Response | null = null;
     let timeout = false;
-    page.addListener("response", (r: puppeteer.Response) => {
+    page.addListener('response', (r: puppeteer.Response) => {
       if (!response) response = r;
     });
     try {
       response = await page.goto(url.href, {
         timeout: TIMEOUT,
-        waitUntil: "networkidle0"
+        waitUntil: 'networkidle0',
       });
     } catch (e) {
       if (e.message.match(/Navigation Timeout Exceeded/)) {
         timeout = true;
       } else {
-        console.error("Caught error when loading page", e);
+        console.error('Caught error when loading page', e);
       }
     }
 
@@ -396,9 +397,11 @@ class Renderer {
     await page.evaluate(injectBaseHref, baseHref);
 
     /* Serialize */
-    await page.evaluate( () => { debugger; } );
+    await page.evaluate(() => {
+      debugger;
+    });
     const preSerializationUrl = await page.evaluate('window.location.href');
-    const body = await page.evaluate("document.firstElementChild.outerHTML");
+    const body = await page.evaluate('document.firstElementChild.outerHTML');
     const headers = response.headers();
     const resolvedUrl = await page.evaluate('window.location.href');
     /* Cleanup */
@@ -416,10 +419,10 @@ class Renderer {
     this._currentTasks.push({ id, promise });
   }
 
-  private _removeTask({ id }: Pick<taskObject, "id">) {
+  private _removeTask({ id }: Pick<taskObject, 'id'>) {
     const idx = this._currentTasks.findIndex(({ id: _id }) => id === _id);
     // Should never happen
-    if (idx === -1) throw new Error("Could not find task");
+    if (idx === -1) throw new Error('Could not find task');
     this._currentTasks.splice(idx, 1);
   }
 }

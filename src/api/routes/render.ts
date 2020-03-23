@@ -1,18 +1,18 @@
-import * as express from "express";
-import renderer from "lib/rendererSingleton";
+import * as express from 'express';
+import renderer from 'lib/rendererSingleton';
 
-import { badRequest } from "api/helpers/errors";
+import { badRequest } from 'api/helpers/errors';
 import { revertUrl, buildUrl } from 'api/helpers/buildUrl';
 
 const HEADERS_TO_FORWARD = process.env.HEADERS_TO_FORWARD
   ? process.env.HEADERS_TO_FORWARD.split(',')
-  : ['Cookie', 'Authorization']
+  : ['Cookie', 'Authorization'];
 
 export function getForwardedHeadersFromRequest(req: express.Request) {
   const headersToForward = HEADERS_TO_FORWARD.reduce((partial, headerName) => {
     const name = headerName.toLowerCase();
     if (req.headers[name]) {
-      return { ...partial, [name]: req.headers[name] }
+      return { ...partial, [name]: req.headers[name] };
     }
     return partial;
   }, {});
@@ -26,8 +26,8 @@ export function getURLFromQuery(
   next: express.NextFunction
 ) {
   // url
-  if (req.method === "GET" && !req.query.url) {
-    badRequest({ res, message: "Missing URL in query params" });
+  if (req.method === 'GET' && !req.query.url) {
+    badRequest({ res, message: 'Missing URL in query params' });
     return;
   }
   try {
@@ -44,8 +44,8 @@ export function getURLFromBody(
   res: express.Response,
   next: express.NextFunction
 ) {
-  if (req.method === "POST" && !req.body.url) {
-    badRequest({ res, message: "Missing URL in body" });
+  if (req.method === 'POST' && !req.body.url) {
+    badRequest({ res, message: 'Missing URL in body' });
     return;
   }
   try {
@@ -64,8 +64,8 @@ export function validateURL(
 ) {
   const { url } = res.locals;
   // Prevent browsing the filesystem using Chrome
-  if (!["http:", "https:"].includes(url.protocol)) {
-    badRequest({ res, message: "Disallowed protocol" });
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    badRequest({ res, message: 'Disallowed protocol' });
     return;
   }
   next();
@@ -80,7 +80,10 @@ export async function render(
   const headersToForward = getForwardedHeadersFromRequest(req);
 
   try {
-    const { error, statusCode, body, resolvedUrl } = await renderer.task({ url, headersToForward });
+    const { error, statusCode, body, resolvedUrl } = await renderer.task({
+      url,
+      headersToForward,
+    });
     if (error) {
       res.status(400).json({ error });
       return;
@@ -92,22 +95,22 @@ export async function render(
     }
     res
       .status(statusCode!)
-      .header("Content-Type", "text/html")
+      .header('Content-Type', 'text/html')
       // Only whitelist loading styles resources when testing
       // (will not change programmatic use of this system)
       .header(
-        "Content-Security-Policy",
+        'Content-Security-Policy',
         [
           "default-src 'none'",
           "style-src * 'unsafe-inline'",
-          "img-src * data:",
-          "font-src *"
-        ].join("; ")
+          'img-src * data:',
+          'font-src *',
+        ].join('; ')
       )
       .send(body);
   } catch (e) {
     res.status(500).json({
-      error: e.message
+      error: e.message,
     });
   }
 }
@@ -120,7 +123,14 @@ export async function renderJSON(
   const { url } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
   try {
-    const { error, statusCode, headers, body, timeout, resolvedUrl } = await renderer.task({ url, headersToForward });
+    const {
+      error,
+      statusCode,
+      headers,
+      body,
+      timeout,
+      resolvedUrl,
+    } = await renderer.task({ url, headersToForward });
     if (error) {
       res.status(400).json({ error });
       return;
@@ -134,7 +144,7 @@ export async function renderJSON(
       statusCode,
       headers,
       body,
-      timeout
+      timeout,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });

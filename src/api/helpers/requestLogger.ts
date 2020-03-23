@@ -1,11 +1,11 @@
-import * as express from "express";
+import * as express from 'express';
 
 export default (
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
 ) => {
-  if (["/ready", "/healthy"].includes(req.url)) {
+  if (['/ready', '/healthy'].includes(req.url)) {
     next();
     return;
   }

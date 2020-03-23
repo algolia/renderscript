@@ -1,4 +1,4 @@
-declare module "ad-block" {
+declare module 'ad-block' {
   // Type definitions for ad-block 4.1.7
   // Project: ad-block
   // Definitions by: Matthieu Dumont <https://www.github.com/Jerska>
@@ -34,7 +34,7 @@ declare module "ad-block" {
     websocket,
     important,
     explicitcancel,
-    unknown
+    unknown,
   }
 
   interface IFilterOptions {

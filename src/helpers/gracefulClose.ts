@@ -1,7 +1,7 @@
-import * as http from "http";
+import * as http from 'http';
 
-import Api from "api/index";
-import RollingRenderer from "lib/RollingRenderer";
+import Api from 'api/index';
+import RollingRenderer from 'lib/RollingRenderer';
 
 interface Params {
   api: Api;
@@ -11,26 +11,26 @@ interface Params {
 let gracefullyClosing = false;
 
 async function close({ api, renderer }: Params) {
-  const webServerPromise = new Promise(resolve => {
-    console.info("[API] Shutting down");
+  const webServerPromise = new Promise((resolve) => {
+    console.info('[API] Shutting down');
     api.stop(() => {
-      console.info("[API] Shut down");
+      console.info('[API] Shut down');
       resolve();
     });
   });
 
   await webServerPromise;
 
-  const rendererPromise = new Promise(async resolve => {
-    console.info("[Renderer] Shutting down");
+  const rendererPromise = new Promise(async (resolve) => {
+    console.info('[Renderer] Shutting down');
     await renderer.stop();
-    console.info("[Renderer] Shut down");
+    console.info('[Renderer] Shut down');
     resolve();
   });
 
   await rendererPromise;
 
-  console.info("Gracefully stopped everything");
+  console.info('Gracefully stopped everything');
 
   process.exit(0);
 }

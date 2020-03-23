@@ -1,24 +1,26 @@
-import { promises as fs } from "fs";
-import * as path from "path";
+import { promises as fs } from 'fs';
+import * as path from 'path';
 
-import fetch from "node-fetch";
-import * as yauzl from "yauzl-promise";
-import * as streamToString from "stream-to-string";
+import fetch from 'node-fetch';
+import * as yauzl from 'yauzl-promise';
+import * as streamToString from 'stream-to-string';
 
-import projectRoot from "helpers/projectRoot";
+import projectRoot from 'helpers/projectRoot';
 
 const EXTENSION_SOURCES: string[] = process.env.EXTENSIONS
-  ? process.env.EXTENSIONS.split(",").map(src => decodeURIComponent(src.trim()))
+  ? process.env.EXTENSIONS.split(',').map((src) =>
+      decodeURIComponent(src.trim())
+    )
   : [];
 const EXTENSION_SOURCES_MAP: { [s: string]: string } = EXTENSION_SOURCES.reduce(
-  (res, src) => ({ ...res, [path.basename(src, ".zip")]: src }),
+  (res, src) => ({ ...res, [path.basename(src, '.zip')]: src }),
   {}
 );
 
 export const EXTENSIONS = Object.keys(EXTENSION_SOURCES_MAP);
 
 export default async function getExtensionPath(name: string) {
-  const modulesPath = path.resolve(projectRoot, "vendors", "extensions");
+  const modulesPath = path.resolve(projectRoot, 'vendors', 'extensions');
   await fs.mkdir(modulesPath).catch(() => {});
   const dirPath = path.resolve(modulesPath, name);
   try {
@@ -48,7 +50,7 @@ export default async function getExtensionPath(name: string) {
       try {
         await fs.mkdir(dirname, { recursive: true });
       } catch (err) {
-        if (err.code !== "EEXISTS") throw err;
+        if (err.code !== 'EEXISTS') throw err;
       }
       await fs.writeFile(fullPath, content);
     }

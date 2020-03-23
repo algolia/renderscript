@@ -5,18 +5,18 @@
  * quality.
  */
 export default function injectBaseHref(origin: string) {
-  const base = document.createElement("base");
-  base.setAttribute("href", origin);
+  const base = document.createElement('base');
+  base.setAttribute('href', origin);
 
-  const bases = document.head.querySelectorAll("base");
+  const bases = document.head.querySelectorAll('base');
   if (bases.length) {
     // Patch existing <base> if it is relative.
-    const existingBase = bases[0].getAttribute("href") || "";
-    if (existingBase.startsWith("/")) {
-      bases[0].setAttribute("href", origin + existingBase);
+    const existingBase = bases[0].getAttribute('href') || '';
+    if (existingBase.startsWith('/')) {
+      bases[0].setAttribute('href', origin + existingBase);
     }
   } else {
     // Only inject <base> if it doesn't already exist.
-    document.head.insertAdjacentElement("afterbegin", base);
+    document.head.insertAdjacentElement('afterbegin', base);
   }
 }
