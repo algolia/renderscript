@@ -1,9 +1,9 @@
-import { promises as fs } from "fs";
-import { AdBlockClient, FilterOptions } from "ad-block";
+import { promises as fs } from 'fs';
+import { AdBlockClient, FilterOptions } from 'ad-block';
 
 import getAdblockListPath, {
-  ADBLOCK_LISTS
-} from "lib/helpers/getAdBlockListPath";
+  ADBLOCK_LISTS,
+} from 'lib/helpers/getAdBlockListPath';
 
 const CHUNK_SIZE = 1000;
 
@@ -28,14 +28,14 @@ export default class AdBlocker {
 
   private async _init() {
     const filterLists = await Promise.all(
-      ADBLOCK_LISTS.map(async name => {
+      ADBLOCK_LISTS.map(async (name) => {
         return await fs.readFile(await getAdblockListPath(name), {
-          encoding: "utf-8"
+          encoding: 'utf-8',
         });
       })
     );
     if (filterLists.length > 0) {
-      console.info("Parsing blocker lists...");
+      console.info('Parsing blocker lists...');
       for (let listAsStr of filterLists) {
         // Split into chunks to not block the main thread too much
         const listAsArr = listAsStr.split('\n');
@@ -43,10 +43,10 @@ export default class AdBlocker {
           const chunk = listAsArr.slice(i, i + CHUNK_SIZE);
           this._client.parse(chunk.join('\n'));
           // Give back to main thread
-          await new Promise(resolve => setTimeout(resolve, 0));
+          await new Promise((resolve) => setTimeout(resolve, 0));
         }
       }
-      console.info("Parsed blocker lists");
+      console.info('Parsed blocker lists');
     }
     this._initPromise = null;
   }

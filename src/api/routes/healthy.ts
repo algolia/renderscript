@@ -1,6 +1,6 @@
-import * as express from "express";
+import * as express from 'express';
 import isReady from 'lib/helpers/isReady';
-import renderer from "lib/rendererSingleton";
+import renderer from 'lib/rendererSingleton';
 
 let readyOnce = false;
 

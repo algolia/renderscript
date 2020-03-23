@@ -1,4 +1,4 @@
-import * as express from "express";
+import * as express from 'express';
 
 interface anyParams {
   res: express.Response;
@@ -20,12 +20,12 @@ interface badRequestParams {
 export function badRequest({
   res,
   details,
-  message = "Bad Request"
+  message = 'Bad Request',
 }: badRequestParams) {
   return any({
     res,
     status: 400,
     message,
-    details
+    details,
   });
 }

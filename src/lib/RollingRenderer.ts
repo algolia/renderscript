@@ -1,4 +1,4 @@
-import Renderer, { taskParams } from "lib/Renderer";
+import Renderer, { taskParams } from 'lib/Renderer';
 
 const MAX_RENDERER_TASKS = 256;
 
@@ -17,7 +17,7 @@ class RollingRenderer {
 
   get renderer() {
     if (this._stopping) {
-      throw new Error("Called (get) renderer on a stopping RollingRenderer");
+      throw new Error('Called (get) renderer on a stopping RollingRenderer');
     }
 
     const { nbTotalTasks } = this._currentRenderer;
@@ -52,7 +52,7 @@ class RollingRenderer {
 
   async task(job: taskParams) {
     if (this._stopping) {
-      throw new Error("Called task on a stopping RollingRenderer");
+      throw new Error('Called task on a stopping RollingRenderer');
     }
     return await this.renderer.task(job);
   }

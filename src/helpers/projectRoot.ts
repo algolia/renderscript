@@ -1,3 +1,3 @@
-import * as path from "path";
+import * as path from 'path';
 
-export default path.join(__dirname, "..", "..");
+export default path.join(__dirname, '..', '..');

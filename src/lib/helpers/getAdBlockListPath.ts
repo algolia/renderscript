@@ -1,11 +1,11 @@
-import { promises as fs } from "fs";
-import * as path from "path";
+import { promises as fs } from 'fs';
+import * as path from 'path';
 
-import fetch from "node-fetch";
-import projectRoot from "helpers/projectRoot";
+import fetch from 'node-fetch';
+import projectRoot from 'helpers/projectRoot';
 
 const ADBLOCK_LIST_SOURCES: string[] = process.env.ADBLOCK_LISTS
-  ? process.env.ADBLOCK_LISTS.split(",").map(src =>
+  ? process.env.ADBLOCK_LISTS.split(',').map((src) =>
       decodeURIComponent(src.trim())
     )
   : [];
@@ -20,14 +20,14 @@ const ADBLOCK_LIST_SOURCES_MAP: {
 export const ADBLOCK_LISTS = Object.keys(ADBLOCK_LIST_SOURCES_MAP);
 
 export default async function getAdblockListPath(name: string) {
-  const dirPath = path.join(projectRoot, "vendors", "adblock-lists");
+  const dirPath = path.join(projectRoot, 'vendors', 'adblock-lists');
   try {
     await fs.stat(dirPath);
   } catch (e) {
     try {
       await fs.mkdir(dirPath, { recursive: true });
     } catch (err) {
-      if (err.code !== "EEXISTS") throw err;
+      if (err.code !== 'EEXISTS') throw err;
     }
   }
   const filePath = path.join(dirPath, name);
