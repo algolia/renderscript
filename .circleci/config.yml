@@ -33,7 +33,7 @@ jobs:
 
       - persist-to-workspace: *persist-work-dir
 
-  release:
+  lint:
     <<: *defaults
     docker:
       - image: circleci/node:10.19.0
