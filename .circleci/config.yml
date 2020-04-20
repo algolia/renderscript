@@ -56,8 +56,8 @@ jobs:
           background: true
 
       - run:
-        command: "while ! curl -sS http://localhost:3000/ready; do sleep 1; done"
-        no_output_timeout: 2m
+          command: "while ! curl -sS http://localhost:3000/ready; do sleep 1; done"
+          no_output_timeout: 2m
       - run: "curl -sS http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html | grep 'A basic page'"
       - run: "curl -sS http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Floads.html | grep 'Init'"
 
