@@ -55,6 +55,7 @@ jobs:
           command: npm start
           background: true
 
+      - run: "sleep 2"
       - run: "curl -sS http://localhost:3000/ready"
       - run: "curl -sS http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html | grep 'A basic page'"
       - run: "curl -sS http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Floads.html | grep 'Init'"
