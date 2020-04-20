@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "yarn clean && ttsc",
+    "ci:start": "ALLOW_LOCALHOST=true yarn start",
     "clean": "rm -rf dist/",
     "dev": "nodemon",
     "dev:run": "yarn build && NODE_ENV=development node dist/index.js",
@@ -13,6 +14,7 @@
     "docker:release": "docker push algolia/renderscript",
     "lint": "prettier --check src/",
     "release": "yarn docker:build && yarn docker:release",
+    "start": "node --max-old-space-size=128 dist/index.js",
     "semantic-release": "semantic-release"
   },
   "repository": {
