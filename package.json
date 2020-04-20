@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "yarn clean && ttsc",
+    "ci:start": "ALLOW_LOCALHOST=true yarn start",
     "clean": "rm -rf dist/",
     "dev": "nodemon",
     "dev:run": "yarn build && NODE_ENV=development node dist/index.js",

@@ -52,7 +52,7 @@ jobs:
       - run: yarn build
 
       - run:
-          command: "ALLOW_LOCALHOST=true npm start"
+          command: "npm run ci:start"
           background: true
 
       - run:
