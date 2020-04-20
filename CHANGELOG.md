@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/algolia/renderscript/compare/v1.3.13...v1.4.0) (2020-04-20)
+
+
+### Features
+
+* add minimal ci testing ([#32](https://github.com/algolia/renderscript/issues/32)) ([ac5156f](https://github.com/algolia/renderscript/commit/ac5156f))
+
 ## [1.3.13](https://github.com/algolia/renderscript/compare/v1.3.12...v1.3.13) (2020-04-20)
 
 
