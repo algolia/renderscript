@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import * as puppeteer from 'puppeteer-core';
-import * as uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { validateURL, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
 
 const IP_PREFIXES_WHITELIST = process.env.IP_PREFIXES_WHITELIST
