@@ -25,13 +25,13 @@ export function getURLFromQuery(
   res: express.Response,
   next: express.NextFunction
 ) {
-  // url
-  if (req.method === 'GET' && !req.query.url) {
+  const url = req.query.url.toString();
+  if (req.method === 'GET' && !url) {
     badRequest({ res, message: 'Missing URL in query params' });
     return;
   }
   try {
-    res.locals.url = buildUrl(decodeURIComponent(req.query.url));
+    res.locals.url = buildUrl(decodeURIComponent(url));
   } catch (e) {
     res.status(400).json({ error: 'invalid_url' });
     return;
@@ -44,12 +44,13 @@ export function getURLFromBody(
   res: express.Response,
   next: express.NextFunction
 ) {
-  if (req.method === 'POST' && !req.body.url) {
+  const { url } = req.body;
+  if (req.method === 'POST' && !url) {
     badRequest({ res, message: 'Missing URL in body' });
     return;
   }
   try {
-    res.locals.url = buildUrl(req.body.url);
+    res.locals.url = buildUrl(url);
   } catch (e) {
     res.status(400).json({ error: 'invalid_url' });
     return;
