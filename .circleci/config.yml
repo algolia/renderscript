@@ -17,6 +17,8 @@ aliases:
 
 defaults: &defaults
   working_directory: ~/app
+  docker:
+    - image: circleci/node:12.16.2
   environment:
     NODE_ENV: 'test'
 
@@ -24,8 +26,8 @@ version: 2
 
 jobs:
   checkout:
-    docker:
-      - image: circleci/node:10.20.1
+    <<: *defaults
+
     steps:
       - checkout
 
@@ -35,18 +37,30 @@ jobs:
 
   lint:
     <<: *defaults
-    docker:
-      - image: circleci/node:10.20.1
 
     steps:
       - attach-workspace: *attach-work-dir
 
       - run: yarn lint
 
+  test:
+    <<: *defaults
+
+    steps:
+      - attach-workspace: *attach-work-dir
+
+      - run: yarn build
+
+      - run:
+          command: npm start
+          background: true
+
+      - run: "curl -sS http://localhost:3000/ready"
+      - run: "curl -sS http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html | grep 'A basic page'"
+      - run: "curl -sS http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Floads.html | grep 'Init'"
+
   release:
     <<: *defaults
-    docker:
-      - image: circleci/node:10.20.1
 
     steps:
       - attach-workspace: *attach-work-dir
@@ -61,6 +75,10 @@ workflows:
       - lint:
           requires:
             - checkout
+      - test:
+          requires:
+            - checkout
       - release:
           requires:
             - lint
+            - test
