@@ -1,3 +1,10 @@
+## [1.3.12](https://github.com/algolia/renderscript/compare/v1.3.11...v1.3.12) (2020-04-20)
+
+
+### Bug Fixes
+
+* **express:** update @types/express dependencies ([1e4a5e0](https://github.com/algolia/renderscript/commit/1e4a5e0))
+
 ## [1.3.11](https://github.com/algolia/renderscript/compare/v1.3.10...v1.3.11) (2020-04-04)
 
 
