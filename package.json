@@ -61,7 +61,7 @@
     "node-fetch": "2.6.0",
     "puppeteer-core": "3.0.2",
     "stream-to-string": "1.2.0",
-    "uuid": "7.0.3",
+    "uuid": "8.0.0",
     "yauzl-promise": "2.1.3"
   }
 }
