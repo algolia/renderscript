@@ -59,7 +59,7 @@
     "body-parser": "1.19.0",
     "express": "4.17.1",
     "node-fetch": "2.6.0",
-    "puppeteer-core": "3.0.2",
+    "puppeteer-core": "3.0.4",
     "stream-to-string": "1.2.0",
     "uuid": "8.0.0",
     "yauzl-promise": "2.1.3"
