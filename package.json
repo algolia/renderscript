@@ -45,7 +45,7 @@
     "@types/yauzl-promise": "2.1.0",
     "concurrently": "5.2.0",
     "dotenv-safe": "8.2.0",
-    "nodemon": "2.0.3",
+    "nodemon": "2.0.4",
     "prettier": "2.0.5",
     "semantic-release": "17.0.7",
     "tslint": "6.1.2",
