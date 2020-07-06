@@ -1,8 +1,8 @@
 import * as puppeteer from 'puppeteer-core';
 
 export default async function getChromiumExecutablePath() {
-  const pkg = require('puppeteer-core/package.json');
-  const { chromium_revision: revision } = pkg.puppeteer;
+  const revisions = require('puppeteer-core/lib/cjs/revisions.js');
+  const { PUPPETEER_REVISIONS: { chromium: revision } } = revisions;
 
   const fetcher = puppeteer.createBrowserFetcher();
   const localRevisions = await fetcher.localRevisions();
