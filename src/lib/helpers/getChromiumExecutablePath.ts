@@ -1,7 +1,7 @@
 import * as puppeteer from 'puppeteer-core';
 
 export default async function getChromiumExecutablePath() {
-  const revisions = require('puppeteer-core/lib/cjs/revisions.js');
+  const revisions = require('puppeteer-core/lib/cjs/puppeteer/revisions.js');
   const {
     PUPPETEER_REVISIONS: { chromium: revision },
   } = revisions;
