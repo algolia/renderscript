@@ -1,3 +1,10 @@
+## [1.4.14](https://github.com/algolia/renderscript/compare/v1.4.13...v1.4.14) (2020-09-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency node-fetch to v2.6.1 [security] ([#92](https://github.com/algolia/renderscript/issues/92)) ([2b92dae](https://github.com/algolia/renderscript/commit/2b92dae))
+
 ## [1.4.13](https://github.com/algolia/renderscript/compare/v1.4.12...v1.4.13) (2020-08-02)
 
 
