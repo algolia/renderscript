@@ -1,14 +1,14 @@
 # Base image
-FROM node:12-slim AS base
+FROM node:14.15.0-slim AS base
 
 # Install git
 # Others are dependencies of our gyp dependencies
 RUN apt-get update && \
   apt-get install -y --no-install-recommends \
-    g++ \
-    git \
-    make \
-    python
+  g++ \
+  git \
+  make \
+  python
 
 # Create tmp directory
 RUN mkdir -p /tmp/renderscript
@@ -19,10 +19,10 @@ WORKDIR /tmp/renderscript
 # Useful if you want to deploy from a branch without needing to commit
 RUN \
   if [ -n "$(git status --porcelain)" ]; then \
-    git config --global user.email "docker@renderscript.algolia.com" && \
-    git config --global user.name "Renderscript Dockerfile" && \
-    git add -A . && \
-    git commit -a -m "dockerfile-temp-commit"; \
+  git config --global user.email "docker@renderscript.algolia.com" && \
+  git config --global user.name "Renderscript Dockerfile" && \
+  git add -A . && \
+  git commit -a -m "dockerfile-temp-commit"; \
   fi
 
 # Use git to only get what's not gitignored in /app/renderscript
@@ -69,15 +69,15 @@ ENV IN_DOCKER true
 RUN true \
   && apt-get update \
   && apt-get install -y --no-install-recommends \
-    chromium \
-    libatk-bridge2.0-0 \
-    libgtk-3-0 \
-    fonts-ipafont-gothic \
-    fonts-wqy-zenhei \
-    fonts-thai-tlwg \
-    fonts-kacst \
-    ttf-freefont \
-    xvfb \
+  chromium \
+  libatk-bridge2.0-0 \
+  libgtk-3-0 \
+  fonts-ipafont-gothic \
+  fonts-wqy-zenhei \
+  fonts-thai-tlwg \
+  fonts-kacst \
+  ttf-freefont \
+  xvfb \
   && apt-get remove -y chromium \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
