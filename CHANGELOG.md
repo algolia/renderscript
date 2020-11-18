@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/algolia/renderscript/compare/v1.4.19...v1.5.0) (2020-11-18)
+
+
+### Features
+
+* upgrade node, packages, eslint ([25c69cf](https://github.com/algolia/renderscript/commit/25c69cf))
+
 ## [1.4.19](https://github.com/algolia/renderscript/compare/v1.4.18...v1.4.19) (2020-11-01)
 
 
