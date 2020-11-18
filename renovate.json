@@ -38,12 +38,6 @@
   "circleci": {
     "enabled": true
   },
-  "docker-compose": {
-    "ignoreDeps": [
-      "kibana-oss",
-      "elasticsearch-oss"
-    ]
-  },
   "node": {
     "supportPolicy": [
       "lts_active"
