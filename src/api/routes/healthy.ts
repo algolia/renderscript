@@ -6,8 +6,7 @@ let readyOnce = false;
 
 export default async function healthy(
   req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
+  res: express.Response
 ) {
   // The system cannot be checked for healthyness unless it has already started
   if (!readyOnce) {

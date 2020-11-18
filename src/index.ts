@@ -13,7 +13,7 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 const api = new Api();
 
 // Uncaught Promise Rejection
-process.on('unhandledRejection', async (reason) => {
+process.on('unhandledRejection', (reason) => {
   console.error('Unhandled rejection');
   console.error(reason);
 

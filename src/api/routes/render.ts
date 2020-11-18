@@ -72,11 +72,7 @@ export function validateURL(
   next();
 }
 
-export async function render(
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) {
+export async function render(req: express.Request, res: express.Response) {
   const { url } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
 
@@ -116,11 +112,7 @@ export async function render(
   }
 }
 
-export async function renderJSON(
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) {
+export async function renderJSON(req: express.Request, res: express.Response) {
   const { url } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
   try {

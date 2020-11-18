@@ -1,5 +1,3 @@
-import * as http from 'http';
-
 import Api from 'api/index';
 import RollingRenderer from 'lib/RollingRenderer';
 
@@ -21,17 +19,13 @@ async function close({ api, renderer }: Params) {
 
   await webServerPromise;
 
-  const rendererPromise = new Promise(async (resolve) => {
-    console.info('[Renderer] Shutting down');
-    await renderer.stop();
-    console.info('[Renderer] Shut down');
-    resolve();
-  });
-
-  await rendererPromise;
+  console.info('[Renderer] Shutting down');
+  await renderer.stop();
+  console.info('[Renderer] Shut down');
 
   console.info('Gracefully stopped everything');
 
+  // eslint-disable-next-line no-process-exit
   process.exit(0);
 }
 

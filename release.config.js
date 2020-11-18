@@ -1,21 +1,23 @@
+/* eslint-disable no-template-curly-in-string */
+// eslint-disable-next-line import/no-commonjs
 module.exports = {
-  branch: "master",
-  verifyConditions: ["@semantic-release/github"],
+  branch: 'master',
+  verifyConditions: ['@semantic-release/github'],
   prepare: [
     {
-      path: "@semantic-release/changelog",
-      changelogFile: "CHANGELOG.md"
+      path: '@semantic-release/changelog',
+      changelogFile: 'CHANGELOG.md',
     },
-    "@semantic-release/npm",
+    '@semantic-release/npm',
     {
-      path: "@semantic-release/git",
-      assets: ["package.json", "CHANGELOG.md"],
+      path: '@semantic-release/git',
+      assets: ['package.json', 'CHANGELOG.md'],
       message:
-        "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-    }
+        'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
+    },
   ],
-  publish: "@semantic-release/github",
+  publish: '@semantic-release/github',
   success: [],
   fail: [],
-  npmPublish: false
+  npmPublish: false,
 };

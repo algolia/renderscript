@@ -29,7 +29,7 @@ export default class Api {
     });
   }
 
-  async stop(cb: () => any) {
+  stop(cb: () => any) {
     this.server.close(cb);
   }
 

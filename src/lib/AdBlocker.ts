@@ -1,5 +1,9 @@
+// Do not work for the moment
+// Please see https://github.com/brave/adblock-rust
+
 import { promises as fs } from 'fs';
-import { AdBlockClient, FilterOptions } from 'ad-block';
+// @ts-ignore
+import { AdBlockClient, FilterOptions } from 'adblock-rs';
 
 import getAdblockListPath, {
   ADBLOCK_LISTS,
@@ -36,7 +40,7 @@ export default class AdBlocker {
     );
     if (filterLists.length > 0) {
       console.info('Parsing blocker lists...');
-      for (let listAsStr of filterLists) {
+      for (const listAsStr of filterLists) {
         // Split into chunks to not block the main thread too much
         const listAsArr = listAsStr.split('\n');
         for (let i = 0; i < listAsArr.length; i += CHUNK_SIZE) {

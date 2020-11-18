@@ -1,5 +1,3 @@
-import * as path from 'path';
-
 import * as puppeteer from 'puppeteer-core';
 import { v4 as uuid } from 'uuid';
 import { validateURL, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
@@ -17,9 +15,6 @@ const RESTRICTED_IPS =
 
 import injectBaseHref from 'lib/helpers/injectBaseHref';
 import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
-import getExtensionPath, { EXTENSIONS } from 'lib/helpers/getExtensionPath';
-
-import adBlocker from 'lib/adBlockerSingleton';
 
 const WIDTH = 1280;
 const HEIGHT = 1024;
@@ -27,14 +22,14 @@ const IGNORED_RESOURCES = ['font', 'image'];
 const PAGE_BUFFER_SIZE = 2;
 const TIMEOUT = 10000;
 
-export interface taskParams {
+export interface TaskParams {
   url: URL;
   headersToForward: {
     [s: string]: string;
   };
 }
 
-export interface taskResult {
+export interface TaskResult {
   statusCode?: number;
   body?: string;
   headers?: { [s: string]: string };
@@ -42,9 +37,9 @@ export interface taskResult {
   error?: string;
 }
 
-interface taskObject {
+interface TaskObject {
   id: string;
-  promise: Promise<taskResult>;
+  promise: Promise<TaskResult>;
 }
 
 class Renderer {
@@ -53,16 +48,13 @@ class Renderer {
   nbTotalTasks: number;
   private _browser: puppeteer.Browser | null;
   private _stopping: boolean;
-  private _pageBuffer: Promise<{
-    page: puppeteer.Page;
-    context: puppeteer.BrowserContext;
-  }>[];
-  private _currentTasks: { id: string; promise: taskObject['promise'] }[];
-  private _extensionsData: {
-    [id: string]: {
-      name: string;
-    };
-  };
+  private _pageBuffer: Array<
+    Promise<{
+      page: puppeteer.Page;
+      context: puppeteer.BrowserContext;
+    }>
+  >;
+  private _currentTasks: Array<{ id: string; promise: TaskObject['promise'] }>;
   private _createBrowserPromise: Promise<void> | null;
 
   constructor() {
@@ -76,7 +68,6 @@ class Renderer {
       this._createNewPage()
     );
     this._currentTasks = [];
-    this._extensionsData = {};
 
     Promise.all(this._pageBuffer).then(() => {
       this.ready = true;
@@ -84,7 +75,7 @@ class Renderer {
     });
   }
 
-  async task(job: taskParams) {
+  async task(job: TaskParams) {
     if (this._stopping) {
       throw new Error('Called task on a stopping Renderer');
     }
@@ -128,11 +119,9 @@ class Renderer {
   private async _createBrowser() {
     console.info(`Browser ${this.id} creating...`);
 
-    const extensions = await Promise.all(EXTENSIONS.map(getExtensionPath));
-
     // Call this before launching the browser,
     // otherwise the launch call might timeout
-    await adBlocker.waitForReadyness();
+    // await adBlocker.waitForReadyness();
 
     const env: { [s: string]: string } = {};
     if (process.env.DISPLAY) {
@@ -140,7 +129,7 @@ class Renderer {
     }
 
     const browser = await puppeteer.launch({
-      headless: extensions.length === 0,
+      headless: true,
       env,
       executablePath: await getChromiumExecutablePath(),
       defaultViewport: {
@@ -173,17 +162,8 @@ class Renderer {
         // Disable dev-shm
         // See https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#tips
         '--disable-dev-shm-usage',
-        // Extensions
-        ...(extensions.length === 0
-          ? []
-          : [
-              `--disable-extensions-except=${extensions.join(',')}`,
-              ...extensions.map((e) => `--load-extension=${e}`),
-            ]),
       ].filter((e) => e !== ''),
     });
-
-    await this._activateIncognitoExtensions({ browser, extensions });
 
     // Try to load a test page first
     const testPage = await browser.newPage();
@@ -203,79 +183,12 @@ class Renderer {
     return this._browser as puppeteer.Browser;
   }
 
-  private async _activateIncognitoExtensions({
-    browser,
-    extensions,
-  }: {
-    browser: puppeteer.Browser;
-    extensions: string[];
-  }) {
-    if (extensions.length === 0) return;
-
-    // Allow extensions in incognito mode
-    const extensionsPage = await browser.newPage();
-    await extensionsPage.goto('chrome://extensions', {
-      waitUntil: 'networkidle0',
-    });
-    const getExtensionsDataCode = `
-      Array.from(
-        document
-          .querySelector("body > extensions-manager")
-          .shadowRoot.querySelector("#items-list")
-          .shadowRoot.querySelectorAll('extensions-item')
-      ).reduce((res, $ext) => ({
-        [$ext.id]: {
-          name: $ext.shadowRoot.querySelector('#name').innerText.trim()
-        }
-      }), {});
-    `;
-    await extensionsPage.waitForFunction(
-      `(() => { try { ${getExtensionsDataCode}; return true; } catch (e) { return false; } })`
-    );
-    this._extensionsData = await extensionsPage.evaluate(getExtensionsDataCode);
-
-    const getIncognitoButtonCode = `
-      document
-        .querySelector("body > extensions-manager")
-        .shadowRoot.querySelector("#viewManager > extensions-detail-view")
-        .shadowRoot.querySelector("#allow-incognito")
-        .shadowRoot.querySelector("#crToggle")
-    `;
-    await Promise.all(
-      Object.keys(this._extensionsData).map(async (id) => {
-        // Do this in a loop because sometimes Chrome doesn't correctly save the incognito status
-        while (true) {
-          const extensionPage = await browser.newPage();
-          await extensionPage.goto(`chrome://extensions/?id=${id}`, {
-            waitUntil: 'networkidle0',
-          });
-          await extensionPage.waitForFunction(
-            `(() => { try { ${getIncognitoButtonCode}; return true; } catch (e) { return false; } })`
-          );
-
-          const toggled = await extensionPage.evaluate(
-            `${getIncognitoButtonCode}.attributes['aria-pressed'].value === 'true'`
-          );
-          if (toggled) break;
-
-          await extensionPage.evaluate(`${getIncognitoButtonCode}.click()`);
-          // Wait a bit to leave time for the setting to be saved
-          await new Promise((resolve) => setTimeout(resolve, 500));
-
-          await extensionPage.close();
-        }
-      })
-    );
-
-    await extensionsPage.close();
-  }
-
   private async _defineRequestContextForPage({
     page,
     task,
   }: {
     page: puppeteer.Page;
-    task: taskParams;
+    task: TaskParams;
   }) {
     const { url, headersToForward } = task;
 
@@ -315,16 +228,16 @@ class Renderer {
           return;
         }
         // Use AdBlocker to ignore more resources
-        if (
-          await adBlocker.test(
-            req.url(),
-            req.resourceType(),
-            new URL(page.url()).host
-          )
-        ) {
-          await req.abort();
-          return;
-        }
+        // if (
+        //   await adBlocker.test(
+        //     req.url(),
+        //     req.resourceType(),
+        //     new URL(page.url()).host
+        //   )
+        // ) {
+        //   await req.abort();
+        //   return;
+        // }
         // console.log(req.resourceType(), req.url());
         if (req.isNavigationRequest()) {
           const headers = req.headers();
@@ -363,7 +276,7 @@ class Renderer {
     return await this._pageBuffer.shift()!;
   }
 
-  private async _processPage(task: taskParams, taskId: string) {
+  private async _processPage(task: TaskParams) {
     /* Setup */
     const { url } = task;
     const { context, page } = await this._newPage();
@@ -392,12 +305,13 @@ class Renderer {
     if (!response) return { error: 'no_response' };
 
     /* Transforming */
-    let statusCode = response.status();
+    const statusCode = response.status();
     const baseHref = `${url.protocol}//${url.host}`;
     await page.evaluate(injectBaseHref, baseHref);
 
     /* Serialize */
     await page.evaluate(() => {
+      // eslint-disable-next-line no-debugger
       debugger;
     });
     const preSerializationUrl = await page.evaluate('window.location.href');
@@ -415,11 +329,11 @@ class Renderer {
     return { statusCode, headers, body, timeout, resolvedUrl };
   }
 
-  private _addTask({ id, promise }: taskObject) {
+  private _addTask({ id, promise }: TaskObject) {
     this._currentTasks.push({ id, promise });
   }
 
-  private _removeTask({ id }: Pick<taskObject, 'id'>) {
+  private _removeTask({ id }: Pick<TaskObject, 'id'>) {
     const idx = this._currentTasks.findIndex(({ id: _id }) => id === _id);
     // Should never happen
     if (idx === -1) throw new Error('Could not find task');
