@@ -1,10 +1,60 @@
 {
   "extends": [
-    "config:js-app",
-    "algolia",
-    ":docker",
-    ":prHourlyLimitNone"
+    ":separateMajorReleases",
+    ":combinePatchMinorReleases",
+    ":ignoreUnstable",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":noUnscheduledUpdates",
+    ":ignoreModulesAndTests",
+    ":autodetectPinVersions",
+    "group:monorepos",
+    "group:recommended"
   ],
-  "reviewers": ["jerska"],
+  "enabledManagers": [
+    "circleci",
+    "docker-compose",
+    "dockerfile",
+    "npm",
+    "nvm"
+  ],
+  "major": {
+    "automerge": false
+  },
+  "minor": {
+    "automerge": true
+  },
+  "patch": {
+    "automerge": true
+  },
+  "pin": {
+    "automerge": true
+  },
+  "separateMultipleMajor": true,
+  "schedule": "every weekend",
+  "reviewers": [],
+  "docker": {
+    "enabled": true
+  },
+  "circleci": {
+    "enabled": true
+  },
+  "docker-compose": {
+    "ignoreDeps": [
+      "kibana-oss",
+      "elasticsearch-oss"
+    ]
+  },
+  "node": {
+    "supportPolicy": [
+      "lts_active"
+    ]
+  },
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "timezone": "Europe/Paris",
+  "prHourlyLimit": 5,
+  "prConcurrentLimit": 10,
+  "dependencyDashboard": true,
   "semanticCommitType": "chore"
 }
