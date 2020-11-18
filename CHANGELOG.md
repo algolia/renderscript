@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/algolia/renderscript/compare/v1.5.0...v1.5.1) (2020-11-18)
+
+
+### Bug Fixes
+
+* upgrade node in dockerfile ([ffb93f8](https://github.com/algolia/renderscript/commit/ffb93f8))
+
 # [1.5.0](https://github.com/algolia/renderscript/compare/v1.4.19...v1.5.0) (2020-11-18)
 
 
