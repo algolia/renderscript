@@ -33,6 +33,10 @@
   "bugs": {
     "url": "https://github.com/algolia/renderscript/issues"
   },
+  "engines": {
+    "node": "14.15.0",
+    "yarn": "^1.19.0"
+  },
   "homepage": "https://github.com/algolia/renderscript#readme",
   "devDependencies": {
     "@semantic-release/changelog": "5.0.1",
