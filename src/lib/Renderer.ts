@@ -82,7 +82,7 @@ class Renderer {
     ++this.nbTotalTasks;
 
     const id = uuid();
-    const promise = this._processPage(job, id);
+    const promise = this._processPage(job);
     this._addTask({ id, promise });
 
     const res = await promise;
