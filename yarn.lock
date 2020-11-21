@@ -6374,10 +6374,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript-transform-paths@2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/typescript-transform-paths/-/typescript-transform-paths-2.0.2.tgz#7040eab666f1921fb4b08ee0a0f21d77403187df"
-  integrity sha512-LRGd/pf73zN275t6Zz6TA3N1jeEHYRnHuiNHUwrGZmFuwt+dmiWeNklz+/e1IcCc5dA6LDI+F+ALe5NyyVFSVQ==
+typescript-transform-paths@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/typescript-transform-paths/-/typescript-transform-paths-2.0.3.tgz#93a6ad04d1bb35164366fc1f003d8c54acc84a03"
+  integrity sha512-DYt44CwtreOiTCso09L0gB/X0pZ/8G5iNg40ZPzi5FlfRBmuStphXCkp2kThzUmVdKYiQnHOF83lYWA9RCOwVA==
 
 typescript@4.0.5:
   version "4.0.5"
