@@ -276,7 +276,9 @@ class Renderer {
     return await this._pageBuffer.shift()!;
   }
 
-  private async _processPage(task: TaskParams): Promise<{
+  private async _processPage(
+    task: TaskParams
+  ): Promise<{
     error?: string;
     statusCode?: number;
     headers?: any;
@@ -322,9 +324,11 @@ class Renderer {
       debugger;
     });
     const preSerializationUrl = await page.evaluate('window.location.href');
-    const body = await page.evaluate('document.firstElementChild.outerHTML') as string;
+    const body = (await page.evaluate(
+      'document.firstElementChild.outerHTML'
+    )) as string;
     const headers = response.headers();
-    const resolvedUrl = await page.evaluate('window.location.href') as string;
+    const resolvedUrl = (await page.evaluate('window.location.href')) as string;
     /* Cleanup */
     await context.close();
 
