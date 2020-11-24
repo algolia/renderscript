@@ -25,7 +25,7 @@ export function getURLFromQuery(
   res: express.Response,
   next: express.NextFunction
 ) {
-  const url = req.query.url.toString();
+  const url = req.query.url?.toString() || '';
   if (req.method === 'GET' && !url) {
     badRequest({ res, message: 'Missing URL in query params' });
     return;
