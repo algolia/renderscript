@@ -9,7 +9,7 @@ interface Params {
 let gracefullyClosing = false;
 
 async function close({ api, renderer }: Params) {
-  const webServerPromise = new Promise((resolve) => {
+  const webServerPromise = new Promise<void>((resolve) => {
     console.info('[API] Shutting down');
     api.stop(() => {
       console.info('[API] Shut down');
