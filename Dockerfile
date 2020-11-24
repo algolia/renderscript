@@ -1,5 +1,5 @@
 # Base image
-FROM node:14.15.0-slim AS base
+FROM node:14.15.1-slim AS base
 
 # Install git
 # Others are dependencies of our gyp dependencies
