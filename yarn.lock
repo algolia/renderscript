@@ -6036,10 +6036,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript-transform-paths@2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/typescript-transform-paths/-/typescript-transform-paths-2.2.0.tgz#925c073050390f51d2aa5472428081dcb370b8d4"
-  integrity sha512-Cc+9Z7IbswrTT+0dKz6Uh+Nv2jUSUCndSCEHYomt5mQYT/xqmFOWOcm6WCKOvgCL6H/kJegGPyB6Q80V44miFA==
+typescript-transform-paths@2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/typescript-transform-paths/-/typescript-transform-paths-2.2.1.tgz#75bad2f5e21826c92b65e1a952997f315819b8b9"
+  integrity sha512-4i2QL3Q7g72KtEuQl6PdK52nAc2y3ps7fVEHi2QSjIPLlmYEs8lYlh3XvS4QvwjYjcVxAzYoOKwXSYZd/Pbx0Q==
   dependencies:
     minimatch "^3.0.4"
 
