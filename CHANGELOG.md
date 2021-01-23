@@ -1,3 +1,10 @@
+## [1.5.5](https://github.com/algolia/renderscript/compare/v1.5.4...v1.5.5) (2021-01-23)
+
+
+### Bug Fixes
+
+* eslint ([#176](https://github.com/algolia/renderscript/issues/176)) ([acfc6a6](https://github.com/algolia/renderscript/commit/acfc6a639ed220dd73dce30829a9a67befc1c187))
+
 ## [1.5.4](https://github.com/algolia/renderscript/compare/v1.5.3...v1.5.4) (2020-12-12)
 
 
