@@ -1,4 +1,4 @@
-import * as puppeteer from 'puppeteer-core';
+import puppeteer from 'puppeteer-core';
 
 export default async function getChromiumExecutablePath(): Promise<string> {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -7,7 +7,7 @@ export default async function getChromiumExecutablePath(): Promise<string> {
     PUPPETEER_REVISIONS: { chromium: revision },
   } = revisions;
 
-  const fetcher = puppeteer.createBrowserFetcher();
+  const fetcher = puppeteer.createBrowserFetcher({});
   const localRevisions = await fetcher.localRevisions();
 
   let revisionInfo;

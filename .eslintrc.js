@@ -19,6 +19,9 @@ module.exports = {
   settings: {
     'import/resolver': {
       typescript: {},
+      alias: {
+        map: [['puppeeter-core', 'puppeteer-core/lib/esm/puppeteer/node']],
+      },
     },
   },
 

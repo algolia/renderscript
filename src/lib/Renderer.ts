@@ -1,5 +1,11 @@
 import { validateURL, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
-import * as puppeteer from 'puppeteer-core';
+import puppeteer from 'puppeteer-core';
+import type {
+  Page,
+  HTTPResponse,
+  Browser,
+  BrowserContext,
+} from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 import { v4 as uuid } from 'uuid';
 
 import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
@@ -39,8 +45,8 @@ export interface TaskResult {
 }
 
 export interface NewPage {
-  page: puppeteer.Page;
-  context: puppeteer.BrowserContext;
+  page: Page;
+  context: BrowserContext;
 }
 
 interface TaskObject {
@@ -52,7 +58,7 @@ class Renderer {
   id: string;
   ready: boolean;
   nbTotalTasks: number;
-  private _browser: puppeteer.Browser | null;
+  private _browser: Browser | null;
   private _stopping: boolean;
   private _pageBuffer: Array<Promise<NewPage>>;
   private _currentTasks: Array<{ id: string; promise: TaskObject['promise'] }>;
@@ -171,7 +177,7 @@ class Renderer {
   }
 
   // Not a `get`ter because the method is `async`
-  private async _getBrowser(): Promise<puppeteer.Browser> {
+  private async _getBrowser(): Promise<Browser> {
     if (this._createBrowserPromise) {
       await this._createBrowserPromise;
     }
@@ -184,7 +190,7 @@ class Renderer {
     page,
     task,
   }: {
-    page: puppeteer.Page;
+    page: Page;
     task: TaskParams;
   }): Promise<void> {
     const { url, headersToForward } = task;
@@ -205,7 +211,7 @@ class Renderer {
     }
 
     /* Ignore useless/dangerous resources */
-    page.on('request', async (req: puppeteer.Request) => {
+    page.on('request', async (req) => {
       // check for ssrf attempts
       try {
         await validateURL({
@@ -269,9 +275,9 @@ class Renderer {
 
     await this._defineRequestContextForPage({ page, task });
 
-    let response: puppeteer.Response | null = null;
+    let response: HTTPResponse | null = null;
     let timeout = false;
-    page.addListener('response', (r: puppeteer.Response) => {
+    page.addListener('response', (r) => {
       if (!response) response = r;
     });
     try {
@@ -293,6 +299,7 @@ class Renderer {
     /* Transforming */
     const statusCode = response.status();
     const baseHref = `${url.protocol}//${url.host}`;
+    // @ts-expect-error I don't understand the error
     await page.evaluate(injectBaseHref, baseHref);
 
     /* Serialize */

@@ -24,9 +24,6 @@ async function close({ api, renderer }: Params): Promise<void> {
   console.info('[Renderer] Shut down');
 
   console.info('Gracefully stopped everything');
-
-  // eslint-disable-next-line no-process-exit
-  process.exit(0);
 }
 
 export default async ({ api, renderer }: Params): Promise<void> => {
@@ -37,4 +34,7 @@ export default async ({ api, renderer }: Params): Promise<void> => {
 
   gracefullyClosing = true;
   await close({ api, renderer });
+
+  // eslint-disable-next-line no-process-exit
+  process.exit(0);
 };
