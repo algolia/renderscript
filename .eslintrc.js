@@ -19,9 +19,6 @@ module.exports = {
   settings: {
     'import/resolver': {
       typescript: {},
-      alias: {
-        map: [['puppeeter-core', 'puppeteer-core/lib/esm/puppeteer/node']],
-      },
     },
   },
 
@@ -58,11 +55,6 @@ module.exports = {
       'error',
       {
         pathGroups: [
-          {
-            pattern: '@algolia/crawler-**/**',
-            group: 'external',
-            position: 'after',
-          },
           {
             pattern: '*(@algolia|components)/**',
             group: 'parent',
