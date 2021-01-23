@@ -32,11 +32,12 @@ export default class AdBlocker {
 
   private async _init() {
     const filterLists = await Promise.all(
-      ADBLOCK_LISTS.map(async (name) => {
-        return await fs.readFile(await getAdblockListPath(name), {
-          encoding: 'utf-8',
-        });
-      })
+      ADBLOCK_LISTS.map(
+        async (name) =>
+          await fs.readFile(await getAdblockListPath(name), {
+            encoding: 'utf-8',
+          })
+      )
     );
     if (filterLists.length > 0) {
       console.info('Parsing blocker lists...');
