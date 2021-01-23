@@ -1,6 +1,15 @@
-import * as puppeteer from 'puppeteer-core';
-import { v4 as uuid } from 'uuid';
 import { validateURL, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
+import puppeteer from 'puppeteer-core';
+import type {
+  Page,
+  HTTPResponse,
+  Browser,
+  BrowserContext,
+} from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
+import { v4 as uuid } from 'uuid';
+
+import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
+import injectBaseHref from 'lib/helpers/injectBaseHref';
 
 const IP_PREFIXES_WHITELIST = process.env.IP_PREFIXES_WHITELIST
   ? process.env.IP_PREFIXES_WHITELIST.split(',')
@@ -11,10 +20,7 @@ const RESTRICTED_IPS =
     ? PRIVATE_IP_PREFIXES.filter(
         (prefix: string) => !IP_PREFIXES_WHITELIST.includes(prefix)
       ) // relax filtering
-    : PRIVATE_IP_PREFIXES; // no private IPs otherwise
-
-import injectBaseHref from 'lib/helpers/injectBaseHref';
-import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
+    : PRIVATE_IP_PREFIXES;
 
 const WIDTH = 1280;
 const HEIGHT = 1024;
@@ -32,9 +38,15 @@ export interface TaskParams {
 export interface TaskResult {
   statusCode?: number;
   body?: string;
-  headers?: { [s: string]: string };
+  headers?: Record<string, string>;
   timeout?: boolean;
   error?: string;
+  resolvedUrl?: string;
+}
+
+export interface NewPage {
+  page: Page;
+  context: BrowserContext;
 }
 
 interface TaskObject {
@@ -46,14 +58,9 @@ class Renderer {
   id: string;
   ready: boolean;
   nbTotalTasks: number;
-  private _browser: puppeteer.Browser | null;
+  private _browser: Browser | null;
   private _stopping: boolean;
-  private _pageBuffer: Array<
-    Promise<{
-      page: puppeteer.Page;
-      context: puppeteer.BrowserContext;
-    }>
-  >;
+  private _pageBuffer: Array<Promise<NewPage>>;
   private _currentTasks: Array<{ id: string; promise: TaskObject['promise'] }>;
   private _createBrowserPromise: Promise<void> | null;
 
@@ -75,7 +82,7 @@ class Renderer {
     });
   }
 
-  async task(job: TaskParams) {
+  async task(job: TaskParams): Promise<TaskResult> {
     if (this._stopping) {
       throw new Error('Called task on a stopping Renderer');
     }
@@ -92,7 +99,7 @@ class Renderer {
     return res;
   }
 
-  async stop() {
+  async stop(): Promise<void> {
     this._stopping = true;
     console.info(`Browser ${this.id} stopping...`);
     while (!this.ready) {
@@ -105,7 +112,7 @@ class Renderer {
     console.info(`Browser ${this.id} stopped`);
   }
 
-  async healthy() {
+  async healthy(): Promise<boolean> {
     if (this._stopping) return false;
     try {
       const browser = await this._getBrowser();
@@ -116,12 +123,8 @@ class Renderer {
     }
   }
 
-  private async _createBrowser() {
+  private async _createBrowser(): Promise<void> {
     console.info(`Browser ${this.id} creating...`);
-
-    // Call this before launching the browser,
-    // otherwise the launch call might timeout
-    // await adBlocker.waitForReadyness();
 
     const env: { [s: string]: string } = {};
     if (process.env.DISPLAY) {
@@ -133,8 +136,8 @@ class Renderer {
       env,
       executablePath: await getChromiumExecutablePath(),
       defaultViewport: {
-        width: 1920,
-        height: 1080,
+        width: WIDTH,
+        height: HEIGHT,
       },
       handleSIGINT: false,
       handleSIGTERM: false,
@@ -174,22 +177,22 @@ class Renderer {
   }
 
   // Not a `get`ter because the method is `async`
-  private async _getBrowser() {
+  private async _getBrowser(): Promise<Browser> {
     if (this._createBrowserPromise) {
       await this._createBrowserPromise;
     }
 
     // We know that _browser is created at the end of the promise
-    return this._browser as puppeteer.Browser;
+    return this._browser!;
   }
 
   private async _defineRequestContextForPage({
     page,
     task,
   }: {
-    page: puppeteer.Page;
+    page: Page;
     task: TaskParams;
-  }) {
+  }): Promise<void> {
     const { url, headersToForward } = task;
 
     await page.setRequestInterception(true);
@@ -208,7 +211,7 @@ class Renderer {
     }
 
     /* Ignore useless/dangerous resources */
-    page.on('request', async (req: puppeteer.Request) => {
+    page.on('request', async (req) => {
       // check for ssrf attempts
       try {
         await validateURL({
@@ -227,18 +230,7 @@ class Renderer {
           await req.abort();
           return;
         }
-        // Use AdBlocker to ignore more resources
-        // if (
-        //   await adBlocker.test(
-        //     req.url(),
-        //     req.resourceType(),
-        //     new URL(page.url()).host
-        //   )
-        // ) {
-        //   await req.abort();
-        //   return;
-        // }
-        // console.log(req.resourceType(), req.url());
+
         if (req.isNavigationRequest()) {
           const headers = req.headers();
           await req.continue({
@@ -255,7 +247,7 @@ class Renderer {
     });
   }
 
-  private async _createNewPage() {
+  private async _createNewPage(): Promise<NewPage> {
     if (this._stopping) {
       throw new Error('Called _createNewPage on a stopping Renderer');
     }
@@ -271,30 +263,21 @@ class Renderer {
     return { page, context };
   }
 
-  private async _newPage() {
+  private async _newPage(): Promise<NewPage> {
     this._pageBuffer.push(this._createNewPage());
     return await this._pageBuffer.shift()!;
   }
 
-  private async _processPage(
-    task: TaskParams
-  ): Promise<{
-    error?: string;
-    statusCode?: number;
-    headers?: any;
-    body?: string;
-    timeout?: boolean;
-    resolvedUrl?: string;
-  }> {
+  private async _processPage(task: TaskParams): Promise<TaskResult> {
     /* Setup */
     const { url } = task;
     const { context, page } = await this._newPage();
 
     await this._defineRequestContextForPage({ page, task });
 
-    let response: puppeteer.Response | null = null;
+    let response: HTTPResponse | null = null;
     let timeout = false;
-    page.addListener('response', (r: puppeteer.Response) => {
+    page.addListener('response', (r) => {
       if (!response) response = r;
     });
     try {
@@ -316,6 +299,7 @@ class Renderer {
     /* Transforming */
     const statusCode = response.status();
     const baseHref = `${url.protocol}//${url.host}`;
+    // @ts-expect-error I don't understand the error
     await page.evaluate(injectBaseHref, baseHref);
 
     /* Serialize */
@@ -340,11 +324,11 @@ class Renderer {
     return { statusCode, headers, body, timeout, resolvedUrl };
   }
 
-  private _addTask({ id, promise }: TaskObject) {
+  private _addTask({ id, promise }: TaskObject): void {
     this._currentTasks.push({ id, promise });
   }
 
-  private _removeTask({ id }: Pick<TaskObject, 'id'>) {
+  private _removeTask({ id }: Pick<TaskObject, 'id'>): void {
     const idx = this._currentTasks.findIndex(({ id: _id }) => id === _id);
     // Should never happen
     if (idx === -1) throw new Error('Could not find task');

@@ -1,10 +1,8 @@
-import dotenv from 'helpers/dotenv';
-dotenv();
-
 import Api from 'api/index';
-import renderer from 'lib/rendererSingleton';
-
+import dotenv from 'helpers/dotenv';
 import gracefulClose from 'helpers/gracefulClose';
+import renderer from 'lib/rendererSingleton';
+dotenv();
 
 console.info(`NODE_ENV = ${process.env.NODE_ENV}`);
 

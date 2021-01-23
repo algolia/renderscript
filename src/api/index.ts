@@ -1,14 +1,13 @@
-import * as path from 'path';
 import * as http from 'http';
-import * as express from 'express';
+import * as path from 'path';
+
 import * as bodyParser from 'body-parser';
+import express from 'express';
 
 import requestLogger from 'api/helpers/requestLogger';
-
-import * as render from 'api/routes/render';
-import ready from 'api/routes/ready';
 import healthy from 'api/routes/healthy';
-
+import ready from 'api/routes/ready';
+import * as render from 'api/routes/render';
 import projectRoot from 'helpers/projectRoot';
 
 export default class Api {
@@ -20,7 +19,7 @@ export default class Api {
     this.server = http.createServer(this._app);
   }
 
-  start(port: number) {
+  start(port: number): void {
     this._setup();
     this._routes();
 
@@ -29,17 +28,17 @@ export default class Api {
     });
   }
 
-  stop(cb: () => any) {
+  stop(cb: () => any): void {
     this.server.close(cb);
   }
 
-  private _setup() {
+  private _setup(): void {
     this._app.disable('x-powered-by');
     this._app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
     this._app.use(requestLogger);
   }
 
-  private _routes() {
+  private _routes(): void {
     this._app
       .get('/ready', ready)
       .get('/healthy', healthy)

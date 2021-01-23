@@ -43,13 +43,6 @@ RUN \
   yarn install --production=true && \
   yarn cache clean
 
-# Pre-install some extensions and block lists
-ARG extensions_cache
-ARG adblock_lists_cache
-
-ENV EXTENSIONS=$extensions_cache
-ENV ADBLOCK_LISTS=$adblock_lists_cache
-
 RUN yarn docker:install
 
 # Resulting image

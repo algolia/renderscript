@@ -1,5 +1,5 @@
-import Api from 'api/index';
-import RollingRenderer from 'lib/RollingRenderer';
+import type Api from 'api/index';
+import type RollingRenderer from 'lib/RollingRenderer';
 
 interface Params {
   api: Api;
@@ -8,7 +8,7 @@ interface Params {
 
 let gracefullyClosing = false;
 
-async function close({ api, renderer }: Params) {
+async function close({ api, renderer }: Params): Promise<void> {
   const webServerPromise = new Promise<void>((resolve) => {
     console.info('[API] Shutting down');
     api.stop(() => {
@@ -24,17 +24,17 @@ async function close({ api, renderer }: Params) {
   console.info('[Renderer] Shut down');
 
   console.info('Gracefully stopped everything');
-
-  // eslint-disable-next-line no-process-exit
-  process.exit(0);
 }
 
-export default ({ api, renderer }: Params) => {
+export default async ({ api, renderer }: Params): Promise<void> => {
   // If we receive multiple signals, swallow them
   if (gracefullyClosing) {
     return;
   }
 
   gracefullyClosing = true;
-  close({ api, renderer });
+  await close({ api, renderer });
+
+  // eslint-disable-next-line no-process-exit
+  process.exit(0);
 };

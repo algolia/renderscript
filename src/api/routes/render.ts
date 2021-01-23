@@ -1,14 +1,16 @@
-import * as express from 'express';
-import renderer from 'lib/rendererSingleton';
+import type express from 'express';
 
-import { badRequest } from 'api/helpers/errors';
 import { revertUrl, buildUrl } from 'api/helpers/buildUrl';
+import { badRequest } from 'api/helpers/errors';
+import renderer from 'lib/rendererSingleton';
 
 const HEADERS_TO_FORWARD = process.env.HEADERS_TO_FORWARD
   ? process.env.HEADERS_TO_FORWARD.split(',')
   : ['Cookie', 'Authorization'];
 
-export function getForwardedHeadersFromRequest(req: express.Request) {
+export function getForwardedHeadersFromRequest(
+  req: express.Request
+): Record<string, string> {
   const headersToForward = HEADERS_TO_FORWARD.reduce((partial, headerName) => {
     const name = headerName.toLowerCase();
     if (req.headers[name]) {
@@ -24,7 +26,7 @@ export function getURLFromQuery(
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
-) {
+): void {
   const url = req.query.url?.toString() || '';
   if (req.method === 'GET' && !url) {
     badRequest({ res, message: 'Missing URL in query params' });
@@ -43,7 +45,7 @@ export function getURLFromBody(
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
-) {
+): void {
   const { url } = req.body;
   if (req.method === 'POST' && !url) {
     badRequest({ res, message: 'Missing URL in body' });
@@ -62,7 +64,7 @@ export function validateURL(
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
-) {
+): void {
   const { url } = res.locals;
   // Prevent browsing the filesystem using Chrome
   if (!['http:', 'https:'].includes(url.protocol)) {
@@ -72,7 +74,10 @@ export function validateURL(
   next();
 }
 
-export async function render(req: express.Request, res: express.Response) {
+export async function render(
+  req: express.Request,
+  res: express.Response
+): Promise<void> {
   const { url } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
 
@@ -112,7 +117,10 @@ export async function render(req: express.Request, res: express.Response) {
   }
 }
 
-export async function renderJSON(req: express.Request, res: express.Response) {
+export async function renderJSON(
+  req: express.Request,
+  res: express.Response
+): Promise<void> {
   const { url } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
   try {

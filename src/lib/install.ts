@@ -1,5 +1,5 @@
 import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
 
-(async () => {
+(async (): Promise<void> => {
   await Promise.all([getChromiumExecutablePath()]);
 })();
