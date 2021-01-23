@@ -1,6 +1,8 @@
-import * as puppeteer from 'puppeteer-core';
-import { v4 as uuid } from 'uuid';
 import { validateURL, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
+import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
+import injectBaseHref from 'lib/helpers/injectBaseHref';
+import * as puppeteer from 'puppeteer-core';
+import { v4 as uuid } from 'uuid'; // no private IPs otherwise
 
 const IP_PREFIXES_WHITELIST = process.env.IP_PREFIXES_WHITELIST
   ? process.env.IP_PREFIXES_WHITELIST.split(',')
@@ -11,10 +13,7 @@ const RESTRICTED_IPS =
     ? PRIVATE_IP_PREFIXES.filter(
         (prefix: string) => !IP_PREFIXES_WHITELIST.includes(prefix)
       ) // relax filtering
-    : PRIVATE_IP_PREFIXES; // no private IPs otherwise
-
-import injectBaseHref from 'lib/helpers/injectBaseHref';
-import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
+    : PRIVATE_IP_PREFIXES;
 
 const WIDTH = 1280;
 const HEIGHT = 1024;

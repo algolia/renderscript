@@ -1,4 +1,4 @@
-import * as express from 'express';
+import type express from 'express';
 
 interface AnyParams {
   res: express.Response;

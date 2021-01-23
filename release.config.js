@@ -1,5 +1,4 @@
 /* eslint-disable no-template-curly-in-string */
-// eslint-disable-next-line import/no-commonjs
 module.exports = {
   branch: 'master',
   verifyConditions: ['@semantic-release/github'],

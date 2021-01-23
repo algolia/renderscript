@@ -1,8 +1,8 @@
 import { promises as fs } from 'fs';
 import * as path from 'path';
 
-import fetch from 'node-fetch';
 import projectRoot from 'helpers/projectRoot';
+import fetch from 'node-fetch';
 
 const ADBLOCK_LIST_SOURCES: string[] = process.env.ADBLOCK_LISTS
   ? process.env.ADBLOCK_LISTS.split(',').map((src) =>

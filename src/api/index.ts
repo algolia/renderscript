@@ -1,14 +1,12 @@
-import * as path from 'path';
 import * as http from 'http';
-import * as express from 'express';
-import * as bodyParser from 'body-parser';
+import * as path from 'path';
 
 import requestLogger from 'api/helpers/requestLogger';
-
-import * as render from 'api/routes/render';
-import ready from 'api/routes/ready';
 import healthy from 'api/routes/healthy';
-
+import ready from 'api/routes/ready';
+import * as render from 'api/routes/render';
+import * as bodyParser from 'body-parser';
+import * as express from 'express';
 import projectRoot from 'helpers/projectRoot';
 
 export default class Api {

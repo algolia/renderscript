@@ -1,4 +1,5 @@
-import Renderer, { TaskParams } from 'lib/Renderer';
+import type { TaskParams } from 'lib/Renderer';
+import Renderer from 'lib/Renderer';
 
 const MAX_RENDERER_TASKS = 256;
 

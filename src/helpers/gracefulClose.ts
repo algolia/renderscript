@@ -1,5 +1,5 @@
-import Api from 'api/index';
-import RollingRenderer from 'lib/RollingRenderer';
+import type Api from 'api/index';
+import type RollingRenderer from 'lib/RollingRenderer';
 
 interface Params {
   api: Api;

@@ -1,4 +1,4 @@
-import * as express from 'express';
+import type express from 'express';
 
 export default (
   req: express.Request,

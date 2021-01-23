@@ -2,9 +2,9 @@
 // Please see https://github.com/brave/adblock-rust
 
 import { promises as fs } from 'fs';
-// @ts-ignore
-import { AdBlockClient, FilterOptions } from 'adblock-rs';
 
+// @ts-expect-error
+import { AdBlockClient, FilterOptions } from 'adblock-rs';
 import getAdblockListPath, {
   ADBLOCK_LISTS,
 } from 'lib/helpers/getAdBlockListPath';
