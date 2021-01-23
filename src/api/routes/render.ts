@@ -1,6 +1,7 @@
+import type express from 'express';
+
 import { revertUrl, buildUrl } from 'api/helpers/buildUrl';
 import { badRequest } from 'api/helpers/errors';
-import type express from 'express';
 import renderer from 'lib/rendererSingleton';
 
 const HEADERS_TO_FORWARD = process.env.HEADERS_TO_FORWARD

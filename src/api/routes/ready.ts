@@ -1,4 +1,5 @@
 import type express from 'express';
+
 import isReady from 'lib/helpers/isReady';
 
 export default async function ready(

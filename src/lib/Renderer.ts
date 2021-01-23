@@ -1,8 +1,9 @@
 import { validateURL, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
+import * as puppeteer from 'puppeteer-core';
+import { v4 as uuid } from 'uuid';
+
 import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
 import injectBaseHref from 'lib/helpers/injectBaseHref';
-import * as puppeteer from 'puppeteer-core';
-import { v4 as uuid } from 'uuid'; // no private IPs otherwise
 
 const IP_PREFIXES_WHITELIST = process.env.IP_PREFIXES_WHITELIST
   ? process.env.IP_PREFIXES_WHITELIST.split(',')
@@ -118,10 +119,6 @@ class Renderer {
   private async _createBrowser() {
     console.info(`Browser ${this.id} creating...`);
 
-    // Call this before launching the browser,
-    // otherwise the launch call might timeout
-    // await adBlocker.waitForReadyness();
-
     const env: { [s: string]: string } = {};
     if (process.env.DISPLAY) {
       env.DISPLAY = process.env.DISPLAY;
@@ -132,8 +129,8 @@ class Renderer {
       env,
       executablePath: await getChromiumExecutablePath(),
       defaultViewport: {
-        width: 1920,
-        height: 1080,
+        width: WIDTH,
+        height: HEIGHT,
       },
       handleSIGINT: false,
       handleSIGTERM: false,
@@ -226,18 +223,7 @@ class Renderer {
           await req.abort();
           return;
         }
-        // Use AdBlocker to ignore more resources
-        // if (
-        //   await adBlocker.test(
-        //     req.url(),
-        //     req.resourceType(),
-        //     new URL(page.url()).host
-        //   )
-        // ) {
-        //   await req.abort();
-        //   return;
-        // }
-        // console.log(req.resourceType(), req.url());
+
         if (req.isNavigationRequest()) {
           const headers = req.headers();
           await req.continue({

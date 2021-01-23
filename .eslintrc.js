@@ -17,6 +17,12 @@ module.exports = {
     ecmaVersion: 11,
     sourceType: 'module',
   },
+  settings: {
+    'import/resolver': {
+      typescript: {},
+    },
+  },
+
   plugins: ['prettier', '@typescript-eslint', 'import', 'algolia'],
   rules: {
     'algolia/func-style-toplevel': 'error',

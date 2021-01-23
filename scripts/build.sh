@@ -14,6 +14,4 @@ fi
 docker build \
   -t algolia/renderscript \
   -t "algolia/renderscript:${current}" \
-  --build-arg extensions_cache="$EXTENSIONS" \
-  --build-arg adblock_lists_cache="$ADBLOCK_LISTS" \
   .

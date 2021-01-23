@@ -11,7 +11,7 @@
     "types": [
       "node"
     ],
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
       "api/*": [
         "src/api/*"
@@ -27,7 +27,8 @@
       {
         "transform": "typescript-transform-paths"
       }
-    ]
+    ],
+    "esModuleInterop": true
   },
   "include": [
     "src/**/*"
