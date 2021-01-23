@@ -19,7 +19,7 @@ export default class Api {
     this.server = http.createServer(this._app);
   }
 
-  start(port: number) {
+  start(port: number): void {
     this._setup();
     this._routes();
 
@@ -28,17 +28,17 @@ export default class Api {
     });
   }
 
-  stop(cb: () => any) {
+  stop(cb: () => any): void {
     this.server.close(cb);
   }
 
-  private _setup() {
+  private _setup(): void {
     this._app.disable('x-powered-by');
     this._app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
     this._app.use(requestLogger);
   }
 
-  private _routes() {
+  private _routes(): void {
     this._app
       .get('/ready', ready)
       .get('/healthy', healthy)

@@ -1,6 +1,7 @@
 import * as puppeteer from 'puppeteer-core';
 
-export default async function getChromiumExecutablePath() {
+export default async function getChromiumExecutablePath(): Promise<string> {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const revisions = require('puppeteer-core/lib/cjs/puppeteer/revisions.js');
   const {
     PUPPETEER_REVISIONS: { chromium: revision },

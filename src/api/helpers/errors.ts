@@ -7,7 +7,7 @@ interface AnyParams {
   details?: any;
 }
 
-function any({ res, status, message, details }: AnyParams) {
+function any({ res, status, message, details }: AnyParams): void {
   res.status(status).json({ error: true, message, details });
 }
 
@@ -21,7 +21,7 @@ export function badRequest({
   res,
   details,
   message = 'Bad Request',
-}: BadRequestParams) {
+}: BadRequestParams): void {
   return any({
     res,
     status: 400,

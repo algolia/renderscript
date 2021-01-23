@@ -8,7 +8,7 @@ interface Params {
 
 let gracefullyClosing = false;
 
-async function close({ api, renderer }: Params) {
+async function close({ api, renderer }: Params): Promise<void> {
   const webServerPromise = new Promise<void>((resolve) => {
     console.info('[API] Shutting down');
     api.stop(() => {
@@ -29,12 +29,12 @@ async function close({ api, renderer }: Params) {
   process.exit(0);
 }
 
-export default ({ api, renderer }: Params) => {
+export default async ({ api, renderer }: Params): Promise<void> => {
   // If we receive multiple signals, swallow them
   if (gracefullyClosing) {
     return;
   }
 
   gracefullyClosing = true;
-  close({ api, renderer });
+  await close({ api, renderer });
 };

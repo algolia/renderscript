@@ -8,7 +8,7 @@ let readyOnce = false;
 export default async function healthy(
   req: express.Request,
   res: express.Response
-) {
+): Promise<void> {
   // The system cannot be checked for healthyness unless it has already started
   if (!readyOnce) {
     readyOnce = await isReady();

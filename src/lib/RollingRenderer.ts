@@ -1,4 +1,4 @@
-import type { TaskParams } from 'lib/Renderer';
+import type { TaskParams, TaskResult } from 'lib/Renderer';
 import Renderer from 'lib/Renderer';
 
 const MAX_RENDERER_TASKS = 256;
@@ -16,7 +16,7 @@ class RollingRenderer {
     this._previousStopPromise = null;
   }
 
-  get renderer() {
+  get renderer(): Renderer {
     if (this._stopping) {
       throw new Error('Called (get) renderer on a stopping RollingRenderer');
     }
@@ -51,14 +51,14 @@ class RollingRenderer {
     return this._currentRenderer;
   }
 
-  async task(job: TaskParams) {
+  async task(job: TaskParams): Promise<TaskResult> {
     if (this._stopping) {
       throw new Error('Called task on a stopping RollingRenderer');
     }
     return await this.renderer.task(job);
   }
 
-  async stop() {
+  async stop(): Promise<void> {
     this._stopping = true;
     if (this._previousStopPromise) {
       await this._previousStopPromise;
@@ -69,15 +69,15 @@ class RollingRenderer {
     }
   }
 
-  get ready() {
+  get ready(): boolean {
     return this.renderer.ready;
   }
 
-  async healthy() {
+  async healthy(): Promise<boolean> {
     return await this.renderer.healthy();
   }
 
-  private _stopCurrentRenderer() {
+  private _stopCurrentRenderer(): Promise<void> {
     this._previousStopPromise = this._currentRenderer.stop().then(() => {
       this._previousStopPromise = null;
     });

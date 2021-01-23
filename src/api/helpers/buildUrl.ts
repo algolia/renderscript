@@ -1,6 +1,6 @@
 const DOCKER_LOCALHOST = 'host.docker.internal';
 
-export function replaceHost(url: URL, from: string, to: string) {
+export function replaceHost(url: URL, from: string, to: string): URL {
   const fromRegex = new RegExp(`^${from}(:|$)`);
   const host = url.host || '';
   // eslint-disable-next-line no-param-reassign
@@ -8,13 +8,13 @@ export function replaceHost(url: URL, from: string, to: string) {
   return url;
 }
 
-export function revertUrl(href: string) {
+export function revertUrl(href: string): URL {
   const url = new URL(href);
   if (process.env.USE_DOCKER_LOCALHOST !== 'true') return url;
   return replaceHost(url, DOCKER_LOCALHOST, 'localhost');
 }
 
-export function buildUrl(href: string) {
+export function buildUrl(href: string): URL {
   const url = new URL(href);
   if (process.env.USE_DOCKER_LOCALHOST !== 'true') return url;
   return replaceHost(url, 'localhost', DOCKER_LOCALHOST);
