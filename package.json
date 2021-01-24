@@ -14,7 +14,7 @@
     "docker:release": "VERSION=$(npx json -f package.json version) && docker push algolia/renderscript && docker push algolia/renderscript:$VERSION",
     "lint": "eslint --ext=jsx,ts,tsx,js .",
     "release": "yarn docker:build && yarn docker:release",
-    "start": "node --max-old-space-size=128 dist/index.js",
+    "start": "UV_THREADPOOL_SIZE=100 node --max-old-space-size=128 --max-old-space-size=420 dist/index.js",
     "semantic-release": "semantic-release"
   },
   "repository": {
@@ -71,6 +71,7 @@
     "@algolia/dns-filter": "1.1.11",
     "body-parser": "1.19.0",
     "express": "4.17.1",
+    "hot-shots": "8.3.0",
     "node-fetch": "2.6.1",
     "puppeteer-core": "5.5.0",
     "stream-to-string": "1.2.0",
