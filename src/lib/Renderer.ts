@@ -8,6 +8,7 @@ import type {
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 import { v4 as uuid } from 'uuid';
 
+import { stats } from 'helpers/stats';
 import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
 import injectBaseHref from 'lib/helpers/injectBaseHref';
 
@@ -86,6 +87,8 @@ class Renderer {
     if (this._stopping) {
       throw new Error('Called task on a stopping Renderer');
     }
+    const start = Date.now();
+
     ++this.nbTotalTasks;
 
     const id = uuid();
@@ -95,6 +98,8 @@ class Renderer {
     const res = await promise;
 
     this._removeTask({ id });
+
+    stats.timing('rendercript.task', Date.now() - start);
 
     return res;
   }
@@ -113,7 +118,10 @@ class Renderer {
   }
 
   async healthy(): Promise<boolean> {
-    if (this._stopping) return false;
+    if (this._stopping) {
+      return false;
+    }
+
     try {
       const browser = await this._getBrowser();
       await browser.version();
@@ -131,6 +139,7 @@ class Renderer {
       env.DISPLAY = process.env.DISPLAY;
     }
 
+    let start = Date.now();
     const browser = await puppeteer.launch({
       headless: true,
       env,
@@ -167,10 +176,13 @@ class Renderer {
         '--disable-dev-shm-usage',
       ].filter((e) => e !== ''),
     });
+    stats.timing('rendercript.create', Date.now() - start);
 
     // Try to load a test page first
+    start = Date.now();
     const testPage = await browser.newPage();
     await testPage.goto('about://settings', { waitUntil: 'networkidle0' });
+    stats.timing('rendercript.page.initial', Date.now() - start);
 
     this._browser = browser;
     this._createBrowserPromise = null;
@@ -251,6 +263,7 @@ class Renderer {
     if (this._stopping) {
       throw new Error('Called _createNewPage on a stopping Renderer');
     }
+    const start = Date.now();
 
     const browser = await this._getBrowser();
     const context = await browser.createIncognitoBrowserContext();
@@ -260,6 +273,7 @@ class Renderer {
     await page.setCacheEnabled(false);
     await page.setViewport({ width: WIDTH, height: HEIGHT });
 
+    stats.timing('rendercript.page.create', Date.now() - start);
     return { page, context };
   }
 
@@ -277,9 +291,13 @@ class Renderer {
 
     let response: HTTPResponse | null = null;
     let timeout = false;
-    page.addListener('response', (r) => {
-      if (!response) response = r;
+    page.on('response', (r) => {
+      if (!response) {
+        response = r;
+      }
     });
+
+    let start = Date.now();
     try {
       response = await page.goto(url.href, {
         timeout: TIMEOUT,
@@ -291,10 +309,16 @@ class Renderer {
       } else {
         console.error('Caught error when loading page', e);
       }
+    } finally {
+      stats.timing('rendercript.page.goto', Date.now() - start, undefined, {
+        success: response ? 'true' : 'false',
+      });
     }
 
     /* Fetch errors */
-    if (!response) return { error: 'no_response' };
+    if (!response) {
+      return { error: 'no_response' };
+    }
 
     /* Transforming */
     const statusCode = response.status();
@@ -303,6 +327,8 @@ class Renderer {
     await page.evaluate(injectBaseHref, baseHref);
 
     /* Serialize */
+    start = Date.now();
+
     await page.evaluate(() => {
       // eslint-disable-next-line no-debugger
       debugger;
@@ -313,6 +339,9 @@ class Renderer {
     )) as string;
     const headers = response.headers();
     const resolvedUrl = (await page.evaluate('window.location.href')) as string;
+
+    stats.timing('rendercript.page.serialize', Date.now() - start);
+
     /* Cleanup */
     await context.close();
 
