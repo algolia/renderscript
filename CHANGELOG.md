@@ -1,3 +1,10 @@
+## [1.5.7](https://github.com/algolia/renderscript/compare/v1.5.6...v1.5.7) (2021-01-25)
+
+
+### Bug Fixes
+
+* add tests ([#179](https://github.com/algolia/renderscript/issues/179)) ([dcd6ff3](https://github.com/algolia/renderscript/commit/dcd6ff36ffbea7a38d9e30c6a99aa1b43538532d))
+
 ## [1.5.6](https://github.com/algolia/renderscript/compare/v1.5.5...v1.5.6) (2021-01-24)
 
 
