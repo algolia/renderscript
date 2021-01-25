@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head> </head>
+
+<body>
+  <script>
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirectURL = searchParams.get('to');
+    if (redirectURL) {
+      if (redirectURL.startsWith('/')) {
+        window.location = new URL(redirectURL, window.location);
+      } else {
+        window.location = redirectURL;
+      }
+    }
+  </script>
+</body>
+
+</html>
