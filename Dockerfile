@@ -48,7 +48,7 @@ RUN yarn docker:install
 # Resulting image
 # New, minimal image
 # This image must have the minimum amount of layers
-FROM node:12-slim
+FROM node:14.15.4-slim
 
 ENV NODE_ENV production
 ENV IN_DOCKER true
