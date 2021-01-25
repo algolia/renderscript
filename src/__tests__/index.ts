@@ -4,6 +4,7 @@ import { request } from 'undici';
 function cleanString(body: string): string {
   return body.replace(/\n|\r/g, '').replace(/\s\s+/g, '');
 }
+jest.setTimeout(30 * 1000);
 
 describe('main', () => {
   it('should render basic page', async () => {
