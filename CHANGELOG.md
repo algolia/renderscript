@@ -1,3 +1,10 @@
+## [1.5.8](https://github.com/algolia/renderscript/compare/v1.5.7...v1.5.8) (2021-01-26)
+
+
+### Bug Fixes
+
+* metric name + add log ([c45ee19](https://github.com/algolia/renderscript/commit/c45ee197c62276b2ffc5118cfd26f6d9d8fc2207))
+
 ## [1.5.7](https://github.com/algolia/renderscript/compare/v1.5.6...v1.5.7) (2021-01-25)
 
 
