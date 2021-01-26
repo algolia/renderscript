@@ -88,6 +88,7 @@ class Renderer {
       throw new Error('Called task on a stopping Renderer');
     }
     const start = Date.now();
+    console.log('Processing:', job.url);
 
     ++this.nbTotalTasks;
 
@@ -99,7 +100,8 @@ class Renderer {
 
     this._removeTask({ id });
 
-    stats.timing('rendercript.task', Date.now() - start);
+    stats.timing('renderscript.task', Date.now() - start);
+    console.log('Done', job.url);
 
     return res;
   }
@@ -176,13 +178,13 @@ class Renderer {
         '--disable-dev-shm-usage',
       ].filter((e) => e !== ''),
     });
-    stats.timing('rendercript.create', Date.now() - start);
+    stats.timing('renderscript.create', Date.now() - start);
 
     // Try to load a test page first
     start = Date.now();
     const testPage = await browser.newPage();
     await testPage.goto('about://settings', { waitUntil: 'networkidle0' });
-    stats.timing('rendercript.page.initial', Date.now() - start);
+    stats.timing('renderscript.page.initial', Date.now() - start);
 
     this._browser = browser;
     this._createBrowserPromise = null;
@@ -273,7 +275,7 @@ class Renderer {
     await page.setCacheEnabled(false);
     await page.setViewport({ width: WIDTH, height: HEIGHT });
 
-    stats.timing('rendercript.page.create', Date.now() - start);
+    stats.timing('renderscript.page.create', Date.now() - start);
     return { page, context };
   }
 
@@ -310,7 +312,7 @@ class Renderer {
         console.error('Caught error when loading page', e);
       }
     } finally {
-      stats.timing('rendercript.page.goto', Date.now() - start, undefined, {
+      stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
         success: response ? 'true' : 'false',
       });
     }
@@ -340,7 +342,7 @@ class Renderer {
     const headers = response.headers();
     const resolvedUrl = (await page.evaluate('window.location.href')) as string;
 
-    stats.timing('rendercript.page.serialize', Date.now() - start);
+    stats.timing('renderscript.page.serialize', Date.now() - start);
 
     /* Cleanup */
     await context.close();
