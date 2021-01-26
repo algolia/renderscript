@@ -1,3 +1,10 @@
+## [1.5.10](https://github.com/algolia/renderscript/compare/v1.5.9...v1.5.10) (2021-01-26)
+
+
+### Bug Fixes
+
+* URL serialisation ([7a69954](https://github.com/algolia/renderscript/commit/7a69954e48f44d0bd05b1578497473e385aeef2e))
+
 ## [1.5.9](https://github.com/algolia/renderscript/compare/v1.5.8...v1.5.9) (2021-01-26)
 
 
