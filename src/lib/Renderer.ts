@@ -88,7 +88,7 @@ class Renderer {
       throw new Error('Called task on a stopping Renderer');
     }
     const start = Date.now();
-    console.log('Processing:', job.url);
+    console.log('Processing:', job.url.toString());
 
     ++this.nbTotalTasks;
 
@@ -101,7 +101,7 @@ class Renderer {
     this._removeTask({ id });
 
     stats.timing('renderscript.task', Date.now() - start);
-    console.log('Done', job.url);
+    console.log('Done', job.url.toString());
 
     return res;
   }
