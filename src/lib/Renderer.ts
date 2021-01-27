@@ -5,12 +5,15 @@ import type {
   HTTPResponse,
   Browser,
   BrowserContext,
+  HTTPRequest,
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 import { v4 as uuid } from 'uuid';
 
 import { stats } from 'helpers/stats';
 import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
 import injectBaseHref from 'lib/helpers/injectBaseHref';
+
+import { flags } from './constants';
 
 const IP_PREFIXES_WHITELIST = process.env.IP_PREFIXES_WHITELIST
   ? process.env.IP_PREFIXES_WHITELIST.split(',')
@@ -25,9 +28,17 @@ const RESTRICTED_IPS =
 
 const WIDTH = 1280;
 const HEIGHT = 1024;
-const IGNORED_RESOURCES = ['font', 'image'];
+const IGNORED_RESOURCES = [
+  'font',
+  'image',
+  'media',
+  'websocket',
+  'manifest',
+  'texttrack',
+];
 const PAGE_BUFFER_SIZE = 2;
 const TIMEOUT = 10000;
+const DATA_REGEXP = /^data:/i;
 
 export interface TaskParams {
   url: URL;
@@ -153,30 +164,7 @@ class Renderer {
       handleSIGINT: false,
       handleSIGTERM: false,
       pipe: true,
-      args: [
-        // Disable sandboxing when not available
-        '--no-sandbox',
-        // No GPU available inside Docker
-        '--disable-gpu',
-        // Seems like a powerful hack, not sure why
-        // https://github.com/Codeception/CodeceptJS/issues/561
-        "--proxy-server='direct://'",
-        '--proxy-bypass-list=*',
-        // Disable cache
-        '--disk-cache-dir=/dev/null',
-        '--media-cache-size=1',
-        '--disk-cache-size=1',
-        // Disable useless UI features
-        '--no-first-run',
-        '--noerrdialogs',
-        '--disable-notifications',
-        '--disable-translate',
-        '--disable-infobars',
-        '--disable-features=TranslateUI',
-        // Disable dev-shm
-        // See https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#tips
-        '--disable-dev-shm-usage',
-      ].filter((e) => e !== ''),
+      args: flags,
     });
     stats.timing('renderscript.create', Date.now() - start);
 
@@ -225,17 +213,26 @@ class Renderer {
     }
 
     /* Ignore useless/dangerous resources */
-    page.on('request', async (req) => {
+    page.on('request', async (req: HTTPRequest) => {
+      const url = req.url();
+
+      // Skip data URIs
+      if (DATA_REGEXP.test(url)) {
+        req.abort();
+        return;
+      }
+
       // check for ssrf attempts
       try {
         await validateURL({
-          url: req.url(),
+          url,
           ipPrefixes: RESTRICTED_IPS,
         });
       } catch (err) {
         // log.error(err);
         // report(err);
         req.abort();
+        return;
       }
 
       try {
@@ -265,10 +262,11 @@ class Renderer {
     if (this._stopping) {
       throw new Error('Called _createNewPage on a stopping Renderer');
     }
-    const start = Date.now();
 
     const browser = await this._getBrowser();
     const context = await browser.createIncognitoBrowserContext();
+
+    const start = Date.now();
     const page = await context.newPage();
 
     await page.setUserAgent('Algolia Crawler Renderscript');
