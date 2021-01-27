@@ -214,10 +214,10 @@ class Renderer {
 
     /* Ignore useless/dangerous resources */
     page.on('request', async (req: HTTPRequest) => {
-      const url = req.url();
+      const reqUrl = req.url();
 
       // Skip data URIs
-      if (DATA_REGEXP.test(url)) {
+      if (DATA_REGEXP.test(reqUrl)) {
         req.abort();
         return;
       }
@@ -225,7 +225,7 @@ class Renderer {
       // check for ssrf attempts
       try {
         await validateURL({
-          url,
+          url: reqUrl,
           ipPrefixes: RESTRICTED_IPS,
         });
       } catch (err) {
