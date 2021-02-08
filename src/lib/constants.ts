@@ -15,7 +15,7 @@ export const flags = [
   '--disk-cache-size=1',
   // Disable useless UI features
   '--disable-extensions',
-  '--disable-features=TranslateUI',
+  '--disable-features=Translate',
   '--disable-infobars',
   '--disable-notifications',
   '--disable-translate',
