@@ -1,3 +1,10 @@
+## [1.5.13](https://github.com/algolia/renderscript/compare/v1.5.12...v1.5.13) (2021-02-08)
+
+
+### Bug Fixes
+
+* **deps:** update dependency puppeteer-core to v7 ([#188](https://github.com/algolia/renderscript/issues/188)) ([dc5c647](https://github.com/algolia/renderscript/commit/dc5c6479d09eded76f4e3875a041bdda1360c66e))
+
 ## [1.5.12](https://github.com/algolia/renderscript/compare/v1.5.11...v1.5.12) (2021-02-08)
 
 
