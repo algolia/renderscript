@@ -8212,10 +8212,10 @@ undefsafe@^2.0.3:
   dependencies:
     debug "^2.2.0"
 
-undici@3.3.1:
-  version "3.3.1"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-3.3.1.tgz#85bb37ae75e255867a54c61e648c27d0fce94b1c"
-  integrity sha512-hatYbCN8wHzaAdADQXRGTxWLDVDIUfIY7oqiGbBtVla3p8tQshPs57NL4x96wD2x0i6qvxGlaFUpVh1n4N6lJQ==
+undici@3.3.3:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-3.3.3.tgz#a90a783a5605fd3d0e093624e261aae234646452"
+  integrity sha512-JcC6p86DLPDne5vhm9nZ9N6hW/WPCtO8/NV+7YHS+x/mQ+NpWvtGxIt28ObBsySPec8FsabyiLPhmn7Htl9w3A==
 
 union-value@^1.0.0:
   version "1.0.1"
