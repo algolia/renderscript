@@ -1,3 +1,10 @@
+## [1.5.14](https://github.com/algolia/renderscript/compare/v1.5.13...v1.5.14) (2021-03-01)
+
+
+### Bug Fixes
+
+* **deps:** update node.js to v14.16.0 ([#196](https://github.com/algolia/renderscript/issues/196)) ([32ffc91](https://github.com/algolia/renderscript/commit/32ffc911ddc6c74fe0d1c7d09c5c8e4cc135994b))
+
 ## [1.5.13](https://github.com/algolia/renderscript/compare/v1.5.12...v1.5.13) (2021-02-08)
 
 
