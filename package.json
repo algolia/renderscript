@@ -71,7 +71,7 @@
     "undici": "3.3.3"
   },
   "dependencies": {
-    "@algolia/dns-filter": "1.1.11",
+    "@algolia/dns-filter": "1.1.13",
     "body-parser": "1.19.0",
     "express": "4.17.1",
     "hot-shots": "8.3.0",
