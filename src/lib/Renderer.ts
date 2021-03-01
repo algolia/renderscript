@@ -121,7 +121,9 @@ class Renderer {
     this._stopping = true;
     console.info(`Browser ${this.id} stopping...`);
     while (!this.ready) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100);
+      });
     }
     await Promise.all(this._currentTasks.map(({ promise }) => promise));
     await Promise.all(this._pageBuffer);
