@@ -2,7 +2,7 @@ import * as http from 'http';
 import * as path from 'path';
 
 import * as bodyParser from 'body-parser';
-import express from 'express';
+import express, { static as expressStatic } from 'express';
 
 import requestLogger from 'api/helpers/requestLogger';
 import healthy from 'api/routes/healthy';
@@ -50,6 +50,6 @@ export default class Api {
         render.renderJSON
       );
 
-    this._app.use(express.static(path.join(projectRoot, '/public')));
+    this._app.use(expressStatic(path.join(projectRoot, '/public')));
   }
 }
