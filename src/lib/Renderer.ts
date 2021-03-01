@@ -323,7 +323,6 @@ class Renderer {
     /* Transforming */
     const statusCode = response.status();
     const baseHref = `${url.protocol}//${url.host}`;
-    // @ts-expect-error I don't understand the error
     await page.evaluate(injectBaseHref, baseHref);
 
     /* Serialize */

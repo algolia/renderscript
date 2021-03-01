@@ -75,7 +75,7 @@
     "body-parser": "1.19.0",
     "express": "4.17.1",
     "hot-shots": "8.3.0",
-    "puppeteer-core": "7.0.1",
+    "puppeteer-core": "7.1.0",
     "stream-to-string": "1.2.0",
     "uuid": "8.3.2"
   }
