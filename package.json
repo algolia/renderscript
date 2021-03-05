@@ -50,7 +50,7 @@
     "@typescript-eslint/parser": "4.16.0",
     "dotenv-safe": "8.2.0",
     "eslint": "7.21.0",
-    "eslint-config-algolia": "17.0.1",
+    "eslint-config-algolia": "18.0.0",
     "eslint-config-prettier": "8.1.0",
     "eslint-config-standard": "16.0.2",
     "eslint-import-resolver-typescript": "2.4.0",
