@@ -1,3 +1,10 @@
+## [1.5.18](https://github.com/algolia/renderscript/compare/v1.5.17...v1.5.18) (2021-03-08)
+
+
+### Bug Fixes
+
+* **deps:** upgrade ([5fe04a8](https://github.com/algolia/renderscript/commit/5fe04a8b1a45523c0d664201f87499051af49b9d))
+
 ## [1.5.17](https://github.com/algolia/renderscript/compare/v1.5.16...v1.5.17) (2021-03-01)
 
 
