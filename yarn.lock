@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@algolia/dns-filter@1.1.15":
-  version "1.1.15"
-  resolved "https://registry.yarnpkg.com/@algolia/dns-filter/-/dns-filter-1.1.15.tgz#d3061290de2119d67befc31ff612e67a6983b84a"
-  integrity sha512-c62wgr2t083/NmCG6njiRHfIbtFS4gj4816R3V2xxksk5SKnUL+jhAoKoVEcCxY13xW2LtozxQ6PZqHHAAgY0w==
+"@algolia/dns-filter@1.1.16":
+  version "1.1.16"
+  resolved "https://registry.yarnpkg.com/@algolia/dns-filter/-/dns-filter-1.1.16.tgz#b09472cd24dd14a6a97d578d069f9ab59d0053be"
+  integrity sha512-UeAh31bDKoA+YTOm/zPIYll3DB+JjCsHicPKKSr6FzPoGvXQFVOznBhumZHess4H1wrPZAQq7OdG0zKKge3D+A==
   dependencies:
     ip-address "7.1.0"
 
