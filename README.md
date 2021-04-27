@@ -30,13 +30,14 @@ Main endpoint. Renders the page and dumps a JSON with all the page information.
 
 Body parameters:
 
-- `url`: URL to render (for hash and query params support, use `encodeURIComponent` on it)
+* `url`: URL to render (for hash and query params support, use `encodeURIComponent` on it)
+* `ua`: User-Agent
 
 Returns `application/json`:
 
-- `statusCode <number>`: HTTP Status Code
-- `headers <{ [key: string]: string }>`: Page headers (keys are lowercase)
-- `body <string>`: Page raw HTML content
+* `statusCode <number>`: HTTP Status Code
+* `headers <{ [key: string]: string }>`: Page headers (keys are lowercase)
+* `body <string>`: Page raw HTML content
 
 > GET `/render`
 
@@ -44,7 +45,8 @@ Used for debug purposes. Dumps directly the HTML for easy inspection in your bro
 
 Query parameters:
 
-- `url`: URL to render (for hash and query params support, use `encodeURIComponent` on it)
+* `url`: URL to render (for hash and query params support, use `encodeURIComponent` on it)
+* `ua`: User-Agent
 
 Returns `text/html`.
 (CSP headers are set to prevent script execution on the rendered page)
@@ -55,18 +57,18 @@ Simply run:
 
 ```sh
 docker run -p 23000:3000 algolia/renderscript
-open http://localhost:3000/render?url=https%3A%2F%2Fwww.algolia.com
+open http://localhost:3000/render?url=https%3A%2F%2Fwww.algolia.com&ua=Test+Renderscript
 ```
 
 ### Parameters
 
 See `.env.prod` to see which ones are installed by default (they still need to be provided to `docker run` to be enabled).
 
-- `ALLOW_LOCALHOST`: Allow calls on localhost IPs
+* `ALLOW_LOCALHOST`: Allow calls on localhost IPs
   Example: `ALLOW_LOCALHOST=true`
-- `IP_PREFIXES_WHITELIST`: Comma-separated list of prefixes to whitelist when `ALLOW_LOCALHOST` is set to true.
+* `IP_PREFIXES_WHITELIST`: Comma-separated list of prefixes to whitelist when `ALLOW_LOCALHOST` is set to true.
   Example: `IP_PREFIXES_WHITELIST=127.,0.,::1` (these are the default values used when the variable is not provided alongside `ALLOW_LOCALHOST`)
-- `HEADERS_TO_FORWARD`: Comma-separated list of headers to forward on navigation request
+* `HEADERS_TO_FORWARD`: Comma-separated list of headers to forward on navigation request
   Example: `HEADERS_TO_FORWARD=Cookie,Authorization` (default value)
 
 ## Credits
