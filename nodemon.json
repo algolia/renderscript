@@ -1,6 +1,13 @@
 {
-  "ignore": [".git", "node_modules", "dist"],
-  "watch": ["src"],
+  "ignore": [
+    ".git",
+    "node_modules",
+    "dist",
+    "__tests__"
+  ],
+  "watch": [
+    "src"
+  ],
   "exec": "npm run dev:run",
   "ext": "ts"
 }

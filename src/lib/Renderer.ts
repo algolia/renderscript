@@ -42,6 +42,7 @@ const DATA_REGEXP = /^data:/i;
 
 export interface TaskParams {
   url: URL;
+  userAgent: string;
   headersToForward: {
     [s: string]: string;
   };
@@ -286,9 +287,10 @@ class Renderer {
 
   private async _processPage(task: TaskParams): Promise<TaskResult> {
     /* Setup */
-    const { url } = task;
+    const { url, userAgent } = task;
     const { context, page } = await this._newPage();
 
+    await page.setUserAgent(userAgent);
     await this._defineRequestContextForPage({ page, task });
 
     let response: HTTPResponse | null = null;

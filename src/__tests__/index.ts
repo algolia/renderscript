@@ -7,9 +7,39 @@ function cleanString(body: string): string {
 jest.setTimeout(30 * 1000);
 
 describe('main', () => {
+  it('should error when no url', async () => {
+    const { statusCode, body } = await request('http://localhost:3000/render?');
+
+    expect(statusCode).toEqual(400);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    expect(cleanString(fullBody)).toEqual(
+      '{"error":true,"message":"Missing URL in query params"}'
+    );
+  });
+
+  it('should error when no user agent', async () => {
+    const { statusCode, body } = await request(
+      'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html'
+    );
+
+    expect(statusCode).toEqual(400);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    expect(cleanString(fullBody)).toEqual(
+      '{"error":true,"message":"Missing User-Agent"}'
+    );
+  });
+
   it('should render basic page', async () => {
     const { statusCode, headers, body } = await request(
-      'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html'
+      'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html&ua=Algolia+Crawler'
     );
 
     expect(statusCode).toEqual(200);
@@ -35,7 +65,7 @@ describe('main', () => {
 
   it('should render async page', async () => {
     const { statusCode, headers, body } = await request(
-      'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fasync.html'
+      'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fasync.html&ua=Algolia+Crawler'
     );
 
     expect(statusCode).toEqual(200);
@@ -63,7 +93,7 @@ describe('main', () => {
     const { statusCode, headers, body } = await request(
       `http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fjs-redirect.html?to=${encodeURIComponent(
         '/test-website/basic.html'
-      )}`
+      )}&ua=Algolia+Crawler`
     );
 
     expect(statusCode).toEqual(307);
