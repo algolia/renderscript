@@ -76,7 +76,7 @@ describe('main', () => {
         "default-src 'none'; style-src * 'unsafe-inline'; img-src * data:; font-src *",
       'content-type': 'text/html; charset=utf-8',
       date: expect.any(String),
-      etag: 'W/"34b-z8UrdlO2wAVr373mPCGBXLkDOpQ"',
+      etag: 'W/"34b-XSEOmhq6gvsRnSyzs9lfm2g+AC8"',
       'keep-alive': 'timeout=5',
     });
 
