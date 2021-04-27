@@ -5,6 +5,10 @@
 </head>
 
 <body>
+  <div id="ua"></div>
+  <script>
+    document.getElementById('ua').innerText = window.navigator.userAgent;
+  </script>
   <script>
     let i = 1;
     const addEvent = name => {
@@ -19,10 +23,6 @@
     setTimeout(addEvent.bind(null, 'setTimeout 5000'), 5000);
     setTimeout(addEvent.bind(null, 'setTimeout 10000'), 10000);
     setTimeout(addEvent.bind(null, 'setTimeout 20000'), 20000);
-  </script>
-  <div id="ua"></div>
-  <script>
-    document.getElementById('ua').innerText = window.navigator.userAgent;
   </script>
 </body>
 
