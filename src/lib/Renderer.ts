@@ -18,7 +18,6 @@ import { flags } from './constants';
 const IP_PREFIXES_WHITELIST = process.env.IP_PREFIXES_WHITELIST
   ? process.env.IP_PREFIXES_WHITELIST.split(',')
   : ['127.', '0.', '::1'];
-
 const RESTRICTED_IPS =
   process.env.ALLOW_LOCALHOST === 'true'
     ? PRIVATE_IP_PREFIXES.filter(
@@ -231,7 +230,7 @@ class Renderer {
           ipPrefixes: RESTRICTED_IPS,
         });
       } catch (err) {
-        // log.error(err);
+        console.error(err);
         // report(err);
         req.abort();
         return;
