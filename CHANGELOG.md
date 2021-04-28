@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/algolia/renderscript/compare/v1.6.0...v1.6.1) (2021-04-28)
+
+
+### Bug Fixes
+
+* dotenv ([#255](https://github.com/algolia/renderscript/issues/255)) ([8f99a90](https://github.com/algolia/renderscript/commit/8f99a9030bd9a5e3bba5da8e91a7d29334993b10))
+
 # [1.6.0](https://github.com/algolia/renderscript/compare/v1.5.21...v1.6.0) (2021-04-28)
 
 
