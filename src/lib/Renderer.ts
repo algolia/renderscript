@@ -48,6 +48,12 @@ export interface TaskParams {
   headersToForward: {
     [s: string]: string;
   };
+  login?: {
+    usernameSelector: string;
+    username: string;
+    passwordSelector: string;
+    password: string;
+  };
 }
 
 export interface TaskResult {
@@ -376,30 +382,26 @@ class Renderer {
     const { url } = task;
     const { context, page } = await this._newPageWithContext(task);
 
-    let response: HTTPResponse;
     try {
-      response = await this._fetch(page, url);
+      await this._goto(page, url);
     } catch (e) {
       return { error: e.message, timeout: Boolean(e.timeout) };
     }
 
-    const chain = response.request().redirectChain();
-    if (chain.length > 0) {
-      console.log(chain.length);
-      console.log(chain[chain.length - 1].url());
-    }
-    const username = await page.$('input#username');
-    await username!.type('admin');
-    const password = await page.$('input#password');
-    await password!.type('password');
+    const username = await page.$(task.login!.usernameSelector);
+    await username!.type(task.login!.username);
+    const password = await page.$(task.login!.passwordSelector);
+    await password!.type(task.login!.password);
     const [loginResponse] = await Promise.all([
       page.waitForNavigation(),
       password!.press('Enter'),
     ]);
-    console.log(loginResponse);
+
+    if (!loginResponse) {
+      return { error: 'no_response' };
+    }
 
     /* Cleanup */
-    console.log('closing context');
     await context.close();
 
     return {
@@ -408,7 +410,7 @@ class Renderer {
     };
   }
 
-  private async _fetch(page: Page, url: URL): Promise<HTTPResponse> {
+  private async _goto(page: Page, url: URL): Promise<HTTPResponse> {
     let response: HTTPResponse | null = null;
     page.on('response', (r) => {
       if (!response) {

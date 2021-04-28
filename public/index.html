@@ -67,7 +67,6 @@
 
     #submit-buttons {
       display: flex;
-      flex: space-between;
       justify-content: space-around;
     }
 
@@ -83,6 +82,34 @@
     }
 
     #submit-buttons>button:hover {
+      background-image: linear-gradient(rgba(255, 255, 255, .32) 11%, rgba(17, 20, 50, .2) 70%);
+      cursor: pointer;
+    }
+
+    #login-section {
+      margin-top: 16px;
+      padding: 8px;
+      border: 1px solid gray;
+      border-radius: 4px;
+    }
+    #login-section .field {
+      width: 30%;
+      margin: 8px 0;
+      border: 1px solid #e8e8e8;
+      border-radius: 4px;
+      font-size: 1em;
+      padding: 0.3em 0.5em;
+    }
+    #login-section button {
+      margin: 0 8px;
+      height: 32px;
+      border: 1px solid rgba(17, 20, 50, .16);
+      border-radius: 1px;
+      box-shadow: 0 2px 3px -2px rgba(35, 37, 51, .32);
+      background-image: linear-gradient(rgba(255, 255, 255, .16) 11%, rgba(17, 20, 50, .1) 70%);
+      font-weight: 600;
+    }
+    #login-section button:hover {
       background-image: linear-gradient(rgba(255, 255, 255, .32) 11%, rgba(17, 20, 50, .2) 70%);
       cursor: pointer;
     }
@@ -116,6 +143,24 @@
       <div id="submit-buttons">
         <button type="submit" formmethod="GET" formaction="render">Render</button>
         <button type="submit" formmethod="POST" formaction="render">Render (JSON)</button>
+      </div>
+
+      <div id="login-section">
+        <h2>Login</h2>
+        <div>
+          <label for="username-selector">Username input selector</label>
+          <input class="field" id="username-selector" name="usernameSelector" placeholder="input#username" />
+          <label for="username">Username</label>
+          <input class="field" id="username" name="username" placeholder="admin" />
+        </div>
+
+        <div>
+          <label for="username-selector">Password input selector</label>
+          <input class="field" id="password-selector" name="passwordSelector" placeholder="input#password" />
+          <label for="password">Password</label>
+          <input class="field" id="password" name="password" placeholder="password" />
+        </div>
+
         <button type="submit" formmethod="POST" formaction="login">Login</button>
       </div>
     </form>

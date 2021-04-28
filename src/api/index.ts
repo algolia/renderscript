@@ -45,13 +45,13 @@ export default class Api {
       .get('/render', render.getURLFromQuery, render.validateURL, render.render)
       .post(
         '/render',
-        render.getURLFromBody,
+        render.getParamsFromBody,
         render.validateURL,
         render.renderJSON
       )
       .post(
         '/login',
-        render.getURLFromBody,
+        render.getParamsFromBody,
         render.validateURL,
         render.processLogin
       );

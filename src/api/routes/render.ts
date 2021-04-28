@@ -48,7 +48,7 @@ export function getURLFromQuery(
   next();
 }
 
-export function getURLFromBody(
+export function getParamsFromBody(
   req: express.Request,
   res: express.Response,
   next: express.NextFunction
@@ -70,6 +70,10 @@ export function getURLFromBody(
     return;
   }
   res.locals.ua = ua;
+  res.locals.usernameSelector = req.body.usernameSelector;
+  res.locals.username = req.body.username;
+  res.locals.passwordSelector = req.body.passwordSelector;
+  res.locals.password = req.body.password;
   next();
 }
 
@@ -182,6 +186,12 @@ export async function processLogin(
       url,
       headersToForward,
       userAgent: ua,
+      login: {
+        usernameSelector: res.locals.usernameSelector,
+        username: res.locals.username,
+        passwordSelector: res.locals.passwordSelector,
+        password: res.locals.password,
+      },
     });
 
     if (error) {
