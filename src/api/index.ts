@@ -1,7 +1,7 @@
 import * as http from 'http';
 import * as path from 'path';
 
-import * as bodyParser from 'body-parser';
+import { urlencoded } from 'body-parser';
 import express, { static as expressStatic } from 'express';
 
 import requestLogger from 'api/helpers/requestLogger';
@@ -34,7 +34,7 @@ export default class Api {
 
   private _setup(): void {
     this._app.disable('x-powered-by');
-    this._app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
+    this._app.use(urlencoded({ limit: '10mb', extended: true }));
     this._app.use(requestLogger);
   }
 

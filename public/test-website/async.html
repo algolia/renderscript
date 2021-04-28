@@ -1,22 +1,29 @@
 <!DOCTYPE html>
 <html>
-  <head>
-  </head>
-  <body>
-    <script>
-      let i = 1;
-      const addEvent = name => {
-        document.body.innerHTML += `${i === 1 ? i : ` - ${i}`}. ${name}`;
-        i++;
-      }
 
-      addEvent('Init')
-      window.onload = addEvent.bind(null, 'window.onload');
-      window.addEventListener('DOMContentLoaded', addEvent.bind(null, 'DOMContentLoaded'));
-      setTimeout(addEvent.bind(null, 'setTimeout 1000'), 1000);
-      setTimeout(addEvent.bind(null, 'setTimeout 5000'), 5000);
-      setTimeout(addEvent.bind(null, 'setTimeout 10000'), 10000);
-      setTimeout(addEvent.bind(null, 'setTimeout 20000'), 20000);
-    </script>
-  </body>
+<head>
+</head>
+
+<body>
+  <div id="ua"></div>
+  <script>
+    document.getElementById('ua').innerText = window.navigator.userAgent;
+  </script>
+  <script>
+    let i = 1;
+    const addEvent = name => {
+      document.body.innerHTML += `${i === 1 ? i : ` - ${i}`}. ${name}`;
+      i++;
+    }
+
+    addEvent('Init')
+    window.onload = addEvent.bind(null, 'window.onload');
+    window.addEventListener('DOMContentLoaded', addEvent.bind(null, 'DOMContentLoaded'));
+    setTimeout(addEvent.bind(null, 'setTimeout 1000'), 1000);
+    setTimeout(addEvent.bind(null, 'setTimeout 5000'), 5000);
+    setTimeout(addEvent.bind(null, 'setTimeout 10000'), 10000);
+    setTimeout(addEvent.bind(null, 'setTimeout 20000'), 20000);
+  </script>
+</body>
+
 </html>

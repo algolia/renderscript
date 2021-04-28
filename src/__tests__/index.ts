@@ -7,9 +7,39 @@ function cleanString(body: string): string {
 jest.setTimeout(30 * 1000);
 
 describe('main', () => {
+  it('should error when no url', async () => {
+    const { statusCode, body } = await request('http://localhost:3000/render?');
+
+    expect(statusCode).toEqual(400);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    expect(cleanString(fullBody)).toEqual(
+      '{"error":true,"message":"Missing URL in query params"}'
+    );
+  });
+
+  it('should error when no user agent', async () => {
+    const { statusCode, body } = await request(
+      'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html'
+    );
+
+    expect(statusCode).toEqual(400);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    expect(cleanString(fullBody)).toEqual(
+      '{"error":true,"message":"Missing User-Agent"}'
+    );
+  });
+
   it('should render basic page', async () => {
     const { statusCode, headers, body } = await request(
-      'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html'
+      'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html&ua=Algolia+Crawler'
     );
 
     expect(statusCode).toEqual(200);
@@ -35,18 +65,18 @@ describe('main', () => {
 
   it('should render async page', async () => {
     const { statusCode, headers, body } = await request(
-      'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fasync.html'
+      'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fasync.html&ua=Algolia+Crawler'
     );
 
     expect(statusCode).toEqual(200);
     expect(headers).toEqual({
       connection: 'keep-alive',
-      'content-length': '741',
+      'content-length': '843',
       'content-security-policy':
         "default-src 'none'; style-src * 'unsafe-inline'; img-src * data:; font-src *",
       'content-type': 'text/html; charset=utf-8',
       date: expect.any(String),
-      etag: 'W/"2e5-ym9yBo+hQc1jA8y+CRp20AhJ0Qg"',
+      etag: 'W/"34b-XSEOmhq6gvsRnSyzs9lfm2g+AC8"',
       'keep-alive': 'timeout=5',
     });
 
@@ -55,7 +85,7 @@ describe('main', () => {
       fullBody += chunk.toString();
     }
     expect(cleanString(fullBody)).toEqual(
-      "<html><head><base href=\"http://localhost:3000\"></head><body><script>let i = 1;const addEvent = name => {document.body.innerHTML += `${i === 1 ? i : ` - ${i}`}. ${name}`;i++;}addEvent('Init')window.onload = addEvent.bind(null, 'window.onload');window.addEventListener('DOMContentLoaded', addEvent.bind(null, 'DOMContentLoaded'));setTimeout(addEvent.bind(null, 'setTimeout 1000'), 1000);setTimeout(addEvent.bind(null, 'setTimeout 5000'), 5000);setTimeout(addEvent.bind(null, 'setTimeout 10000'), 10000);setTimeout(addEvent.bind(null, 'setTimeout 20000'), 20000);</script>1. Init- 2. DOMContentLoaded - 3. window.onload</body></html>"
+      "<html><head><base href=\"http://localhost:3000\"></head><body><div id=\"ua\">Algolia Crawler</div><script>document.getElementById('ua').innerText = window.navigator.userAgent;</script><script>let i = 1;const addEvent = name => {document.body.innerHTML += `${i === 1 ? i : ` - ${i}`}. ${name}`;i++;}addEvent('Init')window.onload = addEvent.bind(null, 'window.onload');window.addEventListener('DOMContentLoaded', addEvent.bind(null, 'DOMContentLoaded'));setTimeout(addEvent.bind(null, 'setTimeout 1000'), 1000);setTimeout(addEvent.bind(null, 'setTimeout 5000'), 5000);setTimeout(addEvent.bind(null, 'setTimeout 10000'), 10000);setTimeout(addEvent.bind(null, 'setTimeout 20000'), 20000);</script>1. Init - 2. DOMContentLoaded - 3. window.onload</body></html>"
     );
   });
 
@@ -63,7 +93,7 @@ describe('main', () => {
     const { statusCode, headers, body } = await request(
       `http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fjs-redirect.html?to=${encodeURIComponent(
         '/test-website/basic.html'
-      )}`
+      )}&ua=Algolia+Crawler`
     );
 
     expect(statusCode).toEqual(307);

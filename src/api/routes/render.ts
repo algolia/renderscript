@@ -27,17 +27,24 @@ export function getURLFromQuery(
   res: express.Response,
   next: express.NextFunction
 ): void {
-  const url = req.query.url?.toString() || '';
-  if (req.method === 'GET' && !url) {
+  const { url, ua } = req.query;
+  if (!url) {
     badRequest({ res, message: 'Missing URL in query params' });
     return;
   }
+  if (!ua) {
+    badRequest({ res, message: 'Missing User-Agent' });
+    return;
+  }
+
   try {
-    res.locals.url = buildUrl(decodeURIComponent(url));
+    res.locals.url = buildUrl(decodeURIComponent(url as any));
   } catch (e) {
     res.status(400).json({ error: 'invalid_url' });
     return;
   }
+  res.locals.ua = ua;
+
   next();
 }
 
@@ -46,17 +53,23 @@ export function getURLFromBody(
   res: express.Response,
   next: express.NextFunction
 ): void {
-  const { url } = req.body;
+  const { url, ua } = req.body;
   if (req.method === 'POST' && !url) {
     badRequest({ res, message: 'Missing URL in body' });
     return;
   }
+  if (!ua) {
+    badRequest({ res, message: 'Missing User-Agent' });
+    return;
+  }
+
   try {
     res.locals.url = buildUrl(url);
   } catch (e) {
     res.status(400).json({ error: 'invalid_url' });
     return;
   }
+  res.locals.ua = ua;
   next();
 }
 
@@ -78,13 +91,15 @@ export async function render(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
-  const { url } = res.locals;
+  const { url, ua } = res.locals;
+
   const headersToForward = getForwardedHeadersFromRequest(req);
 
   try {
     const { error, statusCode, body, resolvedUrl } = await renderer.task({
       url,
       headersToForward,
+      userAgent: ua,
     });
     if (error) {
       res.status(400).json({ error });
@@ -121,7 +136,7 @@ export async function renderJSON(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
-  const { url } = res.locals;
+  const { url, ua } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
   try {
     const {
@@ -131,16 +146,19 @@ export async function renderJSON(
       body,
       timeout,
       resolvedUrl,
-    } = await renderer.task({ url, headersToForward });
+    } = await renderer.task({ url, headersToForward, userAgent: ua });
+
     if (error) {
       res.status(400).json({ error });
       return;
     }
+
     if (resolvedUrl && resolvedUrl !== url.href) {
       const location = revertUrl(resolvedUrl).href;
       res.status(307).header('Location', location).send();
       return;
     }
+
     res.status(200).json({
       statusCode,
       headers,
