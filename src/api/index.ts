@@ -48,6 +48,12 @@ export default class Api {
         render.getURLFromBody,
         render.validateURL,
         render.renderJSON
+      )
+      .post(
+        '/login',
+        render.getURLFromBody,
+        render.validateURL,
+        render.processLogin
       );
 
     this._app.use(expressStatic(path.join(projectRoot, '/public')));

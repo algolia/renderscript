@@ -9,6 +9,7 @@ import type {
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 import { v4 as uuid } from 'uuid';
 
+import { FetchError } from 'api/helpers/errors';
 import { stats } from 'helpers/stats';
 import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
 import injectBaseHref from 'lib/helpers/injectBaseHref';
@@ -41,6 +42,7 @@ const TIMEOUT = 10000;
 const DATA_REGEXP = /^data:/i;
 
 export interface TaskParams {
+  type?: string;
   url: URL;
   userAgent: string;
   headersToForward: {
@@ -105,7 +107,12 @@ class Renderer {
     ++this.nbTotalTasks;
 
     const id = uuid();
-    const promise = this._processPage(job);
+    let promise;
+    if (job.type === 'login') {
+      promise = this._processLogin(job);
+    } else {
+      promise = this._processPage(job);
+    }
     this._addTask({ id, promise });
 
     const res = await promise;
@@ -285,6 +292,14 @@ class Renderer {
     return await this._pageBuffer.shift()!;
   }
 
+  private async _newPageWithContext(task: TaskParams): Promise<NewPage> {
+    this._pageBuffer.push(this._createNewPage());
+    const { context, page } = await this._pageBuffer.shift()!;
+    await page.setUserAgent(task.userAgent);
+    await this._defineRequestContextForPage({ page, task });
+    return { context, page };
+  }
+
   private async _processPage(task: TaskParams): Promise<TaskResult> {
     /* Setup */
     const { url, userAgent } = task;
@@ -354,6 +369,76 @@ class Renderer {
     }
 
     return { statusCode, headers, body, timeout, resolvedUrl };
+  }
+
+  private async _processLogin(task: TaskParams): Promise<TaskResult> {
+    /* Setup */
+    const { url } = task;
+    const { context, page } = await this._newPageWithContext(task);
+
+    let response: HTTPResponse;
+    try {
+      response = await this._fetch(page, url);
+    } catch (e) {
+      return { error: e.message, timeout: Boolean(e.timeout) };
+    }
+
+    const chain = response.request().redirectChain();
+    if (chain.length > 0) {
+      console.log(chain.length);
+      console.log(chain[chain.length - 1].url());
+    }
+    const username = await page.$('input#username');
+    await username!.type('admin');
+    const password = await page.$('input#password');
+    await password!.type('password');
+    const [loginResponse] = await Promise.all([
+      page.waitForNavigation(),
+      password!.press('Enter'),
+    ]);
+    console.log(loginResponse);
+
+    /* Cleanup */
+    console.log('closing context');
+    await context.close();
+
+    return {
+      statusCode: loginResponse!.status(),
+      headers: loginResponse!.headers(),
+    };
+  }
+
+  private async _fetch(page: Page, url: URL): Promise<HTTPResponse> {
+    let response: HTTPResponse | null = null;
+    page.on('response', (r) => {
+      if (!response) {
+        response = r;
+      }
+    });
+
+    const start = Date.now();
+    try {
+      response = await page.goto(url.href, {
+        timeout: TIMEOUT,
+        waitUntil: 'networkidle0',
+      });
+    } catch (e) {
+      if (e.message.match(/Navigation Timeout Exceeded/)) {
+        throw new FetchError('no_response', true);
+      } else {
+        console.error('Caught error when loading page', e);
+      }
+    } finally {
+      stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
+        success: response ? 'true' : 'false',
+      });
+    }
+
+    /* Fetch errors */
+    if (!response) {
+      throw new FetchError('no_response');
+    }
+    return response;
   }
 
   private _addTask({ id, promise }: TaskObject): void {

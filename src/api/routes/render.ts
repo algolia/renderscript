@@ -169,3 +169,32 @@ export async function renderJSON(
     res.status(500).json({ error: err.message });
   }
 }
+
+export async function processLogin(
+  req: express.Request,
+  res: express.Response
+): Promise<void> {
+  const { url, ua } = res.locals;
+  const headersToForward = getForwardedHeadersFromRequest(req);
+  try {
+    const { error, statusCode, headers, timeout } = await renderer.task({
+      type: 'login',
+      url,
+      headersToForward,
+      userAgent: ua,
+    });
+
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+
+    res.status(200).json({
+      statusCode,
+      headers,
+      timeout,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
