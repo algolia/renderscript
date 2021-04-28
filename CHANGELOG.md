@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/algolia/renderscript/compare/v1.5.21...v1.6.0) (2021-04-28)
+
+
+### Features
+
+* pass user-agent ([#254](https://github.com/algolia/renderscript/issues/254)) ([00d14f2](https://github.com/algolia/renderscript/commit/00d14f2ab39c4c2ec8277189f4c330b9daa7788c))
+
 ## [1.5.21](https://github.com/algolia/renderscript/compare/v1.5.20...v1.5.21) (2021-04-26)
 
 
