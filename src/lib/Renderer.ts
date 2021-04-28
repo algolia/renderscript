@@ -232,7 +232,7 @@ class Renderer {
           ipPrefixes: RESTRICTED_IPS,
         });
       } catch (err) {
-        // log.error(err);
+        console.error(err);
         // report(err);
         req.abort();
         return;

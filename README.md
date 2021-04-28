@@ -53,11 +53,18 @@ Returns `text/html`.
 
 ## Running it locally
 
-Simply run:
+Docker image:
 
 ```sh
+yarn docker:build
 docker run -p 23000:3000 algolia/renderscript
 open http://localhost:3000/render?url=https%3A%2F%2Fwww.algolia.com&ua=Test+Renderscript
+```
+
+Development:
+
+```sh
+yarn dev
 ```
 
 ### Parameters
