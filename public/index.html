@@ -102,7 +102,7 @@
       justify-content: space-between;
       padding-right: 32px;
     }
-    #login-section div.grid div > * {
+    #login-section label, #login-section input {
       margin: 12px 0 0 24px;
     }
     #login-section div.grid div input {
@@ -175,27 +175,20 @@
           </div>
 
           <div>
-            <label for="username-selector">Username input selector</label>
-            <input class="field" id="username-selector" name="usernameSelector" placeholder="input#username" />
-          </div>
-          <div>
             <label for="username">Username</label>
             <input class="field" id="username" name="username" placeholder="admin" />
           </div>
-
-          <div>
-            <label for="password-selector">Password input selector</label>
-            <input class="field" id="password-selector" name="passwordSelector" placeholder="input#password" />
-          </div>
+          <div></div>
           <div>
             <label for="password">Password</label>
             <input class="field" type="password" id="password" name="password" placeholder="password" />
           </div>
-          <div>
-            <label for="renderHTML">Render HTML</label>
-            <input type="checkbox" id="renderHTML" name="renderHTML">
-          </div>
         </div>
+        <div style="margin-top: 8px">
+          <label for="renderHTML">Render HTML</label>
+          <input type="checkbox" id="renderHTML" name="renderHTML">
+        </div>
+
         <div style="text-align: center">
           <button type="submit" formmethod="POST" formaction="login">Login</button>
         </div>

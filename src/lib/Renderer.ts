@@ -6,6 +6,7 @@ import type {
   Browser,
   BrowserContext,
   HTTPRequest,
+  Protocol,
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 import { v4 as uuid } from 'uuid';
 
@@ -49,9 +50,7 @@ export interface TaskParams {
     [s: string]: string;
   };
   login?: {
-    usernameSelector: string;
     username: string;
-    passwordSelector: string;
     password: string;
   };
 }
@@ -63,7 +62,7 @@ export interface TaskResult {
   timeout?: boolean;
   error?: string;
   resolvedUrl?: string;
-  redirectChain?: Redirect[];
+  cookies?: Protocol.Network.Cookie[];
 }
 
 interface Redirect {
@@ -396,36 +395,45 @@ class Renderer {
       return { error: e.message, timeout: Boolean(e.timeout) };
     }
 
-    const username = await page.$(task.login!.usernameSelector);
-    const password = await page.$(task.login!.passwordSelector);
-    if (!username) {
-      return { error: `field_not_found: '${task.login!.usernameSelector}'` };
+    const textInput = await page.$('input[type=text], input[type=email]');
+    if (!textInput) {
+      return { error: `field_not_found: input[type=text], input[type=email]` };
     }
-    if (!password) {
-      return { error: `field_not_found: '${task.login!.passwordSelector}'` };
+    await textInput!.type(task.login!.username);
+
+    let passwordInput = await page.$('input[type=password]');
+    if (!passwordInput) {
+      console.log('2 step login: validating username...');
+      await Promise.all([
+        // page.waitForNavigation(), // Doesn't work with Okta for example, it's JS based
+        page.waitForSelector('input[type=password]'),
+        textInput!.press('Enter'),
+      ]);
+      console.log(`2 step login: navigated to ${page.url()}`);
+      passwordInput = await page.$('input[type=password]');
+      if (!passwordInput) {
+        return { error: `field_not_found: input[type=password]` };
+      }
     }
-    await username!.type(task.login!.username);
-    await password!.type(task.login!.password);
+
+    console.log('Logging in...');
+    await passwordInput!.type(task.login!.password);
     const [loginResponse] = await Promise.all([
       page.waitForNavigation(),
-      password!.press('Enter'),
+      passwordInput!.press('Enter'),
     ]);
 
     if (!loginResponse) {
       return { error: 'no_response' };
     }
 
-    const redirectChain: Redirect[] = [];
     const chain = loginResponse.request().redirectChain();
     console.log(`Followed ${chain.length} redirections`);
     chain.forEach((request) => {
-      const redirect = {
-        url: request.url(),
-        responseHeaders: request.response()?.headers(),
-      };
-      console.log(redirect);
-      redirectChain.push(redirect);
+      console.log(request.url());
+      console.log(request.response()?.headers());
     });
+    const cookies = await page.cookies();
 
     const baseHref = `${url.protocol}//${url.host}`;
     await page.evaluate(injectBaseHref, baseHref);
@@ -440,7 +448,7 @@ class Renderer {
       statusCode: loginResponse!.status(),
       headers: loginResponse!.headers(),
       body,
-      redirectChain,
+      cookies,
     };
   }
 

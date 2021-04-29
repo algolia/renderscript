@@ -70,9 +70,7 @@ export function getParamsFromBody(
     return;
   }
   res.locals.ua = ua;
-  res.locals.usernameSelector = req.body.usernameSelector;
   res.locals.username = req.body.username;
-  res.locals.passwordSelector = req.body.passwordSelector;
   res.locals.password = req.body.password;
   res.locals.renderHTML = Boolean(req.body.renderHTML);
   next();
@@ -179,7 +177,7 @@ export async function processLogin(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
-  const { url, ua, renderHTML } = res.locals;
+  const { url, ua, username, password, renderHTML } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
   try {
     const {
@@ -187,7 +185,7 @@ export async function processLogin(
       statusCode,
       headers,
       body,
-      redirectChain,
+      cookies,
       timeout,
     } = await renderer.task({
       type: 'login',
@@ -195,10 +193,8 @@ export async function processLogin(
       headersToForward,
       userAgent: ua,
       login: {
-        usernameSelector: res.locals.usernameSelector,
-        username: res.locals.username,
-        passwordSelector: res.locals.passwordSelector,
-        password: res.locals.password,
+        username,
+        password,
       },
     });
 
@@ -228,7 +224,7 @@ export async function processLogin(
     res.status(200).json({
       statusCode,
       headers,
-      redirectChain,
+      cookies,
       timeout,
     });
   } catch (err) {
