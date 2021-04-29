@@ -182,7 +182,14 @@ export async function processLogin(
   const { url, ua, renderHTML } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
   try {
-    const { error, statusCode, headers, body, timeout } = await renderer.task({
+    const {
+      error,
+      statusCode,
+      headers,
+      body,
+      redirectChain,
+      timeout,
+    } = await renderer.task({
       type: 'login',
       url,
       headersToForward,
@@ -221,6 +228,7 @@ export async function processLogin(
     res.status(200).json({
       statusCode,
       headers,
+      redirectChain,
       timeout,
     });
   } catch (err) {

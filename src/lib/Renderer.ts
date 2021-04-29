@@ -63,6 +63,14 @@ export interface TaskResult {
   timeout?: boolean;
   error?: string;
   resolvedUrl?: string;
+  redirectChain?: Redirect[];
+}
+
+interface Redirect {
+  url: string;
+  responseHeaders?: {
+    [s: string]: string;
+  };
 }
 
 export interface NewPage {
@@ -108,7 +116,7 @@ class Renderer {
       throw new Error('Called task on a stopping Renderer');
     }
     const start = Date.now();
-    console.log('Processing:', job.url.toString());
+    console.log('Processing:', job.url.toString(), `(${job.type ?? 'render'})`);
 
     ++this.nbTotalTasks;
 
@@ -407,6 +415,20 @@ class Renderer {
       return { error: 'no_response' };
     }
 
+    const redirectChain: Redirect[] = [];
+    const chain = loginResponse.request().redirectChain();
+    console.log(`Followed ${chain.length} redirections`);
+    chain.forEach((request) => {
+      const redirect = {
+        url: request.url(),
+        responseHeaders: request.response()?.headers(),
+      };
+      console.log(redirect);
+      redirectChain.push(redirect);
+    });
+
+    const baseHref = `${url.protocol}//${url.host}`;
+    await page.evaluate(injectBaseHref, baseHref);
     const body = (await page.evaluate(
       'document.firstElementChild.outerHTML'
     )) as string;
@@ -418,6 +440,7 @@ class Renderer {
       statusCode: loginResponse!.status(),
       headers: loginResponse!.headers(),
       body,
+      redirectChain,
     };
   }
 
