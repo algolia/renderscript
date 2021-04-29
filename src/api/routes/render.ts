@@ -74,6 +74,7 @@ export function getParamsFromBody(
   res.locals.username = req.body.username;
   res.locals.passwordSelector = req.body.passwordSelector;
   res.locals.password = req.body.password;
+  res.locals.renderHTML = Boolean(req.body.renderHTML);
   next();
 }
 
@@ -178,10 +179,10 @@ export async function processLogin(
   req: express.Request,
   res: express.Response
 ): Promise<void> {
-  const { url, ua } = res.locals;
+  const { url, ua, renderHTML } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
   try {
-    const { error, statusCode, headers, timeout } = await renderer.task({
+    const { error, statusCode, headers, body, timeout } = await renderer.task({
       type: 'login',
       url,
       headersToForward,
@@ -199,6 +200,24 @@ export async function processLogin(
       return;
     }
 
+    if (renderHTML) {
+      res
+        .status(statusCode!)
+        .header('Content-Type', 'text/html')
+        // Only whitelist loading styles resources when testing
+        // (will not change programmatic use of this system)
+        .header(
+          'Content-Security-Policy',
+          [
+            "default-src 'none'",
+            "style-src * 'unsafe-inline'",
+            'img-src * data:',
+            'font-src *',
+          ].join('; ')
+        )
+        .send(body);
+      return;
+    }
     res.status(200).json({
       statusCode,
       headers,

@@ -389,8 +389,14 @@ class Renderer {
     }
 
     const username = await page.$(task.login!.usernameSelector);
-    await username!.type(task.login!.username);
     const password = await page.$(task.login!.passwordSelector);
+    if (!username) {
+      return { error: `field_not_found: '${task.login!.usernameSelector}'` };
+    }
+    if (!password) {
+      return { error: `field_not_found: '${task.login!.passwordSelector}'` };
+    }
+    await username!.type(task.login!.username);
     await password!.type(task.login!.password);
     const [loginResponse] = await Promise.all([
       page.waitForNavigation(),
@@ -401,12 +407,17 @@ class Renderer {
       return { error: 'no_response' };
     }
 
+    const body = (await page.evaluate(
+      'document.firstElementChild.outerHTML'
+    )) as string;
+
     /* Cleanup */
     await context.close();
 
     return {
       statusCode: loginResponse!.status(),
       headers: loginResponse!.headers(),
+      body,
     };
   }
 

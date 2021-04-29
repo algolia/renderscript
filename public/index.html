@@ -87,22 +87,38 @@
     }
 
     #login-section {
-      margin-top: 16px;
+      margin-top: 32px;
       padding: 8px;
       border: 1px solid gray;
       border-radius: 4px;
     }
+    #login-section div.grid {
+      display: grid;
+      grid-template-columns: 50% 50%;
+    }
+    #login-section div.grid div {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-right: 32px;
+    }
+    #login-section div.grid div > * {
+      margin: 12px 0 0 24px;
+    }
+    #login-section div.grid div input {
+      flex-grow: 1;
+    }
     #login-section .field {
-      width: 30%;
-      margin: 8px 0;
+      width: auto;
       border: 1px solid #e8e8e8;
       border-radius: 4px;
       font-size: 1em;
       padding: 0.3em 0.5em;
     }
     #login-section button {
-      margin: 0 8px;
-      height: 32px;
+      margin: 16px auto;
+      width: 30%;
+      height: 48px;
       border: 1px solid rgba(17, 20, 50, .16);
       border-radius: 1px;
       box-shadow: 0 2px 3px -2px rgba(35, 37, 51, .32);
@@ -144,26 +160,47 @@
         <button type="submit" formmethod="GET" formaction="render">Render</button>
         <button type="submit" formmethod="POST" formaction="render">Render (JSON)</button>
       </div>
-
-      <div id="login-section">
-        <h2>Login</h2>
-        <div>
-          <label for="username-selector">Username input selector</label>
-          <input class="field" id="username-selector" name="usernameSelector" placeholder="input#username" />
-          <label for="username">Username</label>
-          <input class="field" id="username" name="username" placeholder="admin" />
-        </div>
-
-        <div>
-          <label for="username-selector">Password input selector</label>
-          <input class="field" id="password-selector" name="passwordSelector" placeholder="input#password" />
-          <label for="password">Password</label>
-          <input class="field" id="password" name="password" placeholder="password" />
-        </div>
-
-        <button type="submit" formmethod="POST" formaction="login">Login</button>
-      </div>
     </form>
+    <div id="login-section">
+      <h2>Login</h2>
+      <form>
+        <div class="grid">
+          <div>
+            <label for="url">URL</label>
+            <input class="field" id="url" name="url" placeholder="https://www.algolia.com/users/sign_in" />
+          </div>
+          <div>
+            <label for="ua">User-Agent</label>
+            <input class="field" id="ua" name="ua" placeholder="User-Agent" value="Algolia Crawler/1.0.0" />
+          </div>
+
+          <div>
+            <label for="username-selector">Username input selector</label>
+            <input class="field" id="username-selector" name="usernameSelector" placeholder="input#username" />
+          </div>
+          <div>
+            <label for="username">Username</label>
+            <input class="field" id="username" name="username" placeholder="admin" />
+          </div>
+
+          <div>
+            <label for="password-selector">Password input selector</label>
+            <input class="field" id="password-selector" name="passwordSelector" placeholder="input#password" />
+          </div>
+          <div>
+            <label for="password">Password</label>
+            <input class="field" type="password" id="password" name="password" placeholder="password" />
+          </div>
+          <div>
+            <label for="renderHTML">Render HTML</label>
+            <input type="checkbox" id="renderHTML" name="renderHTML">
+          </div>
+        </div>
+        <div style="text-align: center">
+          <button type="submit" formmethod="POST" formaction="login">Login</button>
+        </div>
+      </form>
+    </div>
   </div>
 </body>
 
