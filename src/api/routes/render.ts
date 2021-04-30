@@ -214,7 +214,11 @@ export async function processLogin(
       },
     });
 
-    if (error && !renderHTML) {
+    if (error) {
+      if (renderHTML) {
+        res.status(200).header('Content-Type', 'text/html').send(body);
+        return;
+      }
       res.status(400).json({ error });
       return;
     }

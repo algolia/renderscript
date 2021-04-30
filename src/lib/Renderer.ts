@@ -366,26 +366,37 @@ class Renderer {
     let passwordInput = await page.$('input[type=password]');
     if (!passwordInput) {
       console.log('2 step login: validating username...');
-      await Promise.all([
-        // page.waitForNavigation(), // Doesn't work with Okta for example, it's JS based
-        page.waitForSelector('input[type=password]'),
-        textInput!.press('Enter'),
-      ]);
-      console.log(`2 step login: navigated to ${page.url()}`);
-      passwordInput = await page.$('input[type=password]');
-      if (!passwordInput) {
+      try {
+        await Promise.all([
+          // page.waitForNavigation(), // Doesn't work with Okta for example, it's JS based
+          page.waitForSelector('input[type=password]', {
+            timeout: TIMEOUT,
+          }),
+          textInput!.press('Enter'),
+        ]);
+      } catch (err) {
         console.log('Found no password input on the page');
         const body = await this._renderBody(page, new URL(page.url()));
-        return { error: `field_not_found: input[type=password]`, body };
+        return { error: err.message, body };
       }
     }
 
+    console.log(`2 step login: navigated to ${page.url()}`);
+    passwordInput = await page.$('input[type=password]');
     console.log('Logging in...');
     await passwordInput!.type(task.login!.password);
-    const [loginResponse] = await Promise.all([
-      page.waitForNavigation(),
-      passwordInput!.press('Enter'),
-    ]);
+    let loginResponse;
+    try {
+      const [navigationResponse] = await Promise.all([
+        page.waitForNavigation({ timeout: TIMEOUT }),
+        await passwordInput!.press('Enter'),
+      ]);
+      loginResponse = navigationResponse;
+    } catch (err) {
+      console.log(`Error while logging in: ${err.message} (url=${page.url()})`);
+      const body = await this._renderBody(page, new URL(page.url()));
+      return { error: err.message, body };
+    }
 
     if (!loginResponse) {
       console.log(`Got no login response (url=${page.url()})`);
@@ -395,7 +406,7 @@ class Renderer {
 
     const chain = loginResponse.request().redirectChain();
     console.log(`Followed ${chain.length} redirections`);
-    chain.forEach((request) => {
+    chain.forEach((request: HTTPRequest) => {
       console.log(request.url());
       console.log(request.response()?.headers());
     });
