@@ -53,7 +53,7 @@ export function getParamsFromBody(
   res: express.Response,
   next: express.NextFunction
 ): void {
-  const { url, ua } = req.body;
+  const { url, ua, username, password } = req.body;
   if (req.method === 'POST' && !url) {
     badRequest({ res, message: 'Missing URL in body' });
     return;
@@ -61,6 +61,16 @@ export function getParamsFromBody(
   if (!ua) {
     badRequest({ res, message: 'Missing User-Agent' });
     return;
+  }
+  if (req.path === '/login') {
+    if (!username) {
+      badRequest({ res, message: 'Missing username' });
+      return;
+    }
+    if (!password) {
+      badRequest({ res, message: 'Missing password' });
+      return;
+    }
   }
 
   try {
@@ -70,8 +80,8 @@ export function getParamsFromBody(
     return;
   }
   res.locals.ua = ua;
-  res.locals.username = req.body.username;
-  res.locals.password = req.body.password;
+  res.locals.username = username;
+  res.locals.password = password;
   res.locals.renderHTML = Boolean(req.body.renderHTML);
   next();
 }
