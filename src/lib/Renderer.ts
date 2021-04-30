@@ -43,7 +43,7 @@ const TIMEOUT = 10000;
 const DATA_REGEXP = /^data:/i;
 
 export interface TaskParams {
-  type?: string;
+  type: 'render' | 'login';
   url: URL;
   userAgent: string;
   headersToForward: {
@@ -108,7 +108,7 @@ class Renderer {
       throw new Error('Called task on a stopping Renderer');
     }
     const start = Date.now();
-    console.log('Processing:', job.url.toString(), `(${job.type ?? 'render'})`);
+    console.log('Processing:', job.url.toString(), `(${job.type})`);
 
     ++this.nbTotalTasks;
 

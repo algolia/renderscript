@@ -110,6 +110,7 @@ export async function render(
 
   try {
     const { error, statusCode, body, resolvedUrl } = await renderer.task({
+      type: 'render',
       url,
       headersToForward,
       userAgent: ua,
@@ -159,7 +160,12 @@ export async function renderJSON(
       body,
       timeout,
       resolvedUrl,
-    } = await renderer.task({ url, headersToForward, userAgent: ua });
+    } = await renderer.task({
+      type: 'render',
+      url,
+      headersToForward,
+      userAgent: ua,
+    });
 
     if (error) {
       res.status(400).json({ error });
