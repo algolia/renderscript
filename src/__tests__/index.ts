@@ -1,4 +1,5 @@
 /* eslint-disable no-template-curly-in-string */
+import type { Protocol } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 import { request } from 'undici';
 
 function cleanString(body: string): string {
@@ -110,5 +111,39 @@ describe('main', () => {
       fullBody += chunk.toString();
     }
     expect(cleanString(fullBody)).toEqual('');
+  });
+});
+
+describe('login', () => {
+  it('should works with correct credentials', async () => {
+    const { statusCode, body } = await request(
+      'http://localhost:3000/login',
+      // @ts-expect-error
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body:
+          'url=http://localhost:3000/secure/login&username=admin&password=password&ua=Algolia Crawler',
+      }
+    );
+
+    expect(statusCode).toEqual(200);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    const cookies = JSON.parse(fullBody).cookies;
+    expect(
+      cookies.find(
+        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
+      )
+    ).toMatchSnapshot();
+    // Check that we actually went through the form
+    expect(
+      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
+    ).not.toBeUndefined();
   });
 });
