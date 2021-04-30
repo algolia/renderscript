@@ -198,7 +198,7 @@ export async function processLogin(
       },
     });
 
-    if (error) {
+    if (error && !renderHTML) {
       res.status(400).json({ error });
       return;
     }

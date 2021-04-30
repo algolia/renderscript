@@ -77,9 +77,9 @@ export default class Api {
     });
 
     this._app.post('/secure/login', this._csrfProtection, (req, res) => {
-      const { id, password } = req.body;
+      const { username, password } = req.body;
       this._renderLoginResult({
-        id,
+        username,
         password,
         res,
       });
@@ -102,6 +102,23 @@ export default class Api {
         );
     });
 
+    // 2-steps login form with CSRF protection
+    this._app.get('/secure/login/step1', this._csrfProtection, (req, res) => {
+      res.render('login-step1', {
+        baseUrl: req.baseUrl,
+        csrfToken: req.csrfToken(),
+      });
+    });
+
+    this._app.post('/secure/login/step2', this._csrfProtection, (req, res) => {
+      const { username } = req.body;
+      res.render('login-step2', {
+        baseUrl: req.baseUrl,
+        csrfToken: req.csrfToken(),
+        username,
+      });
+    });
+
     // error handler
     this._app.use(
       (
@@ -119,18 +136,18 @@ export default class Api {
   }
 
   private _renderLoginResult({
-    id,
+    username,
     password,
     res,
   }: {
-    id: string;
+    username: string;
     password: string;
     res: express.Response;
   }): void {
-    const granted = id === 'admin' && password === 'password';
+    const granted = username === 'admin' && password === 'password';
     const setCookie = granted ? SESSION_COOKIE : DELETE_COOKIE;
     console.log(
-      `[renderLoginResult] id: ${id}, password: ${password} => set-cookie: ${setCookie}`
+      `[renderLoginResult] username: ${username}, password: ${password} => set-cookie: ${setCookie}`
     );
     res
       .contentType('text/html')

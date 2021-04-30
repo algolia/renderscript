@@ -374,7 +374,9 @@ class Renderer {
       console.log(`2 step login: navigated to ${page.url()}`);
       passwordInput = await page.$('input[type=password]');
       if (!passwordInput) {
-        return { error: `field_not_found: input[type=password]` };
+        console.log('Found no password input on the page');
+        const body = await this._renderBody(page, new URL(page.url()));
+        return { error: `field_not_found: input[type=password]`, body };
       }
     }
 
@@ -386,7 +388,9 @@ class Renderer {
     ]);
 
     if (!loginResponse) {
-      return { error: 'no_response' };
+      console.log(`Got no login response (url=${page.url()})`);
+      const body = await this._renderBody(page, new URL(page.url()));
+      return { error: 'no_response', body };
     }
 
     const chain = loginResponse.request().redirectChain();
@@ -397,11 +401,7 @@ class Renderer {
     });
     const cookies = await page.cookies();
 
-    const baseHref = `${url.protocol}//${url.host}`;
-    await page.evaluate(injectBaseHref, baseHref);
-    const body = (await page.evaluate(
-      'document.firstElementChild.outerHTML'
-    )) as string;
+    const body = await this._renderBody(page, new URL(page.url()));
 
     /* Cleanup */
     await context.close();
@@ -445,6 +445,14 @@ class Renderer {
       throw new FetchError('no_response');
     }
     return response;
+  }
+
+  private async _renderBody(page: Page, url: URL): Promise<string> {
+    const baseHref = `${url.protocol}//${url.host}`;
+    await page.evaluate(injectBaseHref, baseHref);
+    return (await page.evaluate(
+      'document.firstElementChild.outerHTML'
+    )) as string;
   }
 
   private _addTask({ id, promise }: TaskObject): void {
