@@ -65,13 +65,6 @@ export interface TaskResult {
   cookies?: Protocol.Network.Cookie[];
 }
 
-interface Redirect {
-  url: string;
-  responseHeaders?: {
-    [s: string]: string;
-  };
-}
-
 export interface NewPage {
   page: Page;
   context: BrowserContext;
@@ -300,11 +293,6 @@ class Renderer {
     return { page, context };
   }
 
-  private async _newPage(): Promise<NewPage> {
-    this._pageBuffer.push(this._createNewPage());
-    return await this._pageBuffer.shift()!;
-  }
-
   private async _newPageWithContext(task: TaskParams): Promise<NewPage> {
     this._pageBuffer.push(this._createNewPage());
     const { context, page } = await this._pageBuffer.shift()!;
@@ -315,41 +303,15 @@ class Renderer {
 
   private async _processPage(task: TaskParams): Promise<TaskResult> {
     /* Setup */
-    const { url, userAgent } = task;
-    const { context, page } = await this._newPage();
-
-    await page.setUserAgent(userAgent);
-    await this._defineRequestContextForPage({ page, task });
-
-    let response: HTTPResponse | null = null;
-    let timeout = false;
-    page.on('response', (r) => {
-      if (!response) {
-        response = r;
-      }
-    });
+    const { url } = task;
+    const { context, page } = await this._newPageWithContext(task);
 
     let start = Date.now();
+    let response: HTTPResponse;
     try {
-      response = await page.goto(url.href, {
-        timeout: TIMEOUT,
-        waitUntil: 'networkidle0',
-      });
+      response = await this._goto(page, url);
     } catch (e) {
-      if (e.message.match(/Navigation Timeout Exceeded/)) {
-        timeout = true;
-      } else {
-        console.error('Caught error when loading page', e);
-      }
-    } finally {
-      stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
-        success: response ? 'true' : 'false',
-      });
-    }
-
-    /* Fetch errors */
-    if (!response) {
-      return { error: 'no_response' };
+      return { error: e.message, timeout: Boolean(e.timeout) };
     }
 
     /* Transforming */
@@ -381,7 +343,7 @@ class Renderer {
       return { error: 'unsafe_redirect' };
     }
 
-    return { statusCode, headers, body, timeout, resolvedUrl };
+    return { statusCode, headers, body, resolvedUrl };
   }
 
   private async _processLogin(task: TaskParams): Promise<TaskResult> {
