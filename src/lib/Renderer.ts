@@ -42,18 +42,28 @@ const PAGE_BUFFER_SIZE = 2;
 const TIMEOUT = 10000;
 const DATA_REGEXP = /^data:/i;
 
-export interface TaskParams {
+interface TaskBaseParams {
   type: 'render' | 'login';
   url: URL;
   userAgent: string;
   headersToForward: {
     [s: string]: string;
   };
-  login?: {
+}
+
+interface RenderTaskParams extends TaskBaseParams {
+  type: 'render';
+}
+
+interface LoginTaskParams extends TaskBaseParams {
+  type: 'login';
+  login: {
     username: string;
     password: string;
   };
 }
+
+export type TaskParams = RenderTaskParams | LoginTaskParams;
 
 export interface TaskResult {
   statusCode?: number;
@@ -125,7 +135,9 @@ class Renderer {
 
     this._removeTask({ id });
 
-    stats.timing('renderscript.task', Date.now() - start);
+    stats.timing('renderscript.task', Date.now() - start, undefined, {
+      type: job.type,
+    });
     console.log('Done', job.url.toString());
 
     return res;
@@ -209,7 +221,7 @@ class Renderer {
     task,
   }: {
     page: Page;
-    task: TaskParams;
+    task: TaskBaseParams;
   }): Promise<void> {
     const { url, headersToForward } = task;
 
@@ -293,7 +305,7 @@ class Renderer {
     return { page, context };
   }
 
-  private async _newPageWithContext(task: TaskParams): Promise<NewPage> {
+  private async _newPageWithContext(task: TaskBaseParams): Promise<NewPage> {
     this._pageBuffer.push(this._createNewPage());
     const { context, page } = await this._pageBuffer.shift()!;
     await page.setUserAgent(task.userAgent);
@@ -301,7 +313,7 @@ class Renderer {
     return { context, page };
   }
 
-  private async _processPage(task: TaskParams): Promise<TaskResult> {
+  private async _processPage(task: RenderTaskParams): Promise<TaskResult> {
     /* Setup */
     const { url } = task;
     const { context, page } = await this._newPageWithContext(task);
@@ -346,7 +358,7 @@ class Renderer {
     return { statusCode, headers, body, resolvedUrl };
   }
 
-  private async _processLogin(task: TaskParams): Promise<TaskResult> {
+  private async _processLogin(task: LoginTaskParams): Promise<TaskResult> {
     /* Setup */
     const { url } = task;
     const { context, page } = await this._newPageWithContext(task);
@@ -361,7 +373,7 @@ class Renderer {
     if (!textInput) {
       return { error: `field_not_found: input[type=text], input[type=email]` };
     }
-    await textInput!.type(task.login!.username);
+    await textInput.type(task.login!.username);
 
     let passwordInput = await page.$('input[type=password]');
     if (!passwordInput) {
@@ -407,8 +419,7 @@ class Renderer {
     const chain = loginResponse.request().redirectChain();
     console.log(`Followed ${chain.length} redirections`);
     chain.forEach((request: HTTPRequest) => {
-      console.log(request.url());
-      console.log(request.response()?.headers());
+      console.log(`--> ${request.url()}`);
     });
     const cookies = await page.cookies();
 

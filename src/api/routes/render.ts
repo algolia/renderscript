@@ -8,6 +8,15 @@ const HEADERS_TO_FORWARD = process.env.HEADERS_TO_FORWARD
   ? process.env.HEADERS_TO_FORWARD.split(',')
   : ['Cookie', 'Authorization'];
 
+// Only whitelist loading styles resources when testing
+// (will not change programmatic use of this system)
+const CSP_HEADERS = [
+  "default-src 'none'",
+  "style-src * 'unsafe-inline'",
+  'img-src * data:',
+  'font-src *',
+].join('; ');
+
 export function getForwardedHeadersFromRequest(
   req: express.Request
 ): Record<string, string> {
@@ -127,17 +136,7 @@ export async function render(
     res
       .status(statusCode!)
       .header('Content-Type', 'text/html')
-      // Only whitelist loading styles resources when testing
-      // (will not change programmatic use of this system)
-      .header(
-        'Content-Security-Policy',
-        [
-          "default-src 'none'",
-          "style-src * 'unsafe-inline'",
-          'img-src * data:',
-          'font-src *',
-        ].join('; ')
-      )
+      .header('Content-Security-Policy', CSP_HEADERS)
       .send(body);
   } catch (e) {
     res.status(500).json({
@@ -216,7 +215,11 @@ export async function processLogin(
 
     if (error) {
       if (renderHTML) {
-        res.status(200).header('Content-Type', 'text/html').send(body);
+        res
+          .status(200)
+          .header('Content-Type', 'text/html')
+          .header('Content-Security-Policy', CSP_HEADERS)
+          .send(body);
         return;
       }
       res.status(400).json({ error });
@@ -227,17 +230,7 @@ export async function processLogin(
       res
         .status(statusCode!)
         .header('Content-Type', 'text/html')
-        // Only whitelist loading styles resources when testing
-        // (will not change programmatic use of this system)
-        .header(
-          'Content-Security-Policy',
-          [
-            "default-src 'none'",
-            "style-src * 'unsafe-inline'",
-            'img-src * data:',
-            'font-src *',
-          ].join('; ')
-        )
+        .header('Content-Security-Policy', CSP_HEADERS)
         .send(body);
       return;
     }

@@ -12,8 +12,9 @@ import ready from 'api/routes/ready';
 import * as render from 'api/routes/render';
 import projectRoot from 'helpers/projectRoot';
 
-const SESSION_COOKIE = 'sessionToken=53cu23_535510n';
-const DELETE_COOKIE = 'sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+const SESSION_COOKIE = 'sessionToken=53cu23_535510n; SameSite=Strict';
+const DELETE_COOKIE =
+  'sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict';
 
 export default class Api {
   server: http.Server;
@@ -21,7 +22,9 @@ export default class Api {
   private _csrfProtection: express.RequestHandler;
 
   constructor() {
-    this._csrfProtection = csurf({ cookie: { maxAge: 120 } });
+    this._csrfProtection = csurf({
+      cookie: { maxAge: 120, sameSite: 'strict' },
+    });
     this._app = express();
     this.server = http.createServer(this._app);
   }
@@ -113,6 +116,15 @@ export default class Api {
     this._app.post('/secure/login/step2', this._csrfProtection, (req, res) => {
       const { username } = req.body;
       res.render('login-step2', {
+        baseUrl: req.baseUrl,
+        csrfToken: req.csrfToken(),
+        username,
+      });
+    });
+
+    this._app.get('/secure/login/2steps', this._csrfProtection, (req, res) => {
+      const { username } = req.body;
+      res.render('login-2steps-js', {
         baseUrl: req.baseUrl,
         csrfToken: req.csrfToken(),
         username,

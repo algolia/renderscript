@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Log-in</title>
+
+    <style>
+      label {
+        display: block;
+      }
+      input {
+        display: block;
+        margin-bottom: 16px;
+      }
+    </style>
+
+    <script>
+      window.onload = () => {
+        let step = 'username';
+        document.getElementById("loginForm").addEventListener("submit", function (event) {
+          if (step === 'username') {
+            event.preventDefault();
+            document.getElementById("usernameLabel").remove();
+            document.getElementById("username").setAttribute("type", "hidden");
+            document.getElementById("loginBtn").value = "Login";
+
+            const passwordLabel = document.createElement("label");
+            passwordLabel.setAttribute("for", "password");
+            passwordLabel.innerText = "Password:";
+            const passwordInput = document.createElement("input");
+            passwordInput.name = "password";
+            passwordInput.type = "password";
+            const passwordSection = document.getElementById("passwordSection");
+            passwordSection.appendChild(passwordLabel);
+            passwordSection.appendChild(passwordInput);
+            passwordInput.focus();
+            step = 'password';
+          }
+        });
+      }
+    </script>
+</head>
+<body>
+
+<h2>2-steps JavaScript login form</h2>
+
+<form id="loginForm" action="<%= baseUrl %>/secure/login" method="post">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label for="username" id="usernameLabel">Username:</label>
+    <input type="text" id="username" name="username" autofocus>
+    <div id="passwordSection">
+    </div>
+    <input type="submit" id="loginBtn" value="Next" >
+</form>
+
+</body>
+</html>
