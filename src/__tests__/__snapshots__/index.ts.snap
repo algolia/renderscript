@@ -8,6 +8,25 @@ Object {
   "name": "sessionToken",
   "path": "/secure",
   "sameParty": false,
+  "sameSite": "Strict",
+  "secure": false,
+  "session": true,
+  "size": 26,
+  "sourcePort": 3000,
+  "sourceScheme": "NonSecure",
+  "value": "53cu23_535510n",
+}
+`;
+
+exports[`login should works with a 2-steps JS login 1`] = `
+Object {
+  "domain": "localhost",
+  "expires": -1,
+  "httpOnly": false,
+  "name": "sessionToken",
+  "path": "/secure",
+  "sameParty": false,
+  "sameSite": "Strict",
   "secure": false,
   "session": true,
   "size": 26,
@@ -25,6 +44,7 @@ Object {
   "name": "sessionToken",
   "path": "/secure",
   "sameParty": false,
+  "sameSite": "Strict",
   "secure": false,
   "session": true,
   "size": 26,

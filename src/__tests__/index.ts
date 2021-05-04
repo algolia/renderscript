@@ -202,6 +202,31 @@ describe('login', () => {
     ).not.toBeUndefined();
   });
 
+  it('should works with a 2-steps JS login', async () => {
+    const { statusCode, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login/2steps',
+      username: 'admin',
+      password: 'password',
+    });
+
+    expect(statusCode).toEqual(200);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    const cookies = JSON.parse(fullBody).cookies;
+    expect(
+      cookies.find(
+        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
+      )
+    ).toMatchSnapshot();
+    // Check that we actually went through the form
+    expect(
+      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
+    ).not.toBeUndefined();
+  });
+
   it('should works but not get a session token with bad credentials', async () => {
     const { statusCode, body } = await sendLoginRequest({
       url: 'http://localhost:3000/secure/login',
