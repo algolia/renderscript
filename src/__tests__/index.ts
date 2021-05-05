@@ -1,5 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
+import type { Protocol } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 import { request } from 'undici';
+import type { ResponseData } from 'undici/types/client';
 
 function cleanString(body: string): string {
   return body.replace(/\n|\r/g, '').replace(/\s\s+/g, '');
@@ -112,3 +114,163 @@ describe('main', () => {
     expect(cleanString(fullBody)).toEqual('');
   });
 });
+
+describe('login', () => {
+  it('should error when no username', async () => {
+    const { statusCode, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login',
+      username: '',
+      password: 'password',
+    });
+
+    expect(statusCode).toEqual(400);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    expect(cleanString(fullBody)).toEqual(
+      '{"error":true,"message":"Missing username"}'
+    );
+  });
+
+  it('should error when no username', async () => {
+    const { statusCode, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login',
+      username: 'admin',
+      password: '',
+    });
+
+    expect(statusCode).toEqual(400);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    expect(cleanString(fullBody)).toEqual(
+      '{"error":true,"message":"Missing password"}'
+    );
+  });
+
+  it('should works with correct credentials', async () => {
+    const { statusCode, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login',
+      username: 'admin',
+      password: 'password',
+    });
+
+    expect(statusCode).toEqual(200);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    const cookies = JSON.parse(fullBody).cookies;
+    expect(
+      cookies.find(
+        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
+      )
+    ).toMatchSnapshot();
+    // Check that we actually went through the form
+    expect(
+      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
+    ).not.toBeUndefined();
+  });
+
+  it('should works even with a 2-steps login', async () => {
+    const { statusCode, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login/step1',
+      username: 'admin',
+      password: 'password',
+    });
+
+    expect(statusCode).toEqual(200);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    const cookies = JSON.parse(fullBody).cookies;
+    expect(
+      cookies.find(
+        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
+      )
+    ).toMatchSnapshot();
+    // Check that we actually went through the form
+    expect(
+      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
+    ).not.toBeUndefined();
+  });
+
+  it('should works with a 2-steps JS login', async () => {
+    const { statusCode, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login/2steps',
+      username: 'admin',
+      password: 'password',
+    });
+
+    expect(statusCode).toEqual(200);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    const cookies = JSON.parse(fullBody).cookies;
+    expect(
+      cookies.find(
+        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
+      )
+    ).toMatchSnapshot();
+    // Check that we actually went through the form
+    expect(
+      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
+    ).not.toBeUndefined();
+  });
+
+  it('should works but not get a session token with bad credentials', async () => {
+    const { statusCode, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login',
+      username: 'admin',
+      password: 'admin',
+    });
+
+    expect(statusCode).toEqual(200);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    const cookies = JSON.parse(fullBody).cookies;
+    expect(
+      cookies.find(
+        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
+      )
+    ).toBeUndefined();
+    // Check that we actually went through the form
+    expect(
+      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
+    ).not.toBeUndefined();
+  });
+});
+
+async function sendLoginRequest({
+  url,
+  username,
+  password,
+}: {
+  url: string;
+  username: string;
+  password: string;
+}): Promise<ResponseData> {
+  return await request(
+    'http://localhost:3000/login',
+    // @ts-expect-error type are fixed in v4
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `url=${url}&username=${username}&password=${password}&ua=Algolia Crawler`,
+    }
+  );
+}

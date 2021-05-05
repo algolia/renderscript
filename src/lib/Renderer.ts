@@ -6,9 +6,11 @@ import type {
   Browser,
   BrowserContext,
   HTTPRequest,
+  Protocol,
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 import { v4 as uuid } from 'uuid';
 
+import { FetchError } from 'api/helpers/errors';
 import { stats } from 'helpers/stats';
 import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
 import injectBaseHref from 'lib/helpers/injectBaseHref';
@@ -40,13 +42,28 @@ const PAGE_BUFFER_SIZE = 2;
 const TIMEOUT = 10000;
 const DATA_REGEXP = /^data:/i;
 
-export interface TaskParams {
+interface TaskBaseParams {
+  type: 'render' | 'login';
   url: URL;
   userAgent: string;
   headersToForward: {
     [s: string]: string;
   };
 }
+
+interface RenderTaskParams extends TaskBaseParams {
+  type: 'render';
+}
+
+interface LoginTaskParams extends TaskBaseParams {
+  type: 'login';
+  login: {
+    username: string;
+    password: string;
+  };
+}
+
+export type TaskParams = RenderTaskParams | LoginTaskParams;
 
 export interface TaskResult {
   statusCode?: number;
@@ -55,6 +72,7 @@ export interface TaskResult {
   timeout?: boolean;
   error?: string;
   resolvedUrl?: string;
+  cookies?: Protocol.Network.Cookie[];
 }
 
 export interface NewPage {
@@ -100,19 +118,26 @@ class Renderer {
       throw new Error('Called task on a stopping Renderer');
     }
     const start = Date.now();
-    console.log('Processing:', job.url.toString());
+    console.log('Processing:', job.url.toString(), `(${job.type})`);
 
     ++this.nbTotalTasks;
 
     const id = uuid();
-    const promise = this._processPage(job);
+    let promise;
+    if (job.type === 'login') {
+      promise = this._processLogin(job);
+    } else {
+      promise = this._processPage(job);
+    }
     this._addTask({ id, promise });
 
     const res = await promise;
 
     this._removeTask({ id });
 
-    stats.timing('renderscript.task', Date.now() - start);
+    stats.timing('renderscript.task', Date.now() - start, undefined, {
+      type: job.type,
+    });
     console.log('Done', job.url.toString());
 
     return res;
@@ -196,7 +221,7 @@ class Renderer {
     task,
   }: {
     page: Page;
-    task: TaskParams;
+    task: TaskBaseParams;
   }): Promise<void> {
     const { url, headersToForward } = task;
 
@@ -280,48 +305,25 @@ class Renderer {
     return { page, context };
   }
 
-  private async _newPage(): Promise<NewPage> {
+  private async _newPageWithContext(task: TaskBaseParams): Promise<NewPage> {
     this._pageBuffer.push(this._createNewPage());
-    return await this._pageBuffer.shift()!;
+    const { context, page } = await this._pageBuffer.shift()!;
+    await page.setUserAgent(task.userAgent);
+    await this._defineRequestContextForPage({ page, task });
+    return { context, page };
   }
 
-  private async _processPage(task: TaskParams): Promise<TaskResult> {
+  private async _processPage(task: RenderTaskParams): Promise<TaskResult> {
     /* Setup */
-    const { url, userAgent } = task;
-    const { context, page } = await this._newPage();
-
-    await page.setUserAgent(userAgent);
-    await this._defineRequestContextForPage({ page, task });
-
-    let response: HTTPResponse | null = null;
-    let timeout = false;
-    page.on('response', (r) => {
-      if (!response) {
-        response = r;
-      }
-    });
+    const { url } = task;
+    const { context, page } = await this._newPageWithContext(task);
 
     let start = Date.now();
+    let response: HTTPResponse;
     try {
-      response = await page.goto(url.href, {
-        timeout: TIMEOUT,
-        waitUntil: 'networkidle0',
-      });
+      response = await this._goto(page, url);
     } catch (e) {
-      if (e.message.match(/Navigation Timeout Exceeded/)) {
-        timeout = true;
-      } else {
-        console.error('Caught error when loading page', e);
-      }
-    } finally {
-      stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
-        success: response ? 'true' : 'false',
-      });
-    }
-
-    /* Fetch errors */
-    if (!response) {
-      return { error: 'no_response' };
+      return { error: e.message, timeout: Boolean(e.timeout) };
     }
 
     /* Transforming */
@@ -353,7 +355,126 @@ class Renderer {
       return { error: 'unsafe_redirect' };
     }
 
-    return { statusCode, headers, body, timeout, resolvedUrl };
+    return { statusCode, headers, body, resolvedUrl };
+  }
+
+  private async _processLogin(task: LoginTaskParams): Promise<TaskResult> {
+    /* Setup */
+    const { url } = task;
+    const { context, page } = await this._newPageWithContext(task);
+
+    try {
+      await this._goto(page, url);
+    } catch (e) {
+      return { error: e.message, timeout: Boolean(e.timeout) };
+    }
+
+    const textInput = await page.$('input[type=text], input[type=email]');
+    if (!textInput) {
+      return { error: `field_not_found: input[type=text], input[type=email]` };
+    }
+    await textInput.type(task.login!.username);
+
+    let passwordInput = await page.$('input[type=password]');
+    if (!passwordInput) {
+      console.log('2 step login: validating username...');
+      try {
+        await Promise.all([
+          // page.waitForNavigation(), // Doesn't work with Okta for example, it's JS based
+          page.waitForSelector('input[type=password]', {
+            timeout: TIMEOUT,
+          }),
+          textInput!.press('Enter'),
+        ]);
+      } catch (err) {
+        console.log('Found no password input on the page');
+        const body = await this._renderBody(page, new URL(page.url()));
+        return { error: err.message, body };
+      }
+    }
+
+    console.log(`2 step login: navigated to ${page.url()}`);
+    passwordInput = await page.$('input[type=password]');
+    console.log('Logging in...');
+    await passwordInput!.type(task.login!.password);
+    let loginResponse;
+    try {
+      const [navigationResponse] = await Promise.all([
+        page.waitForNavigation({ timeout: TIMEOUT }),
+        await passwordInput!.press('Enter'),
+      ]);
+      loginResponse = navigationResponse;
+    } catch (err) {
+      console.log(`Error while logging in: ${err.message} (url=${page.url()})`);
+      const body = await this._renderBody(page, new URL(page.url()));
+      return { error: err.message, body };
+    }
+
+    if (!loginResponse) {
+      console.log(`Got no login response (url=${page.url()})`);
+      const body = await this._renderBody(page, new URL(page.url()));
+      return { error: 'no_response', body };
+    }
+
+    const chain = loginResponse.request().redirectChain();
+    console.log(`Followed ${chain.length} redirections`);
+    chain.forEach((request: HTTPRequest) => {
+      console.log(`--> ${request.url()}`);
+    });
+    const cookies = await page.cookies();
+
+    const body = await this._renderBody(page, new URL(page.url()));
+
+    /* Cleanup */
+    await context.close();
+
+    return {
+      statusCode: loginResponse!.status(),
+      headers: loginResponse!.headers(),
+      body,
+      cookies,
+    };
+  }
+
+  private async _goto(page: Page, url: URL): Promise<HTTPResponse> {
+    let response: HTTPResponse | null = null;
+    page.on('response', (r) => {
+      if (!response) {
+        response = r;
+      }
+    });
+
+    const start = Date.now();
+    try {
+      response = await page.goto(url.href, {
+        timeout: TIMEOUT,
+        waitUntil: 'networkidle0',
+      });
+    } catch (e) {
+      if (e.message.match(/Navigation Timeout Exceeded/)) {
+        throw new FetchError('no_response', true);
+      } else {
+        console.error('Caught error when loading page', e);
+      }
+    } finally {
+      stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
+        success: response ? 'true' : 'false',
+      });
+    }
+
+    /* Fetch errors */
+    if (!response) {
+      throw new FetchError('no_response');
+    }
+    return response;
+  }
+
+  private async _renderBody(page: Page, url: URL): Promise<string> {
+    const baseHref = `${url.protocol}//${url.host}`;
+    await page.evaluate(injectBaseHref, baseHref);
+    return (await page.evaluate(
+      'document.firstElementChild.outerHTML'
+    )) as string;
   }
 
   private _addTask({ id, promise }: TaskObject): void {

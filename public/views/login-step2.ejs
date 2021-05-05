@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+
+<h2>2-steps login form</h2>
+
+<form action="<%= baseUrl %>/secure/login" method="post">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="username" value="<%= username %>">
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password" autofocus><br><br>
+    <input type="submit" value="Log-in">
+</form>
+
+</body>
+</html>
