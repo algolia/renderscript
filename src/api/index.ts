@@ -32,6 +32,9 @@ export default class Api {
   start(port: number): void {
     this._setup();
     this._routes();
+    if (process.env.NODE_ENV !== 'production') {
+      this._privateRoutes();
+    }
 
     this.server.listen(port, () => {
       console.info(`Server started on port ${port}`);
@@ -69,6 +72,23 @@ export default class Api {
         render.processLogin
       );
 
+    // error handler
+    this._app.use(
+      (
+        err: any,
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+      ) => {
+        if (err.code !== 'EBADCSRFTOKEN') return next(err);
+
+        // CSRF token errors
+        res.status(403).send('The form has expired');
+      }
+    );
+  }
+
+  private _privateRoutes(): void {
     this._app.use(expressStatic(path.join(projectRoot, '/public')));
 
     // Login form with CSRF protection
@@ -130,21 +150,6 @@ export default class Api {
         username,
       });
     });
-
-    // error handler
-    this._app.use(
-      (
-        err: any,
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-      ) => {
-        if (err.code !== 'EBADCSRFTOKEN') return next(err);
-
-        // CSRF token errors
-        res.status(403).send('The form has expired');
-      }
-    );
   }
 
   private _renderLoginResult({
