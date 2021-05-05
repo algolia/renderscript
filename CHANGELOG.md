@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/algolia/renderscript/compare/v1.6.1...v1.7.0) (2021-05-05)
+
+
+### Features
+
+* login to forms ([#256](https://github.com/algolia/renderscript/issues/256)) ([8d5377f](https://github.com/algolia/renderscript/commit/8d5377f3bf3802a7eb67e2e19e7a9f33250d418a))
+
 ## [1.6.1](https://github.com/algolia/renderscript/compare/v1.6.0...v1.6.1) (2021-04-28)
 
 
