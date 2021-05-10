@@ -38,6 +38,7 @@ Returns `application/json`:
 * `statusCode <number>`: HTTP Status Code
 * `headers <{ [key: string]: string }>`: Page headers (keys are lowercase)
 * `body <string>`: Page raw HTML content
+* `timeout <boolean>`: Present only if the page took too long to render
 
 > GET `/render`
 
@@ -49,6 +50,29 @@ Query parameters:
 * `ua`: User-Agent
 
 Returns `text/html`.
+(CSP headers are set to prevent script execution on the rendered page)
+
+> POST `/login`
+
+This endpoint will load a given login page, look for `input` fields, enter the given credentials and validate the form.
+It allows retrieving programmatically a session-cookie from websites with [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) protection.
+
+Body parameters:
+
+* `url`: URL of the login page
+* `username`: Username to enter on the login form. Renderscript expects to find an `input[type=text]` or `input[type=email]` on the login page.
+* `password`: Password to enter on the login form. Renderscript expects to find an `input[type=password]` on the login page.
+* `ua`: User-Agent
+* `renderHTML`: Boolean (optional). If set to true, Renderscript will return the rendered HTML after the login request. Useful to debug visually.
+
+Returns `application/json`:
+
+* `statusCode <number>`: HTTP Status Code.
+* `headers <{ [key: string]: string }>`: Response headers received on the login request.
+* `cookies` <[https://chromedevtools.github.io/devtools-protocol/tot/Network/#type-Cookie](Cookie)[]>: Browser cookies after the login request.
+* `timeout <boolean>`: Present only if the login operation took too long.
+
+If `renderHTML: true`, returns `text/html`.
 (CSP headers are set to prevent script execution on the rendered page)
 
 ## Running it locally
