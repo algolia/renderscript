@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/algolia/renderscript/compare/v1.7.1...v1.7.2) (2021-05-29)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @algolia/dns-filter to v1.1.17 ([#287](https://github.com/algolia/renderscript/issues/287)) ([d509bff](https://github.com/algolia/renderscript/commit/d509bff583e9820ed74eba189aab6de7fcf88c36))
+
 ## [1.7.1](https://github.com/algolia/renderscript/compare/v1.7.0...v1.7.1) (2021-05-08)
 
 
