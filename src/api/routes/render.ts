@@ -152,19 +152,13 @@ export async function renderJSON(
   const { url, ua } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
   try {
-    const {
-      error,
-      statusCode,
-      headers,
-      body,
-      timeout,
-      resolvedUrl,
-    } = await renderer.task({
-      type: 'render',
-      url,
-      headersToForward,
-      userAgent: ua,
-    });
+    const { error, statusCode, headers, body, timeout, resolvedUrl } =
+      await renderer.task({
+        type: 'render',
+        url,
+        headersToForward,
+        userAgent: ua,
+      });
 
     if (error) {
       res.status(400).json({ error });
@@ -195,23 +189,17 @@ export async function processLogin(
   const { url, ua, username, password, renderHTML } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
   try {
-    const {
-      error,
-      statusCode,
-      headers,
-      body,
-      cookies,
-      timeout,
-    } = await renderer.task({
-      type: 'login',
-      url,
-      headersToForward,
-      userAgent: ua,
-      login: {
-        username,
-        password,
-      },
-    });
+    const { error, statusCode, headers, body, cookies, timeout } =
+      await renderer.task({
+        type: 'login',
+        url,
+        headersToForward,
+        userAgent: ua,
+        login: {
+          username,
+          password,
+        },
+      });
 
     if (error) {
       if (renderHTML) {
