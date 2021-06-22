@@ -1,3 +1,10 @@
+## [1.7.6](https://github.com/algolia/renderscript/compare/v1.7.5...v1.7.6) (2021-06-22)
+
+
+### Bug Fixes
+
+* add Contributing ([b4a026b](https://github.com/algolia/renderscript/commit/b4a026b6bef81c01d92494693273b709edbeba04))
+
 ## [1.7.5](https://github.com/algolia/renderscript/compare/v1.7.4...v1.7.5) (2021-06-22)
 
 
