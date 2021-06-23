@@ -1,7 +1,7 @@
 /**
  * Injects a <base> tag which allows other resources to load on the
  * page without trying to get them from the `renderscript` server.
- * Ithas no effect on serialised output, but allows it to verify render
+ * It has no effect on serialised output, but allows it to verify render
  * quality.
  */
 export default function injectBaseHref(origin: string): void {

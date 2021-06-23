@@ -386,6 +386,8 @@ class Renderer {
           }),
           textInput!.press('Enter'),
         ]);
+        console.log(`2 step login: navigated to ${page.url()}`);
+        passwordInput = await page.$('input[type=password]');
       } catch (err) {
         console.log('Found no password input on the page');
         const body = await this._renderBody(page, new URL(page.url()));
@@ -393,8 +395,6 @@ class Renderer {
       }
     }
 
-    console.log(`2 step login: navigated to ${page.url()}`);
-    passwordInput = await page.$('input[type=password]');
     console.log('Logging in...');
     await passwordInput!.type(task.login!.password);
     let loginResponse;
