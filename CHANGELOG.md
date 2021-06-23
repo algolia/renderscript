@@ -1,3 +1,10 @@
+## [1.7.7](https://github.com/algolia/renderscript/compare/v1.7.6...v1.7.7) (2021-06-23)
+
+
+### Bug Fixes
+
+* move 2-steps logging logs to the right place ([#312](https://github.com/algolia/renderscript/issues/312)) ([b8f2820](https://github.com/algolia/renderscript/commit/b8f2820bdfa4e647d2252c72c9687a9cca3b1037))
+
 ## [1.7.6](https://github.com/algolia/renderscript/compare/v1.7.5...v1.7.6) (2021-06-22)
 
 
