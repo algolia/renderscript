@@ -448,7 +448,7 @@ class Renderer {
     try {
       response = await page.goto(url.href, {
         timeout: TIMEOUT,
-        waitUntil: 'networkidle0',
+        waitUntil: ['domcontentloaded', 'networkidle0'],
       });
     } catch (e) {
       if (e.message.match(/Navigation Timeout Exceeded/)) {
