@@ -1,7 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
 import type { Protocol } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 import { request } from 'undici';
-import type { ResponseData } from 'undici/types/client';
+import type { ResponseData } from 'undici/types/dispatcher';
 
 function cleanString(body: string): string {
   return body.replace(/\n|\r/g, '').replace(/\s\s+/g, '');
@@ -262,15 +262,11 @@ async function sendLoginRequest({
   username: string;
   password: string;
 }): Promise<ResponseData> {
-  return await request(
-    'http://localhost:3000/login',
-    // @ts-expect-error type are fixed in v4
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: `url=${url}&username=${username}&password=${password}&ua=Algolia Crawler`,
-    }
-  );
+  return await request('http://localhost:3000/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `url=${url}&username=${username}&password=${password}&ua=Algolia Crawler`,
+  });
 }
