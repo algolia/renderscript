@@ -401,7 +401,7 @@ class Renderer {
     try {
       const [navigationResponse] = await Promise.all([
         page.waitForNavigation({ timeout: TIMEOUT }),
-        await passwordInput!.press('Enter'),
+        passwordInput!.press('Enter'),
       ]);
       loginResponse = navigationResponse;
     } catch (err) {
@@ -410,17 +410,25 @@ class Renderer {
       return { error: err.message, body };
     }
 
-    if (!loginResponse) {
-      console.log(`Got no login response (url=${page.url()})`);
-      const body = await this._renderBody(page, new URL(page.url()));
-      return { error: 'no_response', body };
+    if (loginResponse) {
+      const chain = loginResponse.request().redirectChain();
+      console.log(`Followed ${chain.length} redirections`);
+      chain.forEach((request: HTTPRequest) => {
+        console.log(`--> ${request.url()}`);
+      });
+    } else {
+      if (page.url() === url.href) {
+        // Return an error if we got no login response and are still on the same URL
+        console.log(`Got no login response (url=${page.url()})`);
+        const body = await this._renderBody(page, new URL(page.url()));
+        return { error: 'no_response', body };
+      }
+      // Can happen if navigation was done through History API
+      console.log(
+        `Got no login response, but we were redirected on ${page.url()}, continuing...`
+      );
     }
 
-    const chain = loginResponse.request().redirectChain();
-    console.log(`Followed ${chain.length} redirections`);
-    chain.forEach((request: HTTPRequest) => {
-      console.log(`--> ${request.url()}`);
-    });
     const cookies = await page.cookies();
 
     const body = await this._renderBody(page, new URL(page.url()));
@@ -429,8 +437,8 @@ class Renderer {
     await context.close();
 
     return {
-      statusCode: loginResponse!.status(),
-      headers: loginResponse!.headers(),
+      statusCode: loginResponse?.status() || 200,
+      headers: loginResponse?.headers(),
       body,
       cookies,
     };
