@@ -1,3 +1,10 @@
+## [1.7.12](https://github.com/algolia/renderscript/compare/v1.7.11...v1.7.12) (2021-07-15)
+
+
+### Bug Fixes
+
+* bump version ([0c7e81b](https://github.com/algolia/renderscript/commit/0c7e81bf844ab45997da01f2845c2f49362a6da9))
+
 ## [1.7.11](https://github.com/algolia/renderscript/compare/v1.7.10...v1.7.11) (2021-07-15)
 
 
