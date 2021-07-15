@@ -1,3 +1,10 @@
+## [1.7.11](https://github.com/algolia/renderscript/compare/v1.7.10...v1.7.11) (2021-07-15)
+
+
+### Bug Fixes
+
+* waitForNavigation can resolve with null ([#338](https://github.com/algolia/renderscript/issues/338)) ([f05f878](https://github.com/algolia/renderscript/commit/f05f87838cf45d24d6e3aa3694d04c29d401b739))
+
 ## [1.7.10](https://github.com/algolia/renderscript/compare/v1.7.9...v1.7.10) (2021-07-07)
 
 
