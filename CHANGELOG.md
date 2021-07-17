@@ -1,3 +1,10 @@
+## [1.7.13](https://github.com/algolia/renderscript/compare/v1.7.12...v1.7.13) (2021-07-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency hot-shots to v8.5.0 ([#342](https://github.com/algolia/renderscript/issues/342)) ([7b008a0](https://github.com/algolia/renderscript/commit/7b008a0cb25e85ba2da27a62f0c103562562b938))
+
 ## [1.7.12](https://github.com/algolia/renderscript/compare/v1.7.11...v1.7.12) (2021-07-15)
 
 
