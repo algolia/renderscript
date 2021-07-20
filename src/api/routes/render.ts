@@ -1,21 +1,9 @@
 import type express from 'express';
 
+import { CSP_HEADERS, HEADERS_TO_FORWARD } from 'api/constants';
 import { revertUrl, buildUrl } from 'api/helpers/buildUrl';
 import { badRequest } from 'api/helpers/errors';
 import renderer from 'lib/rendererSingleton';
-
-const HEADERS_TO_FORWARD = process.env.HEADERS_TO_FORWARD
-  ? process.env.HEADERS_TO_FORWARD.split(',')
-  : ['Cookie', 'Authorization'];
-
-// Only whitelist loading styles resources when testing
-// (will not change programmatic use of this system)
-const CSP_HEADERS = [
-  "default-src 'none'",
-  "style-src * 'unsafe-inline'",
-  'img-src * data:',
-  'font-src *',
-].join('; ');
 
 export function getForwardedHeadersFromRequest(
   req: express.Request

@@ -1,3 +1,5 @@
+import { PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
+
 export const flags = [
   // Disable sandboxing when not available
   '--no-sandbox',
@@ -53,3 +55,30 @@ export const flags = [
   '--disable-breakpad',
   '--disable-crash-reporter',
 ];
+
+export const IP_PREFIXES_WHITELIST = process.env.IP_PREFIXES_WHITELIST
+  ? process.env.IP_PREFIXES_WHITELIST.split(',')
+  : ['127.', '0.', '::1'];
+
+export const RESTRICTED_IPS =
+  process.env.ALLOW_LOCALHOST === 'true'
+    ? PRIVATE_IP_PREFIXES.filter(
+        (prefix: string) => !IP_PREFIXES_WHITELIST.includes(prefix)
+      ) // relax filtering
+    : PRIVATE_IP_PREFIXES;
+
+export const WIDTH = 1280;
+export const HEIGHT = 1024;
+export const IGNORED_RESOURCES = [
+  'font',
+  'image',
+  'media',
+  'websocket',
+  'manifest',
+  'texttrack',
+];
+export const PAGE_BUFFER_SIZE = 2;
+export const TIMEOUT = 10000;
+export const DATA_REGEXP = /^data:/i;
+
+export const MAX_RENDERER_TASKS = 256;

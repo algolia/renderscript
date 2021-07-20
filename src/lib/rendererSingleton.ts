@@ -1,3 +1,3 @@
-import RollingRenderer from 'lib/RollingRenderer';
+import { RollingRenderer } from 'lib/RollingRenderer';
 
 export default new RollingRenderer();
