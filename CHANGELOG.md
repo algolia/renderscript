@@ -1,3 +1,10 @@
+## [1.7.14](https://github.com/algolia/renderscript/compare/v1.7.13...v1.7.14) (2021-07-20)
+
+
+### Bug Fixes
+
+* coding style ([#347](https://github.com/algolia/renderscript/issues/347)) ([ed8893c](https://github.com/algolia/renderscript/commit/ed8893c941183ba8ad45af67986996c333429947))
+
 ## [1.7.13](https://github.com/algolia/renderscript/compare/v1.7.12...v1.7.13) (2021-07-17)
 
 
