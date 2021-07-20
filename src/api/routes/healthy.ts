@@ -15,6 +15,7 @@ export async function healthy(
   }
   if (!readyOnce) {
     res.status(200).send();
+    return;
   }
 
   const isHealthy = renderer.ready && (await renderer.healthy());
