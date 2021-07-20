@@ -1,89 +1,37 @@
-import { validateURL, PRIVATE_IP_PREFIXES } from '@algolia/dns-filter';
+import { validateURL } from '@algolia/dns-filter';
 import puppeteer from 'puppeteer-core';
 import type {
   Page,
   HTTPResponse,
   Browser,
-  BrowserContext,
   HTTPRequest,
-  Protocol,
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 import { v4 as uuid } from 'uuid';
 
 import { FetchError } from 'api/helpers/errors';
 import { stats } from 'helpers/stats';
-import getChromiumExecutablePath from 'lib/helpers/getChromiumExecutablePath';
-import injectBaseHref from 'lib/helpers/injectBaseHref';
+import { getChromiumExecutablePath } from 'lib/helpers/getChromiumExecutablePath';
+import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 
-import { flags } from './constants';
-
-const IP_PREFIXES_WHITELIST = process.env.IP_PREFIXES_WHITELIST
-  ? process.env.IP_PREFIXES_WHITELIST.split(',')
-  : ['127.', '0.', '::1'];
-
-const RESTRICTED_IPS =
-  process.env.ALLOW_LOCALHOST === 'true'
-    ? PRIVATE_IP_PREFIXES.filter(
-        (prefix: string) => !IP_PREFIXES_WHITELIST.includes(prefix)
-      ) // relax filtering
-    : PRIVATE_IP_PREFIXES;
-
-const WIDTH = 1280;
-const HEIGHT = 1024;
-const IGNORED_RESOURCES = [
-  'font',
-  'image',
-  'media',
-  'websocket',
-  'manifest',
-  'texttrack',
-];
-const PAGE_BUFFER_SIZE = 2;
-const TIMEOUT = 10000;
-const DATA_REGEXP = /^data:/i;
-
-interface TaskBaseParams {
-  type: 'render' | 'login';
-  url: URL;
-  userAgent: string;
-  headersToForward: {
-    [s: string]: string;
-  };
-}
-
-interface RenderTaskParams extends TaskBaseParams {
-  type: 'render';
-}
-
-interface LoginTaskParams extends TaskBaseParams {
-  type: 'login';
-  login: {
-    username: string;
-    password: string;
-  };
-}
-
-export type TaskParams = RenderTaskParams | LoginTaskParams;
-
-export interface TaskResult {
-  statusCode?: number;
-  body?: string;
-  headers?: Record<string, string>;
-  timeout?: boolean;
-  error?: string;
-  resolvedUrl?: string;
-  cookies?: Protocol.Network.Cookie[];
-}
-
-export interface NewPage {
-  page: Page;
-  context: BrowserContext;
-}
-
-interface TaskObject {
-  id: string;
-  promise: Promise<TaskResult>;
-}
+import {
+  DATA_REGEXP,
+  flags,
+  HEIGHT,
+  IGNORED_RESOURCES,
+  PAGE_BUFFER_SIZE,
+  RESTRICTED_IPS,
+  WIDTH,
+  TIMEOUT,
+} from './constants';
+import type {
+  NewPage,
+  TaskObject,
+  TaskParams,
+  TaskResult,
+  TaskBaseParams,
+  RenderTaskParams,
+  LoginTaskParams,
+} from './types';
 
 class Renderer {
   id: string;

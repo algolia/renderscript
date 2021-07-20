@@ -6,9 +6,9 @@ import cookieParser from 'cookie-parser';
 import csurf from 'csurf';
 import express, { static as expressStatic } from 'express';
 
-import requestLogger from 'api/helpers/requestLogger';
-import healthy from 'api/routes/healthy';
-import ready from 'api/routes/ready';
+import { requestLogger } from 'api/helpers/requestLogger';
+import { healthy } from 'api/routes/healthy';
+import { ready } from 'api/routes/ready';
 import * as render from 'api/routes/render';
 import projectRoot from 'helpers/projectRoot';
 
@@ -16,7 +16,7 @@ const SESSION_COOKIE = 'sessionToken=53cu23_535510n; SameSite=Strict';
 const DELETE_COOKIE =
   'sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict';
 
-export default class Api {
+export class Api {
   server: http.Server;
   private _app: express.Express;
   private _csrfProtection: express.RequestHandler;
@@ -37,7 +37,7 @@ export default class Api {
     }
 
     this.server.listen(port, () => {
-      console.info(`Server started on port ${port}`);
+      console.info(`Server started http://localhost:${port}`);
     });
   }
 

@@ -4,7 +4,7 @@
  * It has no effect on serialised output, but allows it to verify render
  * quality.
  */
-export default function injectBaseHref(origin: string): void {
+export function injectBaseHref(origin: string): void {
   const base = document.createElement('base');
   base.setAttribute('href', origin);
 

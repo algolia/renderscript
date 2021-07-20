@@ -1,5 +1,5 @@
-import Api from 'api/index';
-import gracefulClose from 'helpers/gracefulClose';
+import { Api } from 'api/index';
+import { gracefulClose } from 'helpers/gracefulClose';
 import renderer from 'lib/rendererSingleton';
 
 console.info(`NODE_ENV = ${process.env.NODE_ENV}`);
@@ -12,8 +12,6 @@ const api = new Api();
 process.on('unhandledRejection', (reason) => {
   console.error('Unhandled rejection');
   console.error(reason);
-
-  // process.exit(1);
 });
 
 // Handle SIGINT

@@ -1,9 +1,9 @@
-import type { TaskParams, TaskResult } from 'lib/Renderer';
 import Renderer from 'lib/Renderer';
 
-const MAX_RENDERER_TASKS = 256;
+import { MAX_RENDERER_TASKS } from './constants';
+import type { TaskParams, TaskResult } from './types';
 
-class RollingRenderer {
+export class RollingRenderer {
   private _stopping: boolean;
   private _currentRenderer: Renderer;
   private _futureRenderer: Renderer | null;
@@ -84,5 +84,3 @@ class RollingRenderer {
     return this._previousStopPromise;
   }
 }
-
-export default RollingRenderer;
