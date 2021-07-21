@@ -29,7 +29,17 @@ export async function validate(
 }
 
 export async function processLogin(
-  req: express.Request,
+  req: express.Request<
+    any,
+    any,
+    {
+      url: string;
+      ua: string;
+      username: string;
+      password: string;
+      renderHTML?: boolean;
+    }
+  >,
   res: express.Response
 ): Promise<void> {
   const { url, ua, username, password, renderHTML } = req.body;
@@ -39,7 +49,7 @@ export async function processLogin(
     const { error, statusCode, headers, body, cookies, timeout } =
       await renderer.task({
         type: 'login',
-        url,
+        url: new URL(url),
         headersToForward,
         userAgent: ua,
         login: {
