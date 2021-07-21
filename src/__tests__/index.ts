@@ -116,7 +116,7 @@ describe('main', () => {
     expect(statusCode).toEqual(200);
     expect(headers).toEqual({
       connection: 'keep-alive',
-      'content-length': expect.any(Number),
+      'content-length': expect.any(String),
       'content-security-policy':
         "default-src 'none'; style-src * 'unsafe-inline'; img-src * data:; font-src *",
       'content-type': 'text/html; charset=utf-8',
