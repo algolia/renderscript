@@ -4,7 +4,7 @@ export abstract class Task {
   _results: TaskResult | undefined;
   _metrics: Metrics = {
     goto: null,
-    forcedWait: null,
+    minWait: null,
     serialize: null,
     total: null,
   };

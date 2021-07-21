@@ -1,7 +1,6 @@
 import type { HTTPRequest } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 
 import type Renderer from 'lib/Renderer';
-import { TIMEOUT } from 'lib/constants';
 import type { LoginTaskParams, NewPage } from 'lib/types';
 
 import { Task } from './Task';
@@ -20,11 +19,11 @@ export class LoginTask extends Task {
 
   async process(): Promise<void> {
     /* Setup */
-    const { url } = this.task;
+    const { url, waitTime } = this.task;
     const { context, page } = this.pageContext;
 
     try {
-      await this.renderer.goto(page, url);
+      await this.renderer.goto(page, url, waitTime!.max!);
     } catch (err) {
       this._results = {
         error: err.message,
@@ -50,7 +49,7 @@ export class LoginTask extends Task {
         await Promise.all([
           // page.waitForNavigation(), // Doesn't work with Okta for example, it's JS based
           page.waitForSelector('input[type=password]', {
-            timeout: TIMEOUT,
+            timeout: waitTime!.max!,
           }),
           textInput!.press('Enter'),
         ]);
@@ -73,7 +72,7 @@ export class LoginTask extends Task {
     let loginResponse;
     try {
       const [navigationResponse] = await Promise.all([
-        page.waitForNavigation({ timeout: TIMEOUT }),
+        page.waitForNavigation({ timeout: waitTime!.max! }),
         passwordInput!.press('Enter'),
       ]);
       loginResponse = navigationResponse;

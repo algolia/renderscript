@@ -2,7 +2,6 @@ import type { HTTPResponse } from 'puppeteer-core/lib/esm/puppeteer/api-docs-ent
 
 import { stats } from 'helpers/stats';
 import type Renderer from 'lib/Renderer';
-import { TIMEOUT } from 'lib/constants';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { NewPage, RenderTaskParams } from 'lib/types';
 
@@ -25,16 +24,16 @@ export class PageTask extends Task {
   }
 
   async process(): Promise<void> {
-    const { url } = this.task;
+    const { url, waitTime } = this.task;
     const { context, page } = this.pageContext;
 
     const total = Date.now();
-    const forcedWait = TIMEOUT * 0.7;
+    const minWait = waitTime!.min;
     let start = Date.now();
 
     let response: HTTPResponse;
     try {
-      response = await this.renderer.goto(page, url);
+      response = await this.renderer.goto(page, url, waitTime!.max!);
     } catch (err) {
       this._results = {
         error: err.message,
@@ -50,11 +49,10 @@ export class PageTask extends Task {
     await page.evaluate(injectBaseHref, baseHref);
 
     start = Date.now();
-    /* minimum wait, at least 70% */
-    if (statusCode === 200) {
-      await page.waitForTimeout(forcedWait - (Date.now() - total));
+    if (statusCode === 200 && minWait) {
+      await page.waitForTimeout(minWait - (Date.now() - total));
     }
-    this._metrics.forcedWait = Date.now() - start;
+    this._metrics.minWait = Date.now() - start;
 
     start = Date.now();
     /**

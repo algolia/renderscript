@@ -20,8 +20,8 @@ import {
   IGNORED_RESOURCES,
   PAGE_BUFFER_SIZE,
   RESTRICTED_IPS,
+  WAIT_TIME,
   WIDTH,
-  TIMEOUT,
 } from './constants';
 import { LoginTask } from './tasks/Login';
 import { PageTask } from './tasks/Page';
@@ -66,18 +66,26 @@ class Renderer {
     if (this._stopping) {
       throw new Error('Called task on a stopping Renderer');
     }
+
     const start = Date.now();
+    const jobParam: TaskParams = {
+      ...job,
+      waitTime: {
+        ...WAIT_TIME,
+        ...job,
+      },
+    };
     console.log('Processing:', job.url.toString(), `(${job.type})`);
 
     ++this.nbTotalTasks;
 
     const id = uuid();
-    const context = await this._newPageWithContext(job);
+    const context = await this._newPageWithContext(jobParam);
     let task: Task;
-    if (job.type === 'login') {
-      task = new LoginTask(job, context, this);
+    if (jobParam.type === 'login') {
+      task = new LoginTask(jobParam, context, this);
     } else {
-      task = new PageTask(job, context, this);
+      task = new PageTask(jobParam, context, this);
     }
     this._addTask({ id, task });
 
@@ -123,7 +131,7 @@ class Renderer {
     }
   }
 
-  async goto(page: Page, url: URL): Promise<HTTPResponse> {
+  async goto(page: Page, url: URL, timeout: number): Promise<HTTPResponse> {
     let response: HTTPResponse | null = null;
     page.on('response', (r) => {
       if (!response) {
@@ -134,7 +142,7 @@ class Renderer {
     const start = Date.now();
     try {
       response = await page.goto(url.href, {
-        timeout: TIMEOUT,
+        timeout,
         waitUntil: ['domcontentloaded', 'networkidle0'],
       });
     } catch (e) {

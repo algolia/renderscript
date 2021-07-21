@@ -10,6 +10,10 @@ export interface TaskBaseParams {
   type: 'render' | 'login';
   url: URL;
   userAgent: string;
+  waitTime?: {
+    min?: number;
+    max?: number;
+  };
   headersToForward: {
     [s: string]: string;
   };
@@ -45,7 +49,7 @@ export interface TaskResult {
 
 export interface Metrics {
   goto: number | null;
-  forcedWait: number | null;
+  minWait: number | null;
   serialize: number | null;
   total: number | null;
 }

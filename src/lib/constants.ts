@@ -78,7 +78,11 @@ export const IGNORED_RESOURCES = [
   'texttrack',
 ];
 export const PAGE_BUFFER_SIZE = 2;
-export const TIMEOUT = 10000;
 export const DATA_REGEXP = /^data:/i;
 
 export const MAX_RENDERER_TASKS = 256;
+
+export const WAIT_TIME = {
+  min: undefined,
+  max: 20000,
+};
