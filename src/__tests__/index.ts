@@ -46,6 +46,42 @@ describe('main', () => {
     });
   });
 
+  it('should validate waitTime', async () => {
+    const { statusCode, body } = await request(
+      'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html&ua=Algolia+Crawler&waitTime[min]=foo&waitTime[max]=bar'
+    );
+
+    expect(statusCode).toEqual(400);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    expect(JSON.parse(fullBody)).toEqual({
+      error: true,
+      message: 'Bad Request',
+      details: [
+        {
+          errors: [
+            {
+              label: 'min',
+              message: 'min must be a valid number',
+              type: 'number.typeof',
+            },
+            {
+              label: 'max',
+              message: 'max must be a valid number',
+              type: 'number.typeof',
+            },
+          ],
+          label: 'waitTime',
+          message: 'waitTime does not match its schema',
+          type: 'object.schema',
+        },
+      ],
+    });
+  });
+
   it('should render basic page', async () => {
     const { statusCode, headers, body } = await request(
       'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html&ua=Algolia+Crawler'
@@ -80,7 +116,7 @@ describe('main', () => {
     expect(statusCode).toEqual(200);
     expect(headers).toEqual({
       connection: 'keep-alive',
-      'content-length': '843',
+      'content-length': expect.any(Number),
       'content-security-policy':
         "default-src 'none'; style-src * 'unsafe-inline'; img-src * data:; font-src *",
       'content-type': 'text/html; charset=utf-8',
