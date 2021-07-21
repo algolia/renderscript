@@ -1,7 +1,7 @@
 import Renderer from 'lib/Renderer';
 
 import { MAX_RENDERER_TASKS } from './constants';
-import type { TaskParams, TaskResult } from './types';
+import type { TaskFinal, TaskParams } from './types';
 
 export class RollingRenderer {
   private _stopping: boolean;
@@ -51,7 +51,7 @@ export class RollingRenderer {
     return this._currentRenderer;
   }
 
-  async task(job: TaskParams): Promise<TaskResult> {
+  async task(job: TaskParams): Promise<TaskFinal> {
     if (this._stopping) {
       throw new Error('Called task on a stopping RollingRenderer');
     }

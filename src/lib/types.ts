@@ -4,6 +4,8 @@ import type {
   Protocol,
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 
+import type { Task } from './tasks/Task';
+
 export interface TaskBaseParams {
   type: 'render' | 'login';
   url: URL;
@@ -27,6 +29,10 @@ export interface LoginTaskParams extends TaskBaseParams {
 
 export type TaskParams = RenderTaskParams | LoginTaskParams;
 
+export interface TaskFinal extends TaskResult {
+  metrics: Metrics;
+}
+
 export interface TaskResult {
   statusCode?: number;
   body?: string;
@@ -37,6 +43,13 @@ export interface TaskResult {
   cookies?: Protocol.Network.Cookie[];
 }
 
+export interface Metrics {
+  goto: number | null;
+  forcedWait: number | null;
+  serialize: number | null;
+  total: number | null;
+}
+
 export interface NewPage {
   page: Page;
   context: BrowserContext;
@@ -44,5 +57,5 @@ export interface NewPage {
 
 export interface TaskObject {
   id: string;
-  promise: Promise<TaskResult>;
+  task: Task;
 }

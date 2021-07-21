@@ -140,7 +140,7 @@ export async function renderJSON(
   const { url, ua } = res.locals;
   const headersToForward = getForwardedHeadersFromRequest(req);
   try {
-    const { error, statusCode, headers, body, timeout, resolvedUrl } =
+    const { error, statusCode, headers, body, timeout, resolvedUrl, metrics } =
       await renderer.task({
         type: 'render',
         url,
@@ -161,6 +161,7 @@ export async function renderJSON(
 
     res.status(200).json({
       statusCode,
+      metrics,
       headers,
       body,
       timeout,
