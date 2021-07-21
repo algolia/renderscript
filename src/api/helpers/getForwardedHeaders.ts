@@ -1,0 +1,17 @@
+import type express from 'express';
+
+import { HEADERS_TO_FORWARD } from 'api/constants';
+
+export function getForwardedHeadersFromRequest(
+  req: express.Request
+): Record<string, string> {
+  const headersToForward = HEADERS_TO_FORWARD.reduce((partial, headerName) => {
+    const name = headerName.toLowerCase();
+    if (req.headers[name]) {
+      return { ...partial, [name]: req.headers[name] };
+    }
+    return partial;
+  }, {});
+
+  return headersToForward;
+}
