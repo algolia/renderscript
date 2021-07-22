@@ -1,3 +1,10 @@
+## [1.7.17](https://github.com/algolia/renderscript/compare/v1.7.16...v1.7.17) (2021-07-22)
+
+
+### Bug Fixes
+
+* remove env sourcing ([39b6478](https://github.com/algolia/renderscript/commit/39b6478d12eeba91ac88cb18bee58506ec2fae39))
+
 ## [1.7.16](https://github.com/algolia/renderscript/compare/v1.7.15...v1.7.16) (2021-07-22)
 
 
