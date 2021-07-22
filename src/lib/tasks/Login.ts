@@ -8,12 +8,12 @@ export class LoginTask extends Task<LoginTaskParams> {
   async process(): Promise<void> {
     /* Setup */
     const { url, waitTime, login } = this.params;
-    const { page } = this._page;
+    const { page } = this.page;
 
     try {
-      await this._page.goto(url);
+      await this.page.goto(url);
     } catch (err) {
-      this._results = {
+      this.results = {
         error: err.message,
         timeout: Boolean(err.timeout),
       };
@@ -22,7 +22,7 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     const textInput = await page!.$('input[type=text], input[type=email]');
     if (!textInput) {
-      this._results = {
+      this.results = {
         error: `field_not_found: input[type=text], input[type=email]`,
       };
       return;
@@ -45,9 +45,9 @@ export class LoginTask extends Task<LoginTaskParams> {
         passwordInput = await page!.$('input[type=password]');
       } catch (err) {
         console.log('Found no password input on the page');
-        const body = await this._page.renderBody(new URL(page!.url()));
+        const body = await this.page.renderBody(new URL(page!.url()));
 
-        this._results = {
+        this.results = {
           error: err.message,
           body,
         };
@@ -68,9 +68,9 @@ export class LoginTask extends Task<LoginTaskParams> {
       console.log(
         `Error while logging in: ${err.message} (url=${page!.url()})`
       );
-      const body = await this._page.renderBody(new URL(page!.url()));
+      const body = await this.page.renderBody(new URL(page!.url()));
 
-      this._results = {
+      this.results = {
         error: err.message,
         body,
       };
@@ -87,9 +87,9 @@ export class LoginTask extends Task<LoginTaskParams> {
       if (page!.url() === url.href) {
         // Return an error if we got no login response and are still on the same URL
         console.log(`Got no login response (url=${page!.url()})`);
-        const body = await this._page.renderBody(new URL(page!.url()));
+        const body = await this.page.renderBody(new URL(page!.url()));
 
-        this._results = {
+        this.results = {
           error: 'no_response',
           body,
         };
@@ -103,9 +103,9 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     const cookies = await page!.cookies();
 
-    const body = await this._page.renderBody(new URL(page!.url()));
+    const body = await this.page.renderBody(new URL(page!.url()));
 
-    this._results = {
+    this.results = {
       statusCode: loginResponse?.status() || 200,
       headers: loginResponse?.headers(),
       body,

@@ -9,7 +9,7 @@ import { Task } from './Task';
 export class RenderTask extends Task<RenderTaskParams> {
   async process(): Promise<void> {
     const { url, waitTime } = this.params;
-    const { page } = this._page;
+    const { page } = this.page;
 
     const total = Date.now();
     const minWait = waitTime!.min;
@@ -17,15 +17,15 @@ export class RenderTask extends Task<RenderTaskParams> {
 
     let response: HTTPResponse;
     try {
-      response = await this._page.goto(url);
+      response = await this.page.goto(url);
     } catch (err) {
-      this._results = {
+      this.results = {
         error: err.message,
         timeout: Boolean(err.timeout),
       };
       return;
     }
-    this._metrics.goto = Date.now() - start;
+    this.metrics.goto = Date.now() - start;
 
     /* Transforming */
     const statusCode = response.status();
@@ -36,7 +36,7 @@ export class RenderTask extends Task<RenderTaskParams> {
     if (statusCode === 200 && minWait) {
       await page!.waitForTimeout(minWait - (Date.now() - total));
     }
-    this._metrics.minWait = Date.now() - start;
+    this.metrics.minWait = Date.now() - start;
 
     start = Date.now();
     /**
@@ -56,19 +56,19 @@ export class RenderTask extends Task<RenderTaskParams> {
       'window.location.href'
     )) as string;
 
-    this._metrics.serialize = Date.now() - start;
+    this.metrics.serialize = Date.now() - start;
     stats.timing('renderscript.page.serialize', Date.now() - start);
 
     if (preSerializationUrl !== resolvedUrl) {
       // something super shady happened where the page url changed during evaluation
-      this._results = {
+      this.results = {
         error: 'unsafe_redirect',
       };
       return;
     }
 
-    this._metrics.total = Date.now() - total;
-    this._results = {
+    this.metrics.total = Date.now() - total;
+    this.results = {
       statusCode,
       headers,
       body,
