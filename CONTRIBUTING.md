@@ -2,7 +2,11 @@
 
 ## Releasing
 
-Create a new version by pushing a commit with semantic-release format:
+> The release is an automated process in the CI, there is nothing to do.
+
+### Manual Release
+
+If no version has been created: make a new version by pushing a commit with semantic-release format:
 
 ```sh
 git commit --allow-empty -m "fix: bump version"

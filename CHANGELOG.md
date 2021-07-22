@@ -1,3 +1,24 @@
+## [1.7.17](https://github.com/algolia/renderscript/compare/v1.7.16...v1.7.17) (2021-07-22)
+
+
+### Bug Fixes
+
+* remove env sourcing ([39b6478](https://github.com/algolia/renderscript/commit/39b6478d12eeba91ac88cb18bee58506ec2fae39))
+
+## [1.7.16](https://github.com/algolia/renderscript/compare/v1.7.15...v1.7.16) (2021-07-22)
+
+
+### Bug Fixes
+
+* automatic release ([c55230f](https://github.com/algolia/renderscript/commit/c55230f8f5dcd54560ca3050abd9d5cac061f8a1))
+
+## [1.7.15](https://github.com/algolia/renderscript/compare/v1.7.14...v1.7.15) (2021-07-22)
+
+
+### Bug Fixes
+
+* **api:** add validation ([#350](https://github.com/algolia/renderscript/issues/350)) ([a18990f](https://github.com/algolia/renderscript/commit/a18990f864215e71c1bef952acdb7e6af9674d0c))
+
 ## [1.7.14](https://github.com/algolia/renderscript/compare/v1.7.13...v1.7.14) (2021-07-20)
 
 

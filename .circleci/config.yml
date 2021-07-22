@@ -72,7 +72,19 @@ jobs:
     steps:
       - attach-workspace: *attach-work-dir
 
+      - setup_remote_docker:
+          version: 19.03.13
+
       - run: yarn semantic-release
+
+      - run:
+          name: Docker Build
+          command: yarn docker:build
+      - run:
+          name: Docker publish
+          command: |
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            yarn docker:release
 
 workflows:
   version: 2

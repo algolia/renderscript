@@ -18,9 +18,14 @@ describe('main', () => {
     for await (const chunk of body) {
       fullBody += chunk.toString();
     }
-    expect(cleanString(fullBody)).toEqual(
-      '{"error":true,"message":"Missing URL in query params"}'
-    );
+    expect(JSON.parse(fullBody)).toEqual({
+      details: [
+        { label: 'url', message: 'url is required', type: 'required' },
+        { label: 'ua', message: 'ua is required', type: 'required' },
+      ],
+      error: true,
+      message: 'Bad Request',
+    });
   });
 
   it('should error when no user agent', async () => {
@@ -34,9 +39,47 @@ describe('main', () => {
     for await (const chunk of body) {
       fullBody += chunk.toString();
     }
-    expect(cleanString(fullBody)).toEqual(
-      '{"error":true,"message":"Missing User-Agent"}'
+    expect(JSON.parse(fullBody)).toEqual({
+      error: true,
+      message: 'Bad Request',
+      details: [{ label: 'ua', type: 'required', message: 'ua is required' }],
+    });
+  });
+
+  it('should validate waitTime', async () => {
+    const { statusCode, body } = await request(
+      'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html&ua=Algolia+Crawler&waitTime[min]=foo&waitTime[max]=bar'
     );
+
+    expect(statusCode).toEqual(400);
+
+    let fullBody = '';
+    for await (const chunk of body) {
+      fullBody += chunk.toString();
+    }
+    expect(JSON.parse(fullBody)).toEqual({
+      error: true,
+      message: 'Bad Request',
+      details: [
+        {
+          errors: [
+            {
+              label: 'min',
+              message: 'min must be a valid number',
+              type: 'number.typeof',
+            },
+            {
+              label: 'max',
+              message: 'max must be a valid number',
+              type: 'number.typeof',
+            },
+          ],
+          label: 'waitTime',
+          message: 'waitTime does not match its schema',
+          type: 'object.schema',
+        },
+      ],
+    });
   });
 
   it('should render basic page', async () => {
@@ -73,12 +116,12 @@ describe('main', () => {
     expect(statusCode).toEqual(200);
     expect(headers).toEqual({
       connection: 'keep-alive',
-      'content-length': '843',
+      'content-length': expect.any(String),
       'content-security-policy':
         "default-src 'none'; style-src * 'unsafe-inline'; img-src * data:; font-src *",
       'content-type': 'text/html; charset=utf-8',
       date: expect.any(String),
-      etag: 'W/"34b-XSEOmhq6gvsRnSyzs9lfm2g+AC8"',
+      etag: expect.any(String),
       'keep-alive': 'timeout=5',
     });
 
@@ -129,12 +172,20 @@ describe('login', () => {
     for await (const chunk of body) {
       fullBody += chunk.toString();
     }
-    expect(cleanString(fullBody)).toEqual(
-      '{"error":true,"message":"Missing username"}'
-    );
+    expect(JSON.parse(fullBody)).toEqual({
+      details: [
+        {
+          label: 'username',
+          message: 'username is required',
+          type: 'required',
+        },
+      ],
+      error: true,
+      message: 'Bad Request',
+    });
   });
 
-  it('should error when no username', async () => {
+  it('should error when no password', async () => {
     const { statusCode, body } = await sendLoginRequest({
       url: 'http://localhost:3000/secure/login',
       username: 'admin',
@@ -147,9 +198,17 @@ describe('login', () => {
     for await (const chunk of body) {
       fullBody += chunk.toString();
     }
-    expect(cleanString(fullBody)).toEqual(
-      '{"error":true,"message":"Missing password"}'
-    );
+    expect(JSON.parse(fullBody)).toEqual({
+      details: [
+        {
+          label: 'password',
+          message: 'password is required',
+          type: 'required',
+        },
+      ],
+      error: true,
+      message: 'Bad Request',
+    });
   });
 
   it('should works with correct credentials', async () => {
