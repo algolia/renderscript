@@ -6,9 +6,10 @@ import { revertUrl } from 'api/helpers/buildUrl';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
 import { tasksManager } from 'lib/tasksManagerSingleton';
+import type { TaskFromAPI } from 'lib/types';
 
 export async function validate(
-  req: express.Request,
+  req: express.Request<any, any, any, any>,
   res: express.Response,
   next: express.NextFunction
 ): Promise<void> {
@@ -25,10 +26,10 @@ export async function validate(
 }
 
 export async function render(
-  req: express.Request<any, any, any, { url: string; ua: string }>,
+  req: express.Request<any, any, any, TaskFromAPI>,
   res: express.Response
 ): Promise<void> {
-  const { url: rawUrl, ua } = req.query;
+  const { url: rawUrl, ua, waitTime } = req.query;
   const headersToForward = getForwardedHeadersFromRequest(req);
   const url = new URL(rawUrl);
 
@@ -38,6 +39,7 @@ export async function render(
       url,
       headersToForward,
       userAgent: ua,
+      waitTime,
     });
     if (error) {
       res.status(400).json({ error });
@@ -62,10 +64,10 @@ export async function render(
 }
 
 export async function renderJSON(
-  req: express.Request<any, any, { url: string; ua: string }>,
+  req: express.Request<any, any, TaskFromAPI>,
   res: express.Response
 ): Promise<void> {
-  const { url: rawUrl, ua } = req.body;
+  const { url: rawUrl, ua, waitTime } = req.body;
   const headersToForward = getForwardedHeadersFromRequest(req);
   const url = new URL(rawUrl);
 
@@ -76,6 +78,7 @@ export async function renderJSON(
         url,
         headersToForward,
         userAgent: ua,
+        waitTime,
       });
 
     if (error) {

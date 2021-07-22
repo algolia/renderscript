@@ -4,6 +4,11 @@ import type {
   Protocol,
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 
+export type TaskFromAPI = Omit<TaskBaseParams, 'type' | 'url' | 'userAgent'> & {
+  url: string;
+  ua: string;
+};
+
 export interface TaskBaseParams {
   type: 'render' | 'login';
   url: URL;

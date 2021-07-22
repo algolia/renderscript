@@ -1,7 +1,7 @@
 import * as http from 'http';
 import * as path from 'path';
 
-import { urlencoded } from 'body-parser';
+import { urlencoded, json } from 'body-parser';
 import cookieParser from 'cookie-parser';
 import csurf from 'csurf';
 import express, { static as expressStatic } from 'express';
@@ -46,7 +46,10 @@ export class Api {
 
   private _setup(): void {
     this._app.disable('x-powered-by');
-    this._app.use(urlencoded({ limit: '10mb', extended: true }));
+
+    this._app.use(urlencoded({ limit: '1mb', extended: true }));
+    this._app.use(json({ limit: '1mb' }));
+
     this._app.use(requestLogger);
     this._app.use(cookieParser());
     this._app.set('views', path.join(projectRoot, '/public/views'));

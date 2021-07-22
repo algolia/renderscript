@@ -49,7 +49,7 @@ export class TasksManager {
       ...job,
       waitTime: {
         ...WAIT_TIME,
-        ...job,
+        ...job.waitTime,
       },
     };
     console.log('Processing:', job.url.toString(), `(${job.type})`);
