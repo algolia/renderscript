@@ -1,3 +1,10 @@
+## [1.7.15](https://github.com/algolia/renderscript/compare/v1.7.14...v1.7.15) (2021-07-22)
+
+
+### Bug Fixes
+
+* **api:** add validation ([#350](https://github.com/algolia/renderscript/issues/350)) ([a18990f](https://github.com/algolia/renderscript/commit/a18990f864215e71c1bef952acdb7e6af9674d0c))
+
 ## [1.7.14](https://github.com/algolia/renderscript/compare/v1.7.13...v1.7.14) (2021-07-20)
 
 
