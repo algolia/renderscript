@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/algolia/renderscript/compare/v1.7.17...v1.8.0) (2021-07-22)
+
+
+### Features
+
+* major refacto ([#348](https://github.com/algolia/renderscript/issues/348)) ([c9013b0](https://github.com/algolia/renderscript/commit/c9013b046e6a40ddebe314c0bf140b96f3abccae))
+
 ## [1.7.17](https://github.com/algolia/renderscript/compare/v1.7.16...v1.7.17) (2021-07-22)
 
 
