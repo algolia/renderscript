@@ -1,3 +1,10 @@
+## [1.7.16](https://github.com/algolia/renderscript/compare/v1.7.15...v1.7.16) (2021-07-22)
+
+
+### Bug Fixes
+
+* automatic release ([c55230f](https://github.com/algolia/renderscript/commit/c55230f8f5dcd54560ca3050abd9d5cac061f8a1))
+
 ## [1.7.15](https://github.com/algolia/renderscript/compare/v1.7.14...v1.7.15) (2021-07-22)
 
 
