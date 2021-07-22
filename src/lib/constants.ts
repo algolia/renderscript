@@ -83,6 +83,6 @@ export const DATA_REGEXP = /^data:/i;
 export const MAX_RENDERER_TASKS = 256;
 
 export const WAIT_TIME = {
-  min: undefined,
+  min: 2000,
   max: 20000,
 };

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`login should works even with a 2-steps login 1`] = `
+exports[`should works even with a 2-steps login 1`] = `
 Object {
   "domain": "localhost",
   "expires": -1,
@@ -18,7 +18,7 @@ Object {
 }
 `;
 
-exports[`login should works with a 2-steps JS login 1`] = `
+exports[`should works with a 2-steps JS login 1`] = `
 Object {
   "domain": "localhost",
   "expires": -1,
@@ -36,7 +36,7 @@ Object {
 }
 `;
 
-exports[`login should works with correct credentials 1`] = `
+exports[`should works with correct credentials 1`] = `
 Object {
   "domain": "localhost",
   "expires": -1,

@@ -62,10 +62,10 @@ export async function render(
 }
 
 export async function renderJSON(
-  req: express.Request<any, any, any, { url: string; ua: string }>,
+  req: express.Request<any, any, { url: string; ua: string }>,
   res: express.Response
 ): Promise<void> {
-  const { url: rawUrl, ua } = req.query;
+  const { url: rawUrl, ua } = req.body;
   const headersToForward = getForwardedHeadersFromRequest(req);
   const url = new URL(rawUrl);
 
