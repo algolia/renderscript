@@ -1,6 +1,6 @@
 import { Api } from 'api/index';
 import { gracefulClose } from 'helpers/gracefulClose';
-import renderer from 'lib/rendererSingleton';
+import { tasksManager } from 'lib/tasksManagerSingleton';
 
 console.info(`NODE_ENV = ${process.env.NODE_ENV}`);
 
@@ -21,7 +21,7 @@ process.on('unhandledRejection', (reason) => {
 //     yarn build && NODE_ENV=development node dist/index.js
 //
 // to see that it works fine
-const gracefulCloseParams = { api, renderer };
+const gracefulCloseParams = { api, tasksManager };
 const boundGracefulClose = gracefulClose.bind(null, gracefulCloseParams);
 process.on('SIGINT', boundGracefulClose);
 process.on('SIGTERM', boundGracefulClose);

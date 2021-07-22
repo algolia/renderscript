@@ -4,7 +4,7 @@ import { CSP_HEADERS } from 'api/constants';
 import { getDefaultParams, alt } from 'api/helpers/alt';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
-import renderer from 'lib/rendererSingleton';
+import { tasksManager } from 'lib/tasksManagerSingleton';
 
 export async function validate(
   req: express.Request,
@@ -47,7 +47,7 @@ export async function processLogin(
 
   try {
     const { error, statusCode, headers, body, cookies, timeout } =
-      await renderer.task({
+      await tasksManager.task({
         type: 'login',
         url: new URL(url),
         headersToForward,

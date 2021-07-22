@@ -5,10 +5,11 @@ import { getDefaultParams, alt } from 'api/helpers/alt';
 import { revertUrl } from 'api/helpers/buildUrl';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
-import renderer from 'lib/rendererSingleton';
+import { tasksManager } from 'lib/tasksManagerSingleton';
+import type { TaskFromAPI } from 'lib/types';
 
 export async function validate(
-  req: express.Request,
+  req: express.Request<any, any, any, any>,
   res: express.Response,
   next: express.NextFunction
 ): Promise<void> {
@@ -25,19 +26,20 @@ export async function validate(
 }
 
 export async function render(
-  req: express.Request<any, any, any, { url: string; ua: string }>,
+  req: express.Request<any, any, any, TaskFromAPI>,
   res: express.Response
 ): Promise<void> {
-  const { url: rawUrl, ua } = req.query;
+  const { url: rawUrl, ua, waitTime } = req.query;
   const headersToForward = getForwardedHeadersFromRequest(req);
   const url = new URL(rawUrl);
 
   try {
-    const { error, statusCode, body, resolvedUrl } = await renderer.task({
+    const { error, statusCode, body, resolvedUrl } = await tasksManager.task({
       type: 'render',
       url,
       headersToForward,
       userAgent: ua,
+      waitTime,
     });
     if (error) {
       res.status(400).json({ error });
@@ -53,28 +55,30 @@ export async function render(
       .header('Content-Type', 'text/html')
       .header('Content-Security-Policy', CSP_HEADERS)
       .send(body);
-  } catch (e) {
+  } catch (err) {
     res.status(500).json({
-      error: e.message,
+      error: err.message,
     });
+    console.error(err);
   }
 }
 
 export async function renderJSON(
-  req: express.Request<any, any, any, { url: string; ua: string }>,
+  req: express.Request<any, any, TaskFromAPI>,
   res: express.Response
 ): Promise<void> {
-  const { url: rawUrl, ua } = req.query;
+  const { url: rawUrl, ua, waitTime } = req.body;
   const headersToForward = getForwardedHeadersFromRequest(req);
   const url = new URL(rawUrl);
 
   try {
-    const { error, statusCode, headers, body, timeout, resolvedUrl } =
-      await renderer.task({
+    const { error, statusCode, headers, body, timeout, resolvedUrl, metrics } =
+      await tasksManager.task({
         type: 'render',
         url,
         headersToForward,
         userAgent: ua,
+        waitTime,
       });
 
     if (error) {
@@ -90,11 +94,13 @@ export async function renderJSON(
 
     res.status(200).json({
       statusCode,
+      metrics,
       headers,
       body,
       timeout,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
+    console.error(err);
   }
 }

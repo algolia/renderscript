@@ -32,6 +32,7 @@ Body parameters:
 
 * `url`: URL to render (for hash and query params support, use `encodeURIComponent` on it)
 * `ua`: User-Agent
+* `waitTime: { min: number, max: number}`: minimum and maximum execution time
 
 Returns `application/json`:
 
@@ -48,6 +49,7 @@ Query parameters:
 
 * `url`: URL to render (for hash and query params support, use `encodeURIComponent` on it)
 * `ua`: User-Agent
+* `waitTime[min]&waitTime[max]`: minimum and maximum execution time
 
 Returns `text/html`.
 (CSP headers are set to prevent script execution on the rendered page)
@@ -93,7 +95,7 @@ yarn dev
 
 ### Parameters
 
-See `.env.prod` to see which ones are installed by default (they still need to be provided to `docker run` to be enabled).
+See `.env.example` to see which ones are installed by default (they still need to be provided to `docker run` to be enabled).
 
 * `ALLOW_LOCALHOST`: Allow calls on localhost IPs
   Example: `ALLOW_LOCALHOST=true`

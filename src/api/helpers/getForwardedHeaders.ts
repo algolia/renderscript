@@ -3,7 +3,7 @@ import type express from 'express';
 import { HEADERS_TO_FORWARD } from 'api/constants';
 
 export function getForwardedHeadersFromRequest(
-  req: express.Request
+  req: express.Request<any, any, any, any>
 ): Record<string, string> {
   const headersToForward = HEADERS_TO_FORWARD.reduce((partial, headerName) => {
     const name = headerName.toLowerCase();
