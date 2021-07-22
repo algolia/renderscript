@@ -60,11 +60,6 @@ jobs:
           background: true
 
       - run:
-          name: Wait for ready
-          command: yarn waitforready
-          no_output_timeout: 2m
-
-      - run:
           command: "npm run test"
 
   release:

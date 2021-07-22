@@ -16,8 +16,7 @@
     "release": "yarn docker:build && yarn docker:release",
     "start": "UV_THREADPOOL_SIZE=100 node --max-old-space-size=128 --max-old-space-size=420 dist/index.js",
     "semantic-release": "semantic-release",
-    "test": "jest src/",
-    "waitforready": "while ! curl -sS http://localhost:3000/ready; do sleep 1; done"
+    "test": "jest src/"
   },
   "repository": {
     "type": "git",
