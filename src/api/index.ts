@@ -8,13 +8,12 @@ import express, { static as expressStatic } from 'express';
 
 import { requestLogger } from 'api/helpers/requestLogger';
 import { healthy } from 'api/routes/healthy';
+import * as routeLogin from 'api/routes/login';
 import { ready } from 'api/routes/ready';
-import * as render from 'api/routes/render';
+import * as routeRender from 'api/routes/render';
 import projectRoot from 'helpers/projectRoot';
 
-const SESSION_COOKIE = 'sessionToken=53cu23_535510n; SameSite=Strict';
-const DELETE_COOKIE =
-  'sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict';
+import { DELETE_COOKIE, SESSION_COOKIE } from './constants';
 
 export class Api {
   server: http.Server;
@@ -58,19 +57,9 @@ export class Api {
     this._app
       .get('/ready', ready)
       .get('/healthy', healthy)
-      .get('/render', render.getURLFromQuery, render.validateURL, render.render)
-      .post(
-        '/render',
-        render.getParamsFromBody,
-        render.validateURL,
-        render.renderJSON
-      )
-      .post(
-        '/login',
-        render.getParamsFromBody,
-        render.validateURL,
-        render.processLogin
-      );
+      .get('/render', routeRender.validate, routeRender.render)
+      .post('/render', routeRender.validate, routeRender.renderJSON)
+      .post('/login', routeLogin.validate, routeLogin.processLogin);
 
     // error handler
     this._app.use(
