@@ -4,8 +4,6 @@ import type {
   Protocol,
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 
-import type { Task } from './tasks/Task';
-
 export interface TaskBaseParams {
   type: 'render' | 'login';
   url: URL;
@@ -61,5 +59,5 @@ export interface NewPage {
 
 export interface TaskObject {
   id: string;
-  task: Task;
+  taskPromise: Promise<void>;
 }

@@ -1,31 +1,15 @@
 import type { HTTPResponse } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 
 import { stats } from 'helpers/stats';
-import type Renderer from 'lib/Renderer';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
-import type { NewPage, RenderTaskParams } from 'lib/types';
+import type { RenderTaskParams } from 'lib/types';
 
 import { Task } from './Task';
 
-export class PageTask extends Task {
-  task;
-  pageContext;
-  renderer;
-
-  constructor(
-    task: RenderTaskParams,
-    pageContext: NewPage,
-    renderer: Renderer
-  ) {
-    super();
-    this.task = task;
-    this.pageContext = pageContext;
-    this.renderer = renderer;
-  }
-
+export class RenderTask extends Task<RenderTaskParams> {
   async process(): Promise<void> {
-    const { url, waitTime } = this.task;
-    const { context, page } = this.pageContext;
+    const { url, waitTime } = this.params;
+    const { page } = this._page;
 
     const total = Date.now();
     const minWait = waitTime!.min;
@@ -33,7 +17,7 @@ export class PageTask extends Task {
 
     let response: HTTPResponse;
     try {
-      response = await this.renderer.goto(page, url, waitTime!.max!);
+      response = await this._page.goto(url);
     } catch (err) {
       this._results = {
         error: err.message,
@@ -46,11 +30,11 @@ export class PageTask extends Task {
     /* Transforming */
     const statusCode = response.status();
     const baseHref = `${url.protocol}//${url.host}`;
-    await page.evaluate(injectBaseHref, baseHref);
+    await page!.evaluate(injectBaseHref, baseHref);
 
     start = Date.now();
     if (statusCode === 200 && minWait) {
-      await page.waitForTimeout(minWait - (Date.now() - total));
+      await page!.waitForTimeout(minWait - (Date.now() - total));
     }
     this._metrics.minWait = Date.now() - start;
 
@@ -59,22 +43,21 @@ export class PageTask extends Task {
      * Serialize
      * We put a debugger to stop processing JS.
      **/
-    await page.evaluate(() => {
+    await page!.evaluate(() => {
       // eslint-disable-next-line no-debugger
       debugger;
     });
-    const preSerializationUrl = await page.evaluate('window.location.href');
-    const body = (await page.evaluate(
+    const preSerializationUrl = await page!.evaluate('window.location.href');
+    const body = (await page!.evaluate(
       'document.firstElementChild.outerHTML'
     )) as string;
     const headers = response.headers();
-    const resolvedUrl = (await page.evaluate('window.location.href')) as string;
+    const resolvedUrl = (await page!.evaluate(
+      'window.location.href'
+    )) as string;
 
     this._metrics.serialize = Date.now() - start;
     stats.timing('renderscript.page.serialize', Date.now() - start);
-
-    /* Cleanup */
-    await context.close();
 
     if (preSerializationUrl !== resolvedUrl) {
       // something super shady happened where the page url changed during evaluation

@@ -1,14 +1,14 @@
 import type { Api } from 'api/index';
-import type { RollingRenderer } from 'lib/RollingRenderer';
+import type { TasksManager } from 'lib/TasksManager';
 
 interface Params {
   api: Api;
-  renderer: RollingRenderer;
+  tasksManager: TasksManager;
 }
 
 let gracefullyClosing = false;
 
-async function close({ api, renderer }: Params): Promise<void> {
+async function close({ api, tasksManager }: Params): Promise<void> {
   const webServerPromise = new Promise<void>((resolve) => {
     console.info('[API] Shutting down');
     api.stop(() => {
@@ -19,21 +19,19 @@ async function close({ api, renderer }: Params): Promise<void> {
 
   await webServerPromise;
 
-  console.info('[Renderer] Shutting down');
-  await renderer.stop();
-  console.info('[Renderer] Shut down');
+  await tasksManager.stop();
 
   console.info('Gracefully stopped everything');
 }
 
-export async function gracefulClose({ api, renderer }: Params): Promise<void> {
+export async function gracefulClose(opts: Params): Promise<void> {
   // If we receive multiple signals, swallow them
   if (gracefullyClosing) {
     return;
   }
 
   gracefullyClosing = true;
-  await close({ api, renderer });
+  await close(opts);
 
   // eslint-disable-next-line no-process-exit
   process.exit(0);

@@ -5,7 +5,7 @@ import { getDefaultParams, alt } from 'api/helpers/alt';
 import { revertUrl } from 'api/helpers/buildUrl';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
-import renderer from 'lib/rendererSingleton';
+import { tasksManager } from 'lib/tasksManagerSingleton';
 
 export async function validate(
   req: express.Request,
@@ -33,7 +33,7 @@ export async function render(
   const url = new URL(rawUrl);
 
   try {
-    const { error, statusCode, body, resolvedUrl } = await renderer.task({
+    const { error, statusCode, body, resolvedUrl } = await tasksManager.task({
       type: 'render',
       url,
       headersToForward,
@@ -53,10 +53,11 @@ export async function render(
       .header('Content-Type', 'text/html')
       .header('Content-Security-Policy', CSP_HEADERS)
       .send(body);
-  } catch (e) {
+  } catch (err) {
     res.status(500).json({
-      error: e.message,
+      error: err.message,
     });
+    console.error(err);
   }
 }
 
@@ -70,7 +71,7 @@ export async function renderJSON(
 
   try {
     const { error, statusCode, headers, body, timeout, resolvedUrl, metrics } =
-      await renderer.task({
+      await tasksManager.task({
         type: 'render',
         url,
         headersToForward,
@@ -97,5 +98,6 @@ export async function renderJSON(
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
+    console.error(err);
   }
 }
