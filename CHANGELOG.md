@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/algolia/renderscript/compare/v1.9.0...v1.9.1) (2021-07-23)
+
+
+### Bug Fixes
+
+* report more metrics + make sure we close everything ([#352](https://github.com/algolia/renderscript/issues/352)) ([c976192](https://github.com/algolia/renderscript/commit/c976192061cce5b6cc291cceb2676affe7ade048))
+
 # [1.9.0](https://github.com/algolia/renderscript/compare/v1.8.0...v1.9.0) (2021-07-23)
 
 
