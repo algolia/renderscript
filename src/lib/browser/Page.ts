@@ -79,14 +79,15 @@ export class BrowserPage {
 
   async metrics(): Promise<PageMetrics> {
     const metrics = await this.#page!.metrics();
-    return {
+    const res = {
       ...this.#metrics,
-      layoutDuration: metrics.LayoutDuration || null,
-      scriptDuration: metrics.ScriptDuration || null,
-      taskDuration: metrics.TaskDuration || null,
-      jsHeapUsedSize: metrics.JSHeapUsedSize || null,
-      jsHeapTotalSize: metrics.JSHeapTotalSize || null,
+      layoutDuration: metrics.LayoutDuration || 0,
+      scriptDuration: metrics.ScriptDuration || 0,
+      taskDuration: metrics.TaskDuration || 0,
+      jsHeapUsedSize: metrics.JSHeapUsedSize || 0,
+      jsHeapTotalSize: metrics.JSHeapTotalSize || 0,
     };
+    return res;
   }
 
   async linkToTask(task: Task): Promise<void> {

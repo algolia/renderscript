@@ -11,15 +11,9 @@ import type { Task } from './tasks/Task';
 import type { TaskObject, TaskParams, TaskFinal } from './types';
 
 export class TasksManager {
-  #browser: Browser | null;
-  #stopping: boolean;
+  #browser: Browser | null = null;
+  #stopping: boolean = true;
   #currentTasks: TaskObject[] = [];
-
-  constructor() {
-    this.#browser = null;
-    this.#stopping = true;
-    this.#currentTasks = [];
-  }
 
   get healthy(): boolean {
     if (this.#stopping) {
@@ -30,6 +24,14 @@ export class TasksManager {
       return this.#browser.isReady;
     }
     return false;
+  }
+
+  get currentBrowser(): Browser | null {
+    return this.#browser;
+  }
+
+  get currentConcurrency(): number {
+    return this.#currentTasks.length;
   }
 
   async launch(): Promise<void> {
@@ -45,6 +47,7 @@ export class TasksManager {
     }
 
     const start = Date.now();
+    const id = uuid();
     const jobParam: TaskParams = {
       ...job,
       waitTime: {
@@ -52,38 +55,62 @@ export class TasksManager {
         ...job.waitTime,
       },
     };
+    let task: Task | undefined;
+
     console.log('Processing:', job.url.toString(), `(${job.type})`);
+    try {
+      const page = new BrowserPage();
+      await page.create(this.#browser);
 
-    const id = uuid();
+      if (jobParam.type === 'login') {
+        task = new LoginTask(jobParam, page);
+      } else {
+        task = new RenderTask(jobParam, page);
+      }
 
-    const page = new BrowserPage();
-    await page.create(this.#browser);
+      await page.linkToTask(task);
+      const taskPromise = task.process().catch((err) => {
+        // TO DO: log to sentry
+        console.error(err);
+      });
+      this.#addTask({ id, taskPromise });
 
-    let task: Task;
-    if (jobParam.type === 'login') {
-      task = new LoginTask(jobParam, page);
-    } else {
-      task = new RenderTask(jobParam, page);
+      await taskPromise;
+      const res = task.results!;
+
+      this.#removeTask({ id });
+      await task.close();
+
+      // ---- Reporting
+      stats.timing('renderscript.task', Date.now() - start, undefined, {
+        type: job.type,
+      });
+      const metrics = task.metrics;
+
+      if (metrics.page) {
+        Object.entries(metrics.page).forEach(([key, value]) => {
+          if (key.endsWith('Duration')) {
+            stats.timing(`renderscript.task.${key}`, value);
+            return;
+          }
+
+          stats.histogram(`renderscript.task.${key}`, value);
+          stats.increment(`renderscript.task.${key}.amount`, value);
+        });
+      }
+      // --- /done
+
+      console.log('Done', job.url.toString());
+
+      task = undefined;
+
+      return { ...res, metrics };
+    } finally {
+      if (task) {
+        this.#removeTask({ id });
+        task.close();
+      }
     }
-
-    await page.linkToTask(task);
-    const taskPromise = task.process().catch((err) => {
-      console.error(err);
-    });
-    this.#addTask({ id, taskPromise });
-
-    await taskPromise;
-    const res = task.results!;
-
-    this.#removeTask({ id });
-    await task.close();
-
-    stats.timing('renderscript.task', Date.now() - start, undefined, {
-      type: job.type,
-    });
-    console.log('Done', job.url.toString());
-
-    return { ...res, metrics: task.metrics };
   }
 
   async stop(): Promise<void> {
@@ -94,6 +121,7 @@ export class TasksManager {
 
     if (this.#browser) {
       await this.#browser.stop();
+      this.#browser = null;
     }
   }
 
