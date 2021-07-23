@@ -9,16 +9,16 @@ export async function healthy(
 ): Promise<void> {
   const isHealthy = tasksManager.healthy;
   const tasksRunning = tasksManager.currentConcurrency;
-  const pagesOpened = tasksManager.currentBrowser
+  const pagesOpen = tasksManager.currentBrowser
     ? await tasksManager.currentBrowser.getCurrentConcurrency()
     : -1;
 
   // Those stats could be computed from .task.count
   // But we want to double check that we don't forgot tasks or tabs
   stats.gauge('renderscript.tasks.running', tasksRunning);
-  stats.gauge('renderscript.pages.opened', pagesOpened);
+  stats.gauge('renderscript.pages.open', pagesOpen);
 
   res
     .status(isHealthy ? 200 : 503)
-    .json({ ready: isHealthy, tasksRunning, pagesOpened });
+    .json({ ready: isHealthy, tasksRunning, pagesOpen });
 }

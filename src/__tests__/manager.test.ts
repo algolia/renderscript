@@ -8,7 +8,7 @@ it('should properly close page after done', async () => {
   expect(JSON.parse(body)).toEqual({
     ready: true,
     tasksRunning: 0,
-    pagesOpened: 1,
+    pagesOpen: 1,
   });
 
   // Process something
@@ -33,6 +33,6 @@ it('should properly close page after done', async () => {
   expect(JSON.parse(bodyAfter)).toEqual({
     ready: true,
     tasksRunning: 0,
-    pagesOpened: 1,
+    pagesOpen: 1,
   });
 });
