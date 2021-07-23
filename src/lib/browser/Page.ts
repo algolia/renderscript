@@ -212,11 +212,20 @@ export class BrowserPage {
     this.#page!.on('response', async (res) => {
       const headers = res.headers();
 
-      // Not every request has the content-lenght header, the byteLength match perfectly
-      // but does not necessarly represent what was transfered (if it was gzipped for example)
-      const cl = headers['content-length']
-        ? parseInt(headers['content-length'], 10)
-        : (await res.buffer()).byteLength;
+      let cl = 0;
+
+      if (headers['content-length']) {
+        cl = parseInt(headers['content-length'], 10);
+      }
+
+      const status = res.status();
+      // Redirection does not have a body
+      if (status < 300 || status >= 400) {
+        // Not every request has the content-lenght header, the byteLength match perfectly
+        // but does not necessarly represent what was transfered (if it was gzipped for example)
+        cl = (await res.buffer()).byteLength;
+      }
+
       if (res.url() === url.href) {
         this.#metrics.contentLength = cl;
       }
