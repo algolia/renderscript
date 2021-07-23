@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/algolia/renderscript/compare/v1.8.0...v1.9.0) (2021-07-23)
+
+
+### Features
+
+* expose more metrics ([#351](https://github.com/algolia/renderscript/issues/351)) ([b181e70](https://github.com/algolia/renderscript/commit/b181e7051acec3a7e2fb595cce507daa68bc2449))
+
 # [1.8.0](https://github.com/algolia/renderscript/compare/v1.7.17...v1.8.0) (2021-07-22)
 
 
