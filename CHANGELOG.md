@@ -1,3 +1,10 @@
+## [1.9.2](https://github.com/algolia/renderscript/compare/v1.9.1...v1.9.2) (2021-07-23)
+
+
+### Bug Fixes
+
+* redirection does not have a body ([#353](https://github.com/algolia/renderscript/issues/353)) ([e5ff565](https://github.com/algolia/renderscript/commit/e5ff56521f4c3669495f74ca231eaff8e805d345))
+
 ## [1.9.1](https://github.com/algolia/renderscript/compare/v1.9.0...v1.9.1) (2021-07-23)
 
 
