@@ -76,6 +76,7 @@ export class TasksManager {
     const res = task.results!;
 
     this.#removeTask({ id });
+    await task.close();
 
     stats.timing('renderscript.task', Date.now() - start, undefined, {
       type: job.type,
