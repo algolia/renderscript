@@ -79,7 +79,7 @@ export class BrowserPage {
 
   async metrics(): Promise<PageMetrics> {
     const metrics = await this.#page!.metrics();
-    const res = {
+    return {
       ...this.#metrics,
       layoutDuration: metrics.LayoutDuration || 0,
       scriptDuration: metrics.ScriptDuration || 0,
@@ -87,7 +87,6 @@ export class BrowserPage {
       jsHeapUsedSize: metrics.JSHeapUsedSize || 0,
       jsHeapTotalSize: metrics.JSHeapTotalSize || 0,
     };
-    return res;
   }
 
   async linkToTask(task: Task): Promise<void> {
