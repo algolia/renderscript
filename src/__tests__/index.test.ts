@@ -122,7 +122,7 @@ describe('main', () => {
     expect(res.statusCode).toEqual(200);
 
     expect(json.metrics).toMatchObject({
-      goto: expect.any(String),
+      goto: expect.any(Number),
       minWait: expect.any(Number),
       serialize: expect.any(Number),
       total: expect.any(Number),
