@@ -56,9 +56,11 @@ export class Browser {
     const testPage = await browser.newPage();
     await testPage.goto('about://settings', { waitUntil: 'networkidle0' });
     stats.timing('renderscript.page.initial', Date.now() - start);
+    testPage.close();
 
     this.#browser = browser;
     this.#ready = true;
+    console.log(`Browser is ready`);
   }
 
   async stop(): Promise<void> {

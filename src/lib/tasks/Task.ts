@@ -10,6 +10,7 @@ export abstract class Task<TTaskType = TaskBaseParams> {
     minWait: null,
     serialize: null,
     total: null,
+    page: null,
   };
 
   constructor(params: TTaskType, page: BrowserPage) {
@@ -22,8 +23,8 @@ export abstract class Task<TTaskType = TaskBaseParams> {
   }
 
   async close(): Promise<void> {
-    await this.page.page?.close();
-    await this.page.context?.close();
+    this.metrics.page = await this.page.metrics();
+    await this.page.close();
   }
 
   abstract process(): Promise<void>;

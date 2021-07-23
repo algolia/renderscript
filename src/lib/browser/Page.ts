@@ -1,7 +1,6 @@
 import { validateURL } from '@algolia/dns-filter';
 import type {
   BrowserContext,
-  HTTPRequest,
   HTTPResponse,
   Page,
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
@@ -10,6 +9,7 @@ import { FetchError } from 'api/helpers/errors';
 import { stats } from 'helpers/stats';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { Task } from 'lib/tasks/Task';
+import type { PageMetrics } from 'lib/types';
 
 import {
   DATA_REGEXP,
@@ -25,6 +25,17 @@ export class BrowserPage {
   #page: Page | undefined;
   #context: BrowserContext | undefined;
   #task: Task | undefined;
+  #metrics: PageMetrics = {
+    layoutDuration: null,
+    scriptDuration: null,
+    taskDuration: null,
+    jsHeapUsedSize: null,
+    jsHeapTotalSize: null,
+    requests: 0,
+    blockedRequests: 0,
+    contentLength: 0,
+    contentLengthTotal: 0,
+  };
 
   get page(): Page | undefined {
     return this.#page;
@@ -46,10 +57,36 @@ export class BrowserPage {
     await page.setUserAgent('Algolia Crawler Renderscript');
     await page.setCacheEnabled(false);
     await page.setViewport({ width: WIDTH, height: HEIGHT });
+    // To enable later
+    // await page.setExtraHTTPHeaders({
+    //   'Accept-Encoding': 'gzip, deflate',
+    //   Accept:
+    //     'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    // });
 
     stats.timing('renderscript.page.create', Date.now() - start);
     this.#page = page;
     this.#context = context;
+  }
+
+  /**
+   * Destroy the page and the private context.
+   */
+  async close(): Promise<void> {
+    await this.#page?.close();
+    await this.#context?.close();
+  }
+
+  async metrics(): Promise<PageMetrics> {
+    const metrics = await this.#page!.metrics();
+    return {
+      ...this.#metrics,
+      layoutDuration: metrics.LayoutDuration || null,
+      scriptDuration: metrics.ScriptDuration || null,
+      taskDuration: metrics.TaskDuration || null,
+      jsHeapUsedSize: metrics.JSHeapUsedSize || null,
+      jsHeapTotalSize: metrics.JSHeapTotalSize || null,
+    };
   }
 
   async linkToTask(task: Task): Promise<void> {
@@ -122,11 +159,13 @@ export class BrowserPage {
     }
 
     /* Ignore useless/dangerous resources */
-    this.#page!.on('request', async (req: HTTPRequest) => {
+    this.#page!.on('request', async (req) => {
       const reqUrl = req.url();
+      this.#metrics.requests += 1;
 
       // Skip data URIs
       if (DATA_REGEXP.test(reqUrl)) {
+        this.#metrics.blockedRequests += 1;
         req.abort();
         return;
       }
@@ -141,12 +180,14 @@ export class BrowserPage {
         console.error(err);
         // report(err);
         req.abort();
+        this.#metrics.blockedRequests += 1;
         return;
       }
 
       try {
         // Ignore some type of resources
         if (IGNORED_RESOURCES.includes(req.resourceType())) {
+          this.#metrics.blockedRequests += 1;
           await req.abort();
           return;
         }
@@ -161,9 +202,26 @@ export class BrowserPage {
         }
         await req.continue();
       } catch (e) {
-        if (!e.message.match(/Request is already handled/)) throw e;
+        if (!e.message.match(/Request is already handled/)) {
+          throw e;
+        }
         // Ignore Request is already handled error
       }
+    });
+
+    this.#page!.on('response', async (res) => {
+      const headers = res.headers();
+
+      // Not every request has the content-lenght header, the byteLength match perfectly
+      // but does not necessarly represent what was transfered (if it was gzipped for example)
+      const cl = headers['content-length']
+        ? parseInt(headers['content-length'], 10)
+        : (await res.buffer()).byteLength;
+      if (res.url() === url.href) {
+        this.#metrics.contentLength = cl;
+      }
+
+      this.#metrics.contentLengthTotal += cl;
     });
   }
 }

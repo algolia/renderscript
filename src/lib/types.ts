@@ -55,6 +55,19 @@ export interface Metrics {
   minWait: number | null;
   serialize: number | null;
   total: number | null;
+  page: PageMetrics | null;
+}
+
+export interface PageMetrics {
+  layoutDuration: number | null;
+  scriptDuration: number | null;
+  taskDuration: number | null;
+  jsHeapUsedSize: number | null; // currently active to render the page
+  jsHeapTotalSize: number | null; // total allocated
+  requests: number;
+  blockedRequests: number;
+  contentLength: number;
+  contentLengthTotal: number;
 }
 
 export interface NewPage {
