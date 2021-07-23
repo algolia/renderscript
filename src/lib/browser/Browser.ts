@@ -24,6 +24,10 @@ export class Browser {
     return this.#browser;
   }
 
+  async getCurrentConcurrency(): Promise<number> {
+    return (await this.#browser!.pages()).length;
+  }
+
   /**
    * Create a puppeteer instance.
    */
