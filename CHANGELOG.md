@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/algolia/renderscript/compare/v1.9.3...v1.10.0) (2021-07-24)
+
+
+### Features
+
+* add GET /list  ([#359](https://github.com/algolia/renderscript/issues/359)) ([bd5e612](https://github.com/algolia/renderscript/commit/bd5e612fcc13dd25fb223e489dd72a3d97ebf0c1))
+
 ## [1.9.3](https://github.com/algolia/renderscript/compare/v1.9.2...v1.9.3) (2021-07-24)
 
 
