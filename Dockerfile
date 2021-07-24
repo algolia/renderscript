@@ -62,6 +62,7 @@ ENV IN_DOCKER true
 RUN true \
   && apt-get update \
   && apt-get install -y --no-install-recommends \
+  curl \
   chromium \
   libatk-bridge2.0-0 \
   libgtk-3-0 \

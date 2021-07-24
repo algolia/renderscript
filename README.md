@@ -24,6 +24,15 @@ The aim is to make a more reliable and more flexible version for long-term use.
 
 ## API
 
+> GET `/healthy` GET `/ready`
+
+For Kubernetes and others.
+
+> GET `/list`
+
+List currenlty open pages.
+Useful to debug.
+
 > POST `/render`
 
 Main endpoint. Renders the page and dumps a JSON with all the page information.

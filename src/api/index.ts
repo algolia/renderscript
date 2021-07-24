@@ -14,6 +14,7 @@ import * as routeRender from 'api/routes/render';
 import projectRoot from 'helpers/projectRoot';
 
 import { DELETE_COOKIE, SESSION_COOKIE } from './constants';
+import { list } from './routes/list';
 
 export class Api {
   server: http.Server;
@@ -60,6 +61,7 @@ export class Api {
     this._app
       .get('/ready', ready)
       .get('/healthy', healthy)
+      .get('/list', list)
       .get('/render', routeRender.validate, routeRender.render)
       .post('/render', routeRender.validate, routeRender.renderJSON)
       .post('/login', routeLogin.validate, routeLogin.processLogin);
@@ -72,7 +74,9 @@ export class Api {
         res: express.Response,
         next: express.NextFunction
       ) => {
-        if (err.code !== 'EBADCSRFTOKEN') return next(err);
+        if (err.code !== 'EBADCSRFTOKEN') {
+          return next(err);
+        }
 
         // CSRF token errors
         res.status(403).send('The form has expired');
