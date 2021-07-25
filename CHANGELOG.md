@@ -1,3 +1,10 @@
+## [1.10.4](https://github.com/algolia/renderscript/compare/v1.10.3...v1.10.4) (2021-07-25)
+
+
+### Bug Fixes
+
+* handle empty response ([40cf060](https://github.com/algolia/renderscript/commit/40cf060c95a200eb57554e9eaee91d714978f4ba))
+
 ## [1.10.3](https://github.com/algolia/renderscript/compare/v1.10.2...v1.10.3) (2021-07-25)
 
 
