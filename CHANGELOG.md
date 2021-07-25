@@ -1,3 +1,10 @@
+## [1.10.3](https://github.com/algolia/renderscript/compare/v1.10.2...v1.10.3) (2021-07-25)
+
+
+### Bug Fixes
+
+* health check for long task + log fail job + log id of the jobs ([e81663a](https://github.com/algolia/renderscript/commit/e81663a0c35ab2c069b64958a5d5b4013a13a078))
+
 ## [1.10.2](https://github.com/algolia/renderscript/compare/v1.10.1...v1.10.2) (2021-07-25)
 
 
