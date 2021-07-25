@@ -221,9 +221,21 @@ export class BrowserPage {
       const status = res.status();
       // Redirection does not have a body
       if (status < 300 || status >= 400) {
-        // Not every request has the content-lenght header, the byteLength match perfectly
-        // but does not necessarly represent what was transfered (if it was gzipped for example)
-        cl = (await res.buffer()).byteLength;
+        try {
+          // Not every request has the content-length header, the byteLength match perfectly
+          // but does not necessarly represent what was transfered (if it was gzipped for example)
+          cl = (await res.buffer()).byteLength;
+        } catch (e) {
+          if (
+            e.message.includes(
+              'No data found for resource with given identifier'
+            )
+          ) {
+            // can happen with 200 without body
+            return;
+          }
+          throw e;
+        }
       }
 
       if (res.url() === url.href) {
