@@ -1,3 +1,10 @@
+## [1.10.1](https://github.com/algolia/renderscript/compare/v1.10.0...v1.10.1) (2021-07-25)
+
+
+### Bug Fixes
+
+* handle 200 without body ([4a4e1b0](https://github.com/algolia/renderscript/commit/4a4e1b09b5fd392347967c687cd2cdef665e6b89))
+
 # [1.10.0](https://github.com/algolia/renderscript/compare/v1.9.3...v1.10.0) (2021-07-24)
 
 
