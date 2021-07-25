@@ -1,3 +1,10 @@
+## [1.10.2](https://github.com/algolia/renderscript/compare/v1.10.1...v1.10.2) (2021-07-25)
+
+
+### Bug Fixes
+
+* do not report expected ENOTFOUND ([f448903](https://github.com/algolia/renderscript/commit/f448903817c7e78adc57a580955da17b6e96dde3))
+
 ## [1.10.1](https://github.com/algolia/renderscript/compare/v1.10.0...v1.10.1) (2021-07-25)
 
 
