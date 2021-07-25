@@ -177,10 +177,11 @@ export class BrowserPage {
           ipPrefixes: RESTRICTED_IPS,
         });
       } catch (err) {
-        console.error(err);
-        // report(err);
+        if (!err.message.includes('ENOTFOUND')) {
+          console.error(err);
+          this.#metrics.blockedRequests += 1;
+        }
         req.abort();
-        this.#metrics.blockedRequests += 1;
         return;
       }
 
