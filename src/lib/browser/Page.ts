@@ -230,11 +230,13 @@ export class BrowserPage {
           if (
             e.message.includes(
               'No data found for resource with given identifier'
-            )
+            ) ||
+            e.message.includes(' No resource with given identifier found')
           ) {
-            // can happen with 200 without body
+            // can happen with 200 without body, or OPTIONS/HEAD
             return;
           }
+
           throw e;
         }
       }
