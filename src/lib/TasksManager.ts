@@ -4,7 +4,7 @@ import { stats } from 'helpers/stats';
 
 import { Browser } from './browser/Browser';
 import { BrowserPage } from './browser/Page';
-import { WAIT_TIME } from './constants';
+import { UNHEALTHY_TASK_TTL, WAIT_TIME } from './constants';
 import { LoginTask } from './tasks/Login';
 import { RenderTask } from './tasks/Render';
 import type { Task } from './tasks/Task';
@@ -22,6 +22,12 @@ export class TasksManager {
 
     if (this.#browser) {
       return this.#browser.isReady;
+    }
+    const lostTask = this.#currentTasks.some((task) => {
+      return Date.now() - task.createdAt.getTime() > UNHEALTHY_TASK_TTL;
+    });
+    if (lostTask) {
+      return false;
     }
     return false;
   }
@@ -55,9 +61,10 @@ export class TasksManager {
         ...job.waitTime,
       },
     };
+    const url = job.url.toString();
     let task: Task | undefined;
 
-    console.log('Processing:', job.url.toString(), `(${job.type})`);
+    console.log('Processing:', url, `(${job.type})(${id})`);
     try {
       const page = new BrowserPage();
       await page.create(this.#browser);
@@ -100,11 +107,14 @@ export class TasksManager {
       }
       // --- /done
 
-      console.log('Done', job.url.toString());
+      console.log('Done', url, `(${id})`);
 
       task = undefined;
 
       return { ...res, metrics };
+    } catch (e) {
+      console.log('Fail', url, `(${id})`);
+      throw e;
     } finally {
       if (task) {
         this.#removeTask({ id });
@@ -125,8 +135,8 @@ export class TasksManager {
     }
   }
 
-  #addTask({ id, taskPromise }: TaskObject): void {
-    this.#currentTasks.push({ id, taskPromise });
+  #addTask({ id, taskPromise }: Pick<TaskObject, 'id' | 'taskPromise'>): void {
+    this.#currentTasks.push({ id, taskPromise, createdAt: new Date() });
   }
 
   #removeTask({ id }: Pick<TaskObject, 'id'>): void {
