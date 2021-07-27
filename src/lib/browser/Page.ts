@@ -21,6 +21,14 @@ import {
 
 import type { Browser } from './Browser';
 
+const IGNORED_ERRORS = [
+  // 200 no body, HEAD, OPTIONS
+  'No data found for resource with given identifier',
+  'No resource with given identifier found',
+  // Too big to fit in memory, or memory filled
+  'Request content was evicted from inspector cache',
+];
+
 export class BrowserPage {
   #page: Page | undefined;
   #context: BrowserContext | undefined;
@@ -227,13 +235,7 @@ export class BrowserPage {
           // but does not necessarly represent what was transfered (if it was gzipped for example)
           cl = (await res.buffer()).byteLength;
         } catch (e) {
-          if (
-            e.message.includes(
-              'No data found for resource with given identifier'
-            ) ||
-            e.message.includes(' No resource with given identifier found')
-          ) {
-            // can happen with 200 without body, or OPTIONS/HEAD
+          if (IGNORED_ERRORS.some((msg) => e.message.includes(msg))) {
             return;
           }
 
