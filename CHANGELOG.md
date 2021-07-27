@@ -1,3 +1,10 @@
+## [1.10.5](https://github.com/algolia/renderscript/compare/v1.10.4...v1.10.5) (2021-07-27)
+
+
+### Bug Fixes
+
+* ignore more errors ([dd5775a](https://github.com/algolia/renderscript/commit/dd5775ac65f535569d5ec714906d9a2b35f54e67))
+
 ## [1.10.4](https://github.com/algolia/renderscript/compare/v1.10.3...v1.10.4) (2021-07-25)
 
 
