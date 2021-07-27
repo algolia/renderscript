@@ -20,15 +20,18 @@ export class TasksManager {
       return false;
     }
 
-    if (this.#browser) {
-      return this.#browser.isReady;
-    }
+    // Tasks lifecycle
     const lostTask = this.#currentTasks.some((task) => {
       return Date.now() - task.createdAt.getTime() > UNHEALTHY_TASK_TTL;
     });
     if (lostTask) {
       return false;
     }
+
+    if (this.#browser) {
+      return this.#browser.isReady;
+    }
+
     return false;
   }
 

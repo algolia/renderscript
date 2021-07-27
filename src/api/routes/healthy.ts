@@ -17,6 +17,10 @@ export async function healthy(
   // But we want to double check that we don't forgot tasks or tabs
   stats.gauge('renderscript.tasks.running', tasksRunning);
   stats.gauge('renderscript.pages.open', pagesOpen);
+  stats.check(
+    'renderscript.up',
+    isHealthy ? stats.CHECKS.OK : stats.CHECKS.CRITICAL
+  );
 
   res
     .status(isHealthy ? 200 : 503)
