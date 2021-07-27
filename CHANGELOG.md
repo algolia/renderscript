@@ -1,3 +1,10 @@
+## [1.10.6](https://github.com/algolia/renderscript/compare/v1.10.5...v1.10.6) (2021-07-27)
+
+
+### Bug Fixes
+
+* order of health check + datadog report ([a124409](https://github.com/algolia/renderscript/commit/a124409768ecf1d0b2308e7783b9dcb6ec727cb6))
+
 ## [1.10.5](https://github.com/algolia/renderscript/compare/v1.10.4...v1.10.5) (2021-07-27)
 
 
