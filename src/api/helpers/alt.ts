@@ -19,5 +19,6 @@ export function getDefaultParams(): Record<any, any> {
         max: alt.number().cast().min(2000).max(20000),
       })
     ),
+    adblock: alt.boolean().cast(),
   };
 }

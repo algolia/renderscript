@@ -71,8 +71,7 @@
     "ts-jest": "27.0.4",
     "ttypescript": "1.5.12",
     "typescript": "4.3.5",
-    "typescript-transform-paths": "3.1.0",
-    "undici": "4.3.1"
+    "typescript-transform-paths": "3.1.0"
   },
   "dependencies": {
     "@algolia/dns-filter": "1.1.19",
@@ -84,6 +83,7 @@
     "hot-shots": "8.5.0",
     "puppeteer-core": "10.1.0",
     "stream-to-string": "1.2.0",
+    "undici": "4.3.1",
     "uuid": "8.3.2"
   }
 }

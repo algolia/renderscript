@@ -1,7 +1,7 @@
 import type express from 'express';
 
 import { stats } from 'helpers/stats';
-import { tasksManager } from 'lib/tasksManagerSingleton';
+import { tasksManager } from 'lib/singletons';
 
 export async function healthy(
   req: express.Request,

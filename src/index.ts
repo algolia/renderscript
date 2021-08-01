@@ -1,6 +1,6 @@
 import { Api } from 'api/index';
 import { gracefulClose } from 'helpers/gracefulClose';
-import { tasksManager } from 'lib/tasksManagerSingleton';
+import { tasksManager } from 'lib/singletons';
 
 console.info(`NODE_ENV = ${process.env.NODE_ENV}`);
 

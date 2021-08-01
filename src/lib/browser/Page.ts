@@ -8,6 +8,7 @@ import type {
 import { FetchError } from 'api/helpers/errors';
 import { stats } from 'helpers/stats';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
+import { adblocker } from 'lib/singletons';
 import type { Task } from 'lib/tasks/Task';
 import type { PageMetrics } from 'lib/types';
 
@@ -89,9 +90,9 @@ export class BrowserPage {
     const metrics = await this.#page!.metrics();
     return {
       ...this.#metrics,
-      layoutDuration: metrics.LayoutDuration || 0,
-      scriptDuration: metrics.ScriptDuration || 0,
-      taskDuration: metrics.TaskDuration || 0,
+      layoutDuration: Math.round((metrics.LayoutDuration || 0) * 1000),
+      scriptDuration: Math.round((metrics.ScriptDuration || 0) * 1000),
+      taskDuration: Math.round((metrics.TaskDuration || 0) * 1000),
       jsHeapUsedSize: metrics.JSHeapUsedSize || 0,
       jsHeapTotalSize: metrics.JSHeapTotalSize || 0,
     };
@@ -147,7 +148,7 @@ export class BrowserPage {
   }
 
   async #updateContext(): Promise<void> {
-    const { url, headersToForward, userAgent } = this.#task!.params!;
+    const { url, headersToForward, userAgent, adblock } = this.#task!.params!;
 
     await this.#page!.setUserAgent(userAgent);
 
@@ -196,6 +197,11 @@ export class BrowserPage {
       try {
         // Ignore some type of resources
         if (IGNORED_RESOURCES.includes(req.resourceType())) {
+          this.#metrics.blockedRequests += 1;
+          await req.abort();
+          return;
+        }
+        if (adblock && adblocker.match(new URL(reqUrl))) {
           this.#metrics.blockedRequests += 1;
           await req.abort();
           return;
