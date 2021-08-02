@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/algolia/renderscript/compare/v1.10.6...v1.11.0) (2021-08-02)
+
+
+### Features
+
+* simple adblocking ([#369](https://github.com/algolia/renderscript/issues/369)) ([cf9b607](https://github.com/algolia/renderscript/commit/cf9b607b9dbbaaa50db3a089965f5511ca421655))
+
 ## [1.10.6](https://github.com/algolia/renderscript/compare/v1.10.5...v1.10.6) (2021-07-27)
 
 
