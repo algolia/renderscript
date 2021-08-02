@@ -5,7 +5,7 @@ import { getDefaultParams, alt } from 'api/helpers/alt';
 import { revertUrl } from 'api/helpers/buildUrl';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
-import { tasksManager } from 'lib/tasksManagerSingleton';
+import { tasksManager } from 'lib/singletons';
 import type { TaskFromAPI } from 'lib/types';
 
 export async function validate(
@@ -29,7 +29,7 @@ export async function render(
   req: express.Request<any, any, any, TaskFromAPI>,
   res: express.Response
 ): Promise<void> {
-  const { url: rawUrl, ua, waitTime } = req.query;
+  const { url: rawUrl, ua, waitTime, adblock } = req.query;
   const headersToForward = getForwardedHeadersFromRequest(req);
   const url = new URL(rawUrl);
 
@@ -40,6 +40,7 @@ export async function render(
       headersToForward,
       userAgent: ua,
       waitTime,
+      adblock,
     });
     if (error) {
       res.status(400).json({ error });
@@ -67,7 +68,7 @@ export async function renderJSON(
   req: express.Request<any, any, TaskFromAPI>,
   res: express.Response
 ): Promise<void> {
-  const { url: rawUrl, ua, waitTime } = req.body;
+  const { url: rawUrl, ua, waitTime, adblock } = req.body;
   const headersToForward = getForwardedHeadersFromRequest(req);
   const url = new URL(rawUrl);
 
@@ -79,6 +80,7 @@ export async function renderJSON(
         headersToForward,
         userAgent: ua,
         waitTime,
+        adblock,
       });
 
     if (error) {

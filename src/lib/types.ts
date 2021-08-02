@@ -13,6 +13,7 @@ export interface TaskBaseParams {
   type: 'render' | 'login';
   url: URL;
   userAgent: string;
+  adblock?: boolean;
   waitTime?: {
     min?: number;
     max?: number;

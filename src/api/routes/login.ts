@@ -4,7 +4,7 @@ import { CSP_HEADERS } from 'api/constants';
 import { getDefaultParams, alt } from 'api/helpers/alt';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
-import { tasksManager } from 'lib/tasksManagerSingleton';
+import { tasksManager } from 'lib/singletons';
 
 export async function validate(
   req: express.Request,

@@ -1,6 +1,6 @@
 import type express from 'express';
 
-import { tasksManager } from 'lib/tasksManagerSingleton';
+import { tasksManager } from 'lib/singletons';
 
 /**
  * List currently opened page.
