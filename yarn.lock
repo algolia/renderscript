@@ -7095,10 +7095,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript-transform-paths@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/typescript-transform-paths/-/typescript-transform-paths-3.1.0.tgz#48f3e50b6b1fb8275cb5657f0651346467da32f4"
-  integrity sha512-JEdKeRgsTlfuzQABkLLyqMvNsHsbXkTgeOwuVTCVG7RYxpVs6wZSsnf9z39l09LBljOiXXpEv3AL2eQnKlJupA==
+typescript-transform-paths@3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/typescript-transform-paths/-/typescript-transform-paths-3.2.1.tgz#aa3f60ebf8c9eb4c4c07c96b91f6ee0a0db1b3f8"
+  integrity sha512-A2WRrELxKz4ivai9NO2lq7+H2peNZ9/ouSULSgrE0IpEa/sdam2k70aWn9BNb1rFUZnWn/MFXcSijvpa2GgwzQ==
   dependencies:
     minimatch "^3.0.4"
 
