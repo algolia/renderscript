@@ -74,7 +74,7 @@
     "typescript-transform-paths": "3.3.0"
   },
   "dependencies": {
-    "@algolia/dns-filter": "1.1.19",
+    "@algolia/dns-filter": "1.1.22",
     "altheia-async-data-validator": "5.0.11",
     "body-parser": "1.19.0",
     "cookie-parser": "1.4.5",
