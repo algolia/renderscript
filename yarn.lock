@@ -2,12 +2,12 @@
 # yarn lockfile v1
 
 
-"@algolia/dns-filter@1.1.19":
-  version "1.1.19"
-  resolved "https://registry.yarnpkg.com/@algolia/dns-filter/-/dns-filter-1.1.19.tgz#90c3d5de9402e2e952bd740ddf430a3a129abfed"
-  integrity sha512-RPEFak42l+hlnJkegM8G7rTkbVYHJjFTNFykcKYhi/fNrK05auRxD6o/srxW8kUTk+cKff0irS/l7paiCEej9w==
+"@algolia/dns-filter@1.1.22":
+  version "1.1.22"
+  resolved "https://registry.yarnpkg.com/@algolia/dns-filter/-/dns-filter-1.1.22.tgz#347e7328558ee4c7cd65b8159e308c1a97194614"
+  integrity sha512-4b7iB+d0z6hCsinXSSTiHCBtr61+TjDV2a+WO6XW1Pz1Yv0dp8XYgbFgQrQiG8YBBLP5K8+Yz34j5kSjNtWIiA==
   dependencies:
-    ip-address "8.0.0"
+    ip-address "8.1.0"
 
 "@babel/code-frame@7.12.11":
   version "7.12.11"
@@ -3675,10 +3675,10 @@ into-stream@^6.0.0:
     from2 "^2.3.0"
     p-is-promise "^3.0.0"
 
-ip-address@8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/ip-address/-/ip-address-8.0.0.tgz#00ba9435c8027dd591c491ad64c3e6a52a767ee4"
-  integrity sha512-HAGaTPtx3AJj2p/ymbUjAJzF5bQ+pI6sDDEixHnj+vj1XL9DaK4hGvOOs3mdCMZZLIDOH8T8U6SInpqTk76wXw==
+ip-address@8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/ip-address/-/ip-address-8.1.0.tgz#1fe9b4509b51ff7d2fbbef4d3d26994d9915a459"
+  integrity sha512-Wz91gZKpNKoXtqvY8ScarKYwhXoK4r/b5QuT+uywe/azv0/nUCo7Bh0IRRI7F9DHR06kJNWtzMGLIbXavngbKA==
   dependencies:
     jsbn "1.1.0"
     sprintf-js "1.1.2"
