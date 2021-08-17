@@ -15,7 +15,7 @@ export async function validate(
     ...getDefaultParams(),
     username: alt.string().required(),
     password: alt.string().required(),
-    renderHTML: alt.boolean(),
+    renderHTML: alt.boolean().cast(),
   })
     .body(req.body)
     .validate();

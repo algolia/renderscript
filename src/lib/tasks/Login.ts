@@ -28,21 +28,30 @@ export class LoginTask extends Task<LoginTaskParams> {
       return;
     }
 
+    console.log(`Current URL: ${page!.url()}`);
+    console.log('Entering username...');
     await textInput.type(login!.username);
 
-    let passwordInput = await page!.$('input[type=password]');
+    let passwordInput = await page!.$(
+      'input[type=password]:not([aria-hidden="true"])'
+    );
     if (!passwordInput) {
-      console.log('2 step login: validating username...');
+      console.log('No password input found: validating username...');
       try {
         await Promise.all([
-          // page.waitForNavigation(), // Doesn't work with Okta for example, it's JS based
-          page!.waitForSelector('input[type=password]', {
-            timeout: waitTime!.max!,
-          }),
+          // page!.waitForNavigation(), // Doesn't work with Okta for example, it's JS based
+          page!.waitForSelector(
+            'input[type=password]:not([aria-hidden="true"])',
+            {
+              timeout: waitTime!.max!,
+            }
+          ),
           textInput!.press('Enter'),
         ]);
-        console.log(`2 step login: navigated to ${page!.url()}`);
-        passwordInput = await page!.$('input[type=password]');
+        console.log(`Current URL: ${page!.url()}`);
+        passwordInput = await page!.$(
+          'input[type=password]:not([aria-hidden="true"])'
+        );
       } catch (err) {
         console.log('Found no password input on the page');
         const body = await this.page.renderBody(new URL(page!.url()));
@@ -55,7 +64,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       }
     }
 
-    console.log('Logging in...');
+    console.log('Entering password and logging in...');
     await passwordInput!.type(login!.password);
     let loginResponse;
     try {
