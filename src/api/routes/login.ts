@@ -15,7 +15,7 @@ export async function validate(
     ...getDefaultParams(),
     username: alt.string().required(),
     password: alt.string().required(),
-    renderHTML: alt.string(),
+    renderHTML: alt.boolean().cast(),
   })
     .body(req.body)
     .validate();
@@ -37,7 +37,7 @@ export async function processLogin(
       ua: string;
       username: string;
       password: string;
-      renderHTML?: string;
+      renderHTML?: boolean;
     }
   >,
   res: express.Response
