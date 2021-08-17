@@ -39,7 +39,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       console.log('No password input found: validating username...');
       try {
         await Promise.all([
-          page!.waitForNavigation(), // Doesn't work with Okta for example, it's JS based
+          // page!.waitForNavigation(), // Doesn't work with Okta for example, it's JS based
           page!.waitForSelector(
             'input[type=password]:not([aria-hidden="true"])',
             {
