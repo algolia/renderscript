@@ -1,3 +1,10 @@
+## [1.11.3](https://github.com/algolia/renderscript/compare/v1.11.2...v1.11.3) (2021-08-17)
+
+
+### Bug Fixes
+
+* **login:** ignore aria-hidden password fields ([#386](https://github.com/algolia/renderscript/issues/386)) ([f771c41](https://github.com/algolia/renderscript/commit/f771c419b6c326c4c8e118826c1a55ba5c65573d))
+
 ## [1.11.2](https://github.com/algolia/renderscript/compare/v1.11.1...v1.11.2) (2021-08-16)
 
 
