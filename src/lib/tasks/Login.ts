@@ -74,8 +74,6 @@ export class LoginTask extends Task<LoginTaskParams> {
     await passwordInput!.type(login!.password);
     let loginResponse;
     try {
-      const start = Date.now();
-      console.log(`waitTime: ${waitTime!.max!} ${waitTime!.min}`);
       const [navigationResponse] = await Promise.all([
         page!.waitForNavigation({
           timeout: waitTime!.max!,
@@ -84,7 +82,6 @@ export class LoginTask extends Task<LoginTaskParams> {
         passwordInput!.press('Enter'),
       ]);
       loginResponse = navigationResponse;
-      console.log(`response after ${Date.now() - start}ms`);
     } catch (err) {
       console.log(
         `Error while logging in: ${err.message} (url=${page!.url()})`
