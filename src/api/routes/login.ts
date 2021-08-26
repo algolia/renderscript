@@ -38,11 +38,15 @@ export async function processLogin(
       username: string;
       password: string;
       renderHTML?: boolean;
+      waitTime?: {
+        min?: number;
+        max?: number;
+      };
     }
   >,
   res: express.Response
 ): Promise<void> {
-  const { url, ua, username, password, renderHTML } = req.body;
+  const { url, ua, username, password, renderHTML, waitTime } = req.body;
   const headersToForward = getForwardedHeadersFromRequest(req);
 
   try {
@@ -56,6 +60,8 @@ export async function processLogin(
           username,
           password,
         },
+        renderHTML,
+        waitTime,
       });
 
     if (error) {

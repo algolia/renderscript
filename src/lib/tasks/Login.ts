@@ -7,8 +7,12 @@ import { Task } from './Task';
 export class LoginTask extends Task<LoginTaskParams> {
   async process(): Promise<void> {
     /* Setup */
-    const { url, waitTime, login } = this.params;
+    const { url, waitTime, login, renderHTML } = this.params;
     const { page } = this.page;
+
+    const total = Date.now();
+    const minWait = waitTime!.min;
+    let body;
 
     try {
       await this.page.goto(url);
@@ -54,7 +58,9 @@ export class LoginTask extends Task<LoginTaskParams> {
         );
       } catch (err) {
         console.log('Found no password input on the page');
-        const body = await this.page.renderBody(new URL(page!.url()));
+        if (renderHTML) {
+          body = await this.page.renderBody(new URL(page!.url()));
+        }
 
         this.results = {
           error: err.message,
@@ -68,16 +74,24 @@ export class LoginTask extends Task<LoginTaskParams> {
     await passwordInput!.type(login!.password);
     let loginResponse;
     try {
+      const start = Date.now();
+      console.log(`waitTime: ${waitTime!.max!} ${waitTime!.min}`);
       const [navigationResponse] = await Promise.all([
-        page!.waitForNavigation({ timeout: waitTime!.max! }),
+        page!.waitForNavigation({
+          timeout: waitTime!.max!,
+          waitUntil: 'networkidle0',
+        }),
         passwordInput!.press('Enter'),
       ]);
       loginResponse = navigationResponse;
+      console.log(`response after ${Date.now() - start}ms`);
     } catch (err) {
       console.log(
         `Error while logging in: ${err.message} (url=${page!.url()})`
       );
-      const body = await this.page.renderBody(new URL(page!.url()));
+      if (renderHTML) {
+        body = await this.page.renderBody(new URL(page!.url()));
+      }
 
       this.results = {
         error: err.message,
@@ -96,7 +110,9 @@ export class LoginTask extends Task<LoginTaskParams> {
       if (page!.url() === url.href) {
         // Return an error if we got no login response and are still on the same URL
         console.log(`Got no login response (url=${page!.url()})`);
-        const body = await this.page.renderBody(new URL(page!.url()));
+        if (renderHTML) {
+          body = await this.page.renderBody(new URL(page!.url()));
+        }
 
         this.results = {
           error: 'no_response',
@@ -110,9 +126,17 @@ export class LoginTask extends Task<LoginTaskParams> {
       );
     }
 
+    const currentDuration = Date.now() - total;
+    if (minWait && minWait > currentDuration) {
+      console.log(`Waiting ${minWait - currentDuration} extra ms...`);
+      await page!.waitForTimeout(minWait - currentDuration);
+    }
+
     const cookies = await page!.cookies();
 
-    const body = await this.page.renderBody(new URL(page!.url()));
+    if (renderHTML) {
+      body = await this.page.renderBody(new URL(page!.url()));
+    }
 
     this.results = {
       statusCode: loginResponse?.status() || 200,
