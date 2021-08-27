@@ -1,7 +1,11 @@
+import os from 'os';
+
 import type express from 'express';
 
 import { stats } from 'helpers/stats';
 import { tasksManager } from 'lib/singletons';
+
+const hostname = os.hostname();
 
 export async function healthy(
   req: express.Request,
@@ -19,7 +23,10 @@ export async function healthy(
   stats.gauge('renderscript.pages.open', pagesOpen);
   stats.check(
     'renderscript.up',
-    isHealthy ? stats.CHECKS.OK : stats.CHECKS.CRITICAL
+    isHealthy ? stats.CHECKS.OK : stats.CHECKS.CRITICAL,
+    {
+      hostname,
+    }
   );
 
   res
