@@ -1,3 +1,10 @@
+## [1.11.4](https://github.com/algolia/renderscript/compare/v1.11.3...v1.11.4) (2021-08-27)
+
+
+### Bug Fixes
+
+* **datadog:** add hostname to checks ([70bcc39](https://github.com/algolia/renderscript/commit/70bcc39fadb4f34ec07be7ee886e1e923becd0d3))
+
 ## [1.11.3](https://github.com/algolia/renderscript/compare/v1.11.2...v1.11.3) (2021-08-17)
 
 
