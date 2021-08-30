@@ -14,7 +14,7 @@ export default async function setup() {
         console.log('API Ready');
         break;
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e.message);
     } finally {
       await wait(300);

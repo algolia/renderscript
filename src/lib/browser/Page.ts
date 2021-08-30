@@ -119,7 +119,7 @@ export class BrowserPage {
         timeout,
         waitUntil: ['domcontentloaded', 'networkidle0'],
       });
-    } catch (e) {
+    } catch (e: any) {
       if (e.message.match(/Navigation Timeout Exceeded/)) {
         throw new FetchError('no_response', true);
       } else {
@@ -185,7 +185,7 @@ export class BrowserPage {
           url: reqUrl,
           ipPrefixes: RESTRICTED_IPS,
         });
-      } catch (err) {
+      } catch (err: any) {
         if (!err.message.includes('ENOTFOUND')) {
           console.error(err);
           this.#metrics.blockedRequests += 1;
@@ -216,7 +216,7 @@ export class BrowserPage {
           return;
         }
         await req.continue();
-      } catch (e) {
+      } catch (e: any) {
         if (!e.message.match(/Request is already handled/)) {
           throw e;
         }
@@ -240,7 +240,7 @@ export class BrowserPage {
           // Not every request has the content-length header, the byteLength match perfectly
           // but does not necessarly represent what was transfered (if it was gzipped for example)
           cl = (await res.buffer()).byteLength;
-        } catch (e) {
+        } catch (e: any) {
           if (IGNORED_ERRORS.some((msg) => e.message.includes(msg))) {
             return;
           }
