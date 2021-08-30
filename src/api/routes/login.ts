@@ -85,7 +85,7 @@ export async function processLogin(
       cookies,
       timeout,
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 }

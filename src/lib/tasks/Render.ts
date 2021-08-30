@@ -18,7 +18,7 @@ export class RenderTask extends Task<RenderTaskParams> {
     let response: HTTPResponse;
     try {
       response = await this.page.goto(url);
-    } catch (err) {
+    } catch (err: any) {
       this.results = {
         error: err.message,
         timeout: Boolean(err.timeout),

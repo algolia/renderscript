@@ -12,7 +12,7 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     try {
       await this.page.goto(url);
-    } catch (err) {
+    } catch (err: any) {
       this.results = {
         error: err.message,
         timeout: Boolean(err.timeout),
@@ -52,7 +52,7 @@ export class LoginTask extends Task<LoginTaskParams> {
         passwordInput = await page!.$(
           'input[type=password]:not([aria-hidden="true"])'
         );
-      } catch (err) {
+      } catch (err: any) {
         console.log('Found no password input on the page');
         const body = await this.page.renderBody(new URL(page!.url()));
 
@@ -73,7 +73,7 @@ export class LoginTask extends Task<LoginTaskParams> {
         passwordInput!.press('Enter'),
       ]);
       loginResponse = navigationResponse;
-    } catch (err) {
+    } catch (err: any) {
       console.log(
         `Error while logging in: ${err.message} (url=${page!.url()})`
       );

@@ -56,7 +56,7 @@ export async function render(
       .header('Content-Type', 'text/html')
       .header('Content-Security-Policy', CSP_HEADERS)
       .send(body);
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       error: err.message,
     });
@@ -101,7 +101,7 @@ export async function renderJSON(
       body,
       timeout,
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
     console.error(err);
   }
