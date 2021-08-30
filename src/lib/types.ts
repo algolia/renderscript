@@ -10,7 +10,7 @@ export type TaskFromAPI = Omit<TaskBaseParams, 'type' | 'url' | 'userAgent'> & {
 };
 
 export interface TaskBaseParams {
-  type: 'render' | 'login';
+  type: 'login' | 'render';
   url: URL;
   userAgent: string;
   adblock?: boolean;
@@ -35,7 +35,7 @@ export interface LoginTaskParams extends TaskBaseParams {
   };
 }
 
-export type TaskParams = RenderTaskParams | LoginTaskParams;
+export type TaskParams = LoginTaskParams | RenderTaskParams;
 
 export interface TaskFinal extends TaskResult {
   metrics: Metrics;
