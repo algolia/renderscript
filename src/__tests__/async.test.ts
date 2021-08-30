@@ -40,7 +40,7 @@ it('should wait by default for 0ms', async () => {
   expect(json.body).not.toMatch('4. setTimeout 1000');
 });
 
-it('should wait 5000ms', async () => {
+it('should wait 6000ms', async () => {
   const { res, body } = await request('http://localhost:3000/render', {
     method: 'POST',
     headers: {
@@ -50,14 +50,14 @@ it('should wait 5000ms', async () => {
       url: 'http://localhost:3000/test-website/async.html',
       ua: 'Algolia Crawler',
       waitTime: {
-        min: 5000,
+        min: 6000,
       },
     }),
   });
 
   const json = JSON.parse(body);
   expect(res.statusCode).toEqual(200);
-  expect(json.metrics.total).toBeGreaterThanOrEqual(5000);
-  expect(json.metrics.total).toBeLessThanOrEqual(6000);
+  expect(json.metrics.total).toBeGreaterThanOrEqual(6000);
+  expect(json.metrics.total).toBeLessThanOrEqual(7000);
   expect(json.body).toMatch('5. setTimeout 5000');
 });
