@@ -96,10 +96,11 @@ export class Api {
     });
 
     this._app.post('/secure/login', this._csrfProtection, (req, res) => {
-      const { username, password } = req.body;
+      const { username, password, redirect } = req.body;
       this._renderLoginResult({
         username,
         password,
+        redirect,
         res,
       });
     });
@@ -151,14 +152,18 @@ export class Api {
   private _renderLoginResult({
     username,
     password,
+    redirect,
     res,
   }: {
     username: string;
     password: string;
+    redirect?: boolean;
     res: express.Response;
   }): void {
     const granted = username === 'admin' && password === 'password';
-    const setCookie = granted ? SESSION_COOKIE : DELETE_COOKIE;
+    const setCookie = `${
+      granted ? SESSION_COOKIE : DELETE_COOKIE
+    }; SameSite=Strict`;
     console.log(
       `[renderLoginResult] username: ${username}, password: ${password} => set-cookie: ${setCookie}`
     );
@@ -167,9 +172,16 @@ export class Api {
       .set('Set-Cookie', setCookie)
       .status(granted ? 200 : 401)
       .send(
-        `<!DOCTYPE html><html lang="en"><body>${
-          granted ? 'OK' : 'NOK'
-        }</body></html>`
+        `<!DOCTYPE html><html lang="en">${
+          redirect
+            ? `<script>
+// Redirect after 500ms to reproduce https://github.com/algolia/renderscript/pull/394
+setTimeout(() => {
+  window.location = new URL('/secure/test', window.location);
+}, 500);
+</script>`
+            : ''
+        }<body>${granted ? 'OK' : 'NOK'}</body></html>`
       );
   }
 }

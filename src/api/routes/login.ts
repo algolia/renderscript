@@ -37,7 +37,7 @@ export async function processLogin(
       ua: string;
       username: string;
       password: string;
-      renderHTML?: boolean;
+      renderHTML?: string;
       waitTime?: {
         min?: number;
         max?: number;
@@ -47,6 +47,7 @@ export async function processLogin(
   res: express.Response
 ): Promise<void> {
   const { url, ua, username, password, renderHTML, waitTime } = req.body;
+  const renderHTMLInBoolean = renderHTML === 'true';
   const headersToForward = getForwardedHeadersFromRequest(req);
 
   try {
@@ -60,12 +61,12 @@ export async function processLogin(
           username,
           password,
         },
-        renderHTML,
+        renderHTML: renderHTMLInBoolean,
         waitTime,
       });
 
     if (error) {
-      if (renderHTML) {
+      if (renderHTMLInBoolean) {
         res
           .status(200)
           .header('Content-Type', 'text/html')
@@ -77,7 +78,7 @@ export async function processLogin(
       return;
     }
 
-    if (renderHTML) {
+    if (renderHTMLInBoolean) {
       res
         .status(statusCode!)
         .header('Content-Type', 'text/html')
