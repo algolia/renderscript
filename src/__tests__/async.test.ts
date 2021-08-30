@@ -37,7 +37,7 @@ it('should wait by default for 0ms', async () => {
   const json = JSON.parse(body);
   expect(res.statusCode).toEqual(200);
   expect(json.metrics.total).toBeLessThanOrEqual(2000);
-  expect(json.body).toMatch('setTimeout 1000');
+  expect(json.body).not.toMatch('4. setTimeout 1000');
 });
 
 it('should wait 5000ms', async () => {
@@ -59,5 +59,5 @@ it('should wait 5000ms', async () => {
   expect(res.statusCode).toEqual(200);
   expect(json.metrics.total).toBeGreaterThanOrEqual(5000);
   expect(json.metrics.total).toBeLessThanOrEqual(6000);
-  expect(json.body).toMatch('setTimeout 5000');
+  expect(json.body).toMatch('5. setTimeout 5000');
 });
