@@ -22,7 +22,7 @@ it('should render async page', async () => {
   expect(cleanString(body)).toMatchSnapshot();
 });
 
-it('should wait by default for 2000ms', async () => {
+it('should wait by default for 0ms', async () => {
   const { res, body } = await request('http://localhost:3000/render', {
     method: 'POST',
     headers: {
@@ -36,8 +36,7 @@ it('should wait by default for 2000ms', async () => {
 
   const json = JSON.parse(body);
   expect(res.statusCode).toEqual(200);
-  expect(json.metrics.total).toBeGreaterThanOrEqual(2000);
-  expect(json.metrics.total).toBeLessThanOrEqual(3000);
+  expect(json.metrics.total).toBeLessThanOrEqual(2000);
   expect(json.body).toMatch('setTimeout 1000');
 });
 
