@@ -33,6 +33,7 @@ export interface LoginTaskParams extends TaskBaseParams {
     username: string;
     password: string;
   };
+  renderHTML?: boolean;
 }
 
 export type TaskParams = LoginTaskParams | RenderTaskParams;

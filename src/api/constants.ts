@@ -11,7 +11,7 @@ export const CSP_HEADERS = [
   'font-src *',
 ].join('; ');
 
-export const SESSION_COOKIE = 'sessionToken=53cu23_535510n; SameSite=Strict';
+export const SESSION_COOKIE = 'sessionToken=53cu23_535510n';
 
 export const DELETE_COOKIE =
-  'sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict';
+  'sessionToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT';

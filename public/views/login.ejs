@@ -10,8 +10,18 @@
     <input type="text" id="username" name="username" autofocus><br>
     <label for="password">Password:</label><br>
     <input type="password" id="password" name="password"><br><br>
+    <input type="checkbox" id="redirect" name="redirect">
+    <label for="redirect">Redirect after login</label><br><br>
     <input type="submit" value="Log-in">
 </form>
+
+<script>
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirect = searchParams.get('redirect');
+  if (redirect === 'true') {
+    document.getElementById('redirect').checked = true;
+  }
+</script>
 
 </body>
 </html>

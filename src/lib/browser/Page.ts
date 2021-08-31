@@ -139,6 +139,7 @@ export class BrowserPage {
   }
 
   async renderBody(url: URL): Promise<string> {
+    console.log(`Rendering page ${url.href}...`);
     const baseHref = `${url.protocol}//${url.host}`;
 
     await this.#page!.evaluate(injectBaseHref, baseHref);

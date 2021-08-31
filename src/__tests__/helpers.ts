@@ -19,17 +19,21 @@ export async function sendLoginRequest({
   url,
   username,
   password,
+  renderHTML,
 }: {
   url: string;
   username: string;
   password: string;
+  renderHTML?: string;
 }): Promise<{ res: ResponseData; body: string }> {
   return await request('http://localhost:3000/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: `url=${url}&username=${username}&password=${password}&ua=Algolia Crawler`,
+    body: `url=${url}&username=${username}&password=${password}&ua=Algolia Crawler&renderHTML=${Boolean(
+      renderHTML
+    )}`,
   });
 }
 

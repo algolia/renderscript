@@ -129,3 +129,35 @@ it('should works but not get a session token with bad credentials', async () => 
     cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
   ).not.toBeUndefined();
 });
+
+describe('JavaScript redirect', () => {
+  it('should fail to renderHTML because of the JS redirect', async () => {
+    const { res, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login?redirect=true',
+      username: 'admin',
+      password: 'password',
+      renderHTML: 'true',
+    });
+
+    // Page rending crashes because of the JS redirection (c.f. _renderLoginResult()), with the following error:
+    // Error: Execution context was destroyed, most likely because of a navigation.
+    expect(res.statusCode).toEqual(500);
+
+    const jsonBody = JSON.parse(body);
+    expect(jsonBody.error).toEqual('Invalid status code: undefined');
+  });
+
+  it('should not try to render the body if renderHTML was not requested', async () => {
+    const { res, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login?redirect=true',
+      username: 'admin',
+      password: 'password',
+    });
+
+    // Since we didn't try to render, it returns the current cookies, even if there is an ongoing JS redirection
+    expect(res.statusCode).toEqual(200);
+
+    const jsonBody = JSON.parse(body);
+    expect(jsonBody.body).toBeUndefined();
+  });
+});
