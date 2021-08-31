@@ -1,3 +1,10 @@
+## [1.11.5](https://github.com/algolia/renderscript/compare/v1.11.4...v1.11.5) (2021-08-31)
+
+
+### Bug Fixes
+
+* **login:** wait more and dont renderHTML if not needed ([#394](https://github.com/algolia/renderscript/issues/394)) ([1a4c649](https://github.com/algolia/renderscript/commit/1a4c6491f56793e9f75464694fec39f8dca01c2a))
+
 ## [1.11.4](https://github.com/algolia/renderscript/compare/v1.11.3...v1.11.4) (2021-08-27)
 
 
