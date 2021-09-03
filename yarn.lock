@@ -1324,10 +1324,10 @@ ajv@^8.0.1:
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
-altheia-async-data-validator@5.0.11:
-  version "5.0.11"
-  resolved "https://registry.yarnpkg.com/altheia-async-data-validator/-/altheia-async-data-validator-5.0.11.tgz#517df521f727ca2b5cf5a870fa1e7e13ba645ec5"
-  integrity sha512-15FIAwp1mdAccSMiiUxBDEy6VeUhAv4F2MgGgGKD2hi08x1GH6X2K6KufCxmNCxA8C/tb2yJXtRbZdc6KI/KfA==
+altheia-async-data-validator@5.0.12:
+  version "5.0.12"
+  resolved "https://registry.yarnpkg.com/altheia-async-data-validator/-/altheia-async-data-validator-5.0.12.tgz#11b8347ed6c71cc8c75b81d47d3c2a45b81df909"
+  integrity sha512-3doQfFksSQDWIT5YtGZtcYOSSF24eoQidpNz/lHUOEjlTEZ2prHiK1dPcJDBHskRKZORUTe6T05rduRmo4mnMw==
   dependencies:
     lodash "^4.17.21"
 
