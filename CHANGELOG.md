@@ -1,3 +1,10 @@
+## [1.11.6](https://github.com/algolia/renderscript/compare/v1.11.5...v1.11.6) (2021-09-03)
+
+
+### Bug Fixes
+
+* **deps:** update dependency altheia-async-data-validator to v5.0.12 ([#405](https://github.com/algolia/renderscript/issues/405)) ([d0778e7](https://github.com/algolia/renderscript/commit/d0778e707298fa2093f12f4f292bbfc1d7d9025e))
+
 ## [1.11.5](https://github.com/algolia/renderscript/compare/v1.11.4...v1.11.5) (2021-08-31)
 
 
