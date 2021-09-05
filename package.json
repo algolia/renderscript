@@ -35,7 +35,7 @@
     "url": "https://github.com/algolia/renderscript/issues"
   },
   "engines": {
-    "node": "14.17.5",
+    "node": "14.17.6",
     "yarn": "^1.19.0"
   },
   "homepage": "https://github.com/algolia/renderscript#readme",
@@ -46,7 +46,7 @@
     "@types/csurf": "1.11.2",
     "@types/express": "4.17.13",
     "@types/jest": "27.0.1",
-    "@types/node": "14.17.12",
+    "@types/node": "14.17.14",
     "@types/uuid": "8.3.1",
     "@typescript-eslint/eslint-plugin": "4.30.0",
     "@typescript-eslint/parser": "4.30.0",
