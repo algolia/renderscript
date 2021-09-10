@@ -61,3 +61,64 @@ it('should wait 6000ms', async () => {
   expect(json.metrics.total).toBeLessThanOrEqual(7000);
   expect(json.body).toMatch('5. setTimeout 5000');
 });
+
+describe('redirects', () => {
+  describe('server redirect', () => {
+    it('should return the redirection', async () => {
+      const { res } = await request('http://localhost:3000/render', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: 'http://localhost:3000/301',
+          ua: 'Algolia Crawler',
+        }),
+      });
+
+      expect(res.statusCode).toEqual(307);
+      expect(res.headers.location).toEqual(
+        'http://localhost:3000/test-website/basic.html'
+      );
+    });
+  });
+
+  describe('client redirect', () => {
+    it('should return the redirection', async () => {
+      const { res } = await request('http://localhost:3000/render', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: 'http://localhost:3000/test-website/meta-refresh.html',
+          ua: 'Algolia Crawler',
+        }),
+      });
+
+      expect(res.statusCode).toEqual(307);
+      expect(res.headers.location).toEqual(
+        'http://localhost:3000/test-website/basic.html'
+      );
+    });
+
+    it('should return the redirection even if not executed yet', async () => {
+      const { res } = await request('http://localhost:3000/render', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          // The client redirection happens after 5 seconds
+          url: 'http://localhost:3000/test-website/meta-refresh-5.html',
+          ua: 'Algolia Crawler',
+        }),
+      });
+
+      expect(res.statusCode).toEqual(307);
+      expect(res.headers.location).toEqual(
+        'http://localhost:3000/test-website/basic.html'
+      );
+    });
+  });
+});
