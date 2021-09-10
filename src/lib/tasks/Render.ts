@@ -10,6 +10,7 @@ export class RenderTask extends Task<RenderTaskParams> {
   async process(): Promise<void> {
     const { url, waitTime } = this.params;
     const { page } = this.page;
+    const baseHref = `${url.protocol}//${url.host}`;
 
     const total = Date.now();
     const minWait = waitTime!.min;
@@ -27,16 +28,56 @@ export class RenderTask extends Task<RenderTaskParams> {
     }
     this.metrics.goto = Date.now() - start;
 
-    /* Transforming */
     const statusCode = response.status();
-    const baseHref = `${url.protocol}//${url.host}`;
-    await page!.evaluate(injectBaseHref, baseHref);
+    const headers = response.headers();
 
     start = Date.now();
     if (statusCode === 200 && minWait) {
       await page!.waitForTimeout(minWait - (Date.now() - total));
     }
     this.metrics.minWait = Date.now() - start;
+
+    if (page!.url() !== url.href) {
+      this.results = {
+        statusCode,
+        headers,
+        resolvedUrl: page!.url(),
+      };
+      return;
+    }
+
+    try {
+      const metaRefreshElement = await page!.$('meta[http-equiv="refresh"]');
+      if (metaRefreshElement) {
+        console.log(await metaRefreshElement.jsonValue());
+        const metaRefreshContent = await metaRefreshElement.getProperty(
+          'content'
+        );
+        const refreshContent = await metaRefreshContent?.jsonValue<string>();
+        const match = refreshContent?.match(/\d+;\s(?:url|URL)=(.*)/);
+        if (match) {
+          const matchedURL = match[1].replace(/'/g, ''); // Sometimes URLs are surrounded by quotes
+          const redirectURL = matchedURL.startsWith('/')
+            ? `${baseHref}${matchedURL}`
+            : match[1];
+          console.log(`Meta refresh found. Redirecting to ${redirectURL}...`);
+          this.results = {
+            statusCode,
+            headers,
+            resolvedUrl: redirectURL,
+          };
+          return;
+        }
+      }
+    } catch (e) {
+      console.log(
+        'Error while trying to check for meta[http-equive="refresh"]',
+        e
+      );
+    }
+
+    /* Transforming */
+    await page!.evaluate(injectBaseHref, baseHref);
 
     start = Date.now();
     /**
@@ -51,7 +92,6 @@ export class RenderTask extends Task<RenderTaskParams> {
     const body = (await page!.evaluate(
       'document.firstElementChild.outerHTML'
     )) as string;
-    const headers = response.headers();
     const resolvedUrl = (await page!.evaluate(
       'window.location.href'
     )) as string;
