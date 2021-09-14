@@ -1,3 +1,10 @@
+## [1.11.8](https://github.com/algolia/renderscript/compare/v1.11.7...v1.11.8) (2021-09-14)
+
+
+### Bug Fixes
+
+* redirects optimizations ([#411](https://github.com/algolia/renderscript/issues/411)) ([46016b7](https://github.com/algolia/renderscript/commit/46016b7940dfee1b4fd769888547e5ea89a88cbb))
+
 ## [1.11.7](https://github.com/algolia/renderscript/compare/v1.11.6...v1.11.7) (2021-09-04)
 
 
