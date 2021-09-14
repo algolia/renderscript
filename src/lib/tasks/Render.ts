@@ -10,7 +10,7 @@ export class RenderTask extends Task<RenderTaskParams> {
   async process(): Promise<void> {
     const { url, waitTime } = this.params;
     const { page } = this.page;
-    const baseHref = `${url.protocol}//${url.host}`;
+    const baseHref = url.origin;
 
     const total = Date.now();
     const minWait = waitTime!.min;
@@ -49,7 +49,6 @@ export class RenderTask extends Task<RenderTaskParams> {
     try {
       const metaRefreshElement = await page!.$('meta[http-equiv="refresh"]');
       if (metaRefreshElement) {
-        console.log(await metaRefreshElement.jsonValue());
         const metaRefreshContent = await metaRefreshElement.getProperty(
           'content'
         );
