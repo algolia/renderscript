@@ -87,6 +87,10 @@ export class Api {
   private _privateRoutes(): void {
     this._app.use(expressStatic(path.join(projectRoot, '/public')));
 
+    this._app.get('/301', (req, res) =>
+      res.redirect(301, '/test-website/basic.html')
+    );
+
     // Login form with CSRF protection
     this._app.get('/secure/login', this._csrfProtection, (req, res) => {
       res.render('login', {
