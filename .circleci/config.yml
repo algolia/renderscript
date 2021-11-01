@@ -18,7 +18,7 @@ aliases:
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: circleci/node:14.18.0
+    - image: circleci/node:16.13.0
   environment:
     NODE_ENV: 'test'
 
