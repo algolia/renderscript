@@ -61,7 +61,7 @@ jobs:
 
       - run:
           command: |
-          sleep 10s && npm run test
+            sleep 10s && npm run test
 
   release:
     <<: *defaults
