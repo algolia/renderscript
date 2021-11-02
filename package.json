@@ -46,7 +46,7 @@
     "@types/csurf": "1.11.2",
     "@types/express": "4.17.13",
     "@types/jest": "27.0.2",
-    "@types/node": "14.17.21",
+    "@types/node": "16.11.6",
     "@types/uuid": "8.3.1",
     "@typescript-eslint/eslint-plugin": "5.2.0",
     "@typescript-eslint/parser": "5.2.0",
@@ -83,7 +83,7 @@
     "hot-shots": "8.5.2",
     "puppeteer-core": "10.4.0",
     "stream-to-string": "1.2.0",
-    "undici": "4.3.1",
+    "undici": "4.9.3",
     "uuid": "8.3.2"
   }
 }
