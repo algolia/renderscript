@@ -1,3 +1,10 @@
+## [1.11.12](https://github.com/algolia/renderscript/compare/v1.11.11...v1.11.12) (2021-11-02)
+
+
+### Bug Fixes
+
+* lint + wait for api ([391c23f](https://github.com/algolia/renderscript/commit/391c23f03ae9ae1581e02dbca2826ab2909dea6b))
+
 ## [1.11.11](https://github.com/algolia/renderscript/compare/v1.11.10...v1.11.11) (2021-10-15)
 
 
