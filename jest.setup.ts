@@ -4,8 +4,11 @@ import { wait } from './src/helpers/wait';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export default async function setup() {
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
+  const max = 50;
+  let curr = 0;
+
+  while (curr < max) {
+    curr += 1;
     try {
       const { statusCode } = await request('http://localhost:3000/ready');
       console.log('API statusCode:', statusCode);
@@ -17,7 +20,7 @@ export default async function setup() {
     } catch (e: any) {
       console.log(e.message);
     } finally {
-      await wait(300);
+      await wait(500);
     }
   }
 }
