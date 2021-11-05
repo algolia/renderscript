@@ -80,7 +80,7 @@
     "cookie-parser": "1.4.5",
     "csurf": "1.11.0",
     "express": "4.17.1",
-    "hot-shots": "8.5.2",
+    "hot-shots": "9.0.0",
     "puppeteer-core": "10.4.0",
     "stream-to-string": "1.2.0",
     "undici": "4.3.1",
