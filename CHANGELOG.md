@@ -1,3 +1,10 @@
+## [1.11.14](https://github.com/algolia/renderscript/compare/v1.11.13...v1.11.14) (2021-11-09)
+
+
+### Bug Fixes
+
+* **deps:** update dependency hot-shots to v9 ([#462](https://github.com/algolia/renderscript/issues/462)) ([d3c2743](https://github.com/algolia/renderscript/commit/d3c2743d272afa8a0216a5cb519d28508c8ab741))
+
 ## [1.11.13](https://github.com/algolia/renderscript/compare/v1.11.12...v1.11.13) (2021-11-06)
 
 
