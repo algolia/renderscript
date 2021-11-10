@@ -36,5 +36,8 @@ module.exports = {
       'error',
       { props: true, ignorePropertyModificationsFor: ['res', 'req'] }, // http://expressjs.com/en/api.html#res.locals
     ],
+
+    // TMP
+    'jsdoc/check-examples': ['off'],
   },
 };

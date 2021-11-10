@@ -1,3 +1,24 @@
+## [1.11.14](https://github.com/algolia/renderscript/compare/v1.11.13...v1.11.14) (2021-11-09)
+
+
+### Bug Fixes
+
+* **deps:** update dependency hot-shots to v9 ([#462](https://github.com/algolia/renderscript/issues/462)) ([d3c2743](https://github.com/algolia/renderscript/commit/d3c2743d272afa8a0216a5cb519d28508c8ab741))
+
+## [1.11.13](https://github.com/algolia/renderscript/compare/v1.11.12...v1.11.13) (2021-11-06)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @algolia/dns-filter to v1.1.24 ([#463](https://github.com/algolia/renderscript/issues/463)) ([94107db](https://github.com/algolia/renderscript/commit/94107dbd50c64410aeee18b7609ae8c9f7277056))
+
+## [1.11.12](https://github.com/algolia/renderscript/compare/v1.11.11...v1.11.12) (2021-11-02)
+
+
+### Bug Fixes
+
+* lint + wait for api ([391c23f](https://github.com/algolia/renderscript/commit/391c23f03ae9ae1581e02dbca2826ab2909dea6b))
+
 ## [1.11.11](https://github.com/algolia/renderscript/compare/v1.11.10...v1.11.11) (2021-10-15)
 
 
