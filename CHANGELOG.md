@@ -1,3 +1,10 @@
+## [1.11.16](https://github.com/algolia/renderscript/compare/v1.11.15...v1.11.16) (2021-11-19)
+
+
+### Bug Fixes
+
+* **deps:** update dependency cookie-parser to v1.4.6 ([#470](https://github.com/algolia/renderscript/issues/470)) ([3c341e6](https://github.com/algolia/renderscript/commit/3c341e60002791b8cbddbf46bcb71af401585fa8))
+
 ## [1.11.15](https://github.com/algolia/renderscript/compare/v1.11.14...v1.11.15) (2021-11-12)
 
 
