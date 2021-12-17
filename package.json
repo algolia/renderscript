@@ -64,7 +64,7 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-promise": "5.2.0",
-    "jest": "27.4.3",
+    "jest": "27.4.5",
     "nodemon": "2.0.15",
     "prettier": "2.5.1",
     "semantic-release": "18.0.1",
