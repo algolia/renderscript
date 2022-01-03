@@ -50,7 +50,7 @@ export class Browser {
       },
       handleSIGINT: false,
       handleSIGTERM: false,
-      // pipe: true,
+      pipe: true,
       args: flags,
     });
     stats.timing('renderscript.create', Date.now() - start);
