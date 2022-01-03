@@ -26,6 +26,7 @@ version: 2.1
 
 orbs:
   puppeteer: threetreeslight/puppeteer@0.1.2
+  node: circleci/node@5.0.0
 
 jobs:
   checkout:
@@ -83,7 +84,7 @@ jobs:
             yarn docker:release
 
 workflows:
-  version: 2
+  version: 2.1
   suite:
     jobs:
       - checkout
