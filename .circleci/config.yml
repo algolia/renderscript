@@ -1,4 +1,9 @@
 ---
+version: 2.1
+
+orbs:
+  puppeteer: threetreeslight/puppeteer@0.1.2
+
 aliases:
   # Forward the current folder when using wokflows
   #   persist-to-workspace & attach-workspace
@@ -22,12 +27,6 @@ defaults: &defaults
   environment:
     NODE_ENV: 'test'
 
-version: 2.1
-
-orbs:
-  puppeteer: threetreeslight/puppeteer@0.1.2
-  node: circleci/node@5.0.0
-
 jobs:
   checkout:
     <<: *defaults
@@ -35,7 +34,7 @@ jobs:
     steps:
       - checkout
 
-      - run: *yarn
+      - run: yarn install --non-interactive --cache-folder ~/.cache/yarn
 
       - persist-to-workspace: *persist-work-dir
 
@@ -84,7 +83,7 @@ jobs:
             yarn docker:release
 
 workflows:
-  version: 2.1
+  version: 2
   suite:
     jobs:
       - checkout
