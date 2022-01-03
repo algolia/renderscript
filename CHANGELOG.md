@@ -1,3 +1,38 @@
+## [1.11.19](https://github.com/algolia/renderscript/compare/v1.11.18...v1.11.19) (2022-01-03)
+
+
+### Bug Fixes
+
+* **deps:** update dependency puppeteer-core to v13 ([#495](https://github.com/algolia/renderscript/issues/495)) ([2247a8a](https://github.com/algolia/renderscript/commit/2247a8a86a3a3cb097034036c8e48ae2bfc4de31))
+
+## [1.11.18](https://github.com/algolia/renderscript/compare/v1.11.17...v1.11.18) (2021-12-24)
+
+
+### Bug Fixes
+
+* **deps:** update dependency express to v4.17.2 ([#498](https://github.com/algolia/renderscript/issues/498)) ([f977d45](https://github.com/algolia/renderscript/commit/f977d456c859525097e2100147669d2bdb2b51a0))
+
+## [1.11.17](https://github.com/algolia/renderscript/compare/v1.11.16...v1.11.17) (2021-12-18)
+
+
+### Bug Fixes
+
+* **deps:** update dependency body-parser to v1.19.1 ([#493](https://github.com/algolia/renderscript/issues/493)) ([9c34680](https://github.com/algolia/renderscript/commit/9c34680da0af71f6716230a5795d04664d547d8e))
+
+## [1.11.16](https://github.com/algolia/renderscript/compare/v1.11.15...v1.11.16) (2021-11-19)
+
+
+### Bug Fixes
+
+* **deps:** update dependency cookie-parser to v1.4.6 ([#470](https://github.com/algolia/renderscript/issues/470)) ([3c341e6](https://github.com/algolia/renderscript/commit/3c341e60002791b8cbddbf46bcb71af401585fa8))
+
+## [1.11.15](https://github.com/algolia/renderscript/compare/v1.11.14...v1.11.15) (2021-11-12)
+
+
+### Bug Fixes
+
+* **deps:** update dependency puppeteer-core to v11 ([#464](https://github.com/algolia/renderscript/issues/464)) ([55263f6](https://github.com/algolia/renderscript/commit/55263f6e5d408bf3c5d83140537a86d6b55a382e))
+
 ## [1.11.14](https://github.com/algolia/renderscript/compare/v1.11.13...v1.11.14) (2021-11-09)
 
 
