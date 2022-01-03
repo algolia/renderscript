@@ -56,12 +56,12 @@ jobs:
       - run: yarn build
 
       - run:
-          command: "npm run ci:start"
+          command: "yarn ci:start"
           background: true
 
       - run:
           command: |
-            sleep 10s && npm run test
+            sleep 10s && yarn test
 
   release:
     <<: *defaults
