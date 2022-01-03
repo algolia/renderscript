@@ -4,22 +4,6 @@ version: 2.1
 orbs:
   puppeteer: threetreeslight/puppeteer@0.1.2
 
-aliases:
-  # Forward the current folder when using wokflows
-  #   persist-to-workspace & attach-workspace
-  - &persist-work-dir
-    root: .
-    paths: .
-
-  - &attach-work-dir
-    at: ~/app/
-
-  # Dependencies
-  - &yarn
-    name: Run Yarn
-    command: |
-      yarn install --non-interactive --cache-folder ~/.cache/yarn
-
 defaults: &defaults
   working_directory: ~/app
   docker:
@@ -36,13 +20,17 @@ jobs:
 
       - run: yarn install --non-interactive --cache-folder ~/.cache/yarn
 
-      - persist-to-workspace: *persist-work-dir
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
   lint:
     <<: *defaults
 
     steps:
-      - attach-workspace: *attach-work-dir
+      - attach_workspace:
+          at: ~/app/
 
       - run: yarn lint
 
@@ -50,7 +38,8 @@ jobs:
     <<: *defaults
 
     steps:
-      - attach-workspace: *attach-work-dir
+      - attach_workspace:
+          at: ~/app/
 
       - run: yarn build
 
@@ -66,7 +55,8 @@ jobs:
     <<: *defaults
 
     steps:
-      - attach-workspace: *attach-work-dir
+      - attach_workspace:
+          at: ~/app/
 
       - setup_remote_docker:
           version: 19.03.13
