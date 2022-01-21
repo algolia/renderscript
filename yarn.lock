@@ -1550,10 +1550,10 @@ ajv@^6.10.0, ajv@^6.12.3, ajv@^6.12.4:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-altheia-async-data-validator@5.0.12:
-  version "5.0.12"
-  resolved "https://registry.yarnpkg.com/altheia-async-data-validator/-/altheia-async-data-validator-5.0.12.tgz#11b8347ed6c71cc8c75b81d47d3c2a45b81df909"
-  integrity sha512-3doQfFksSQDWIT5YtGZtcYOSSF24eoQidpNz/lHUOEjlTEZ2prHiK1dPcJDBHskRKZORUTe6T05rduRmo4mnMw==
+altheia-async-data-validator@5.0.13:
+  version "5.0.13"
+  resolved "https://registry.yarnpkg.com/altheia-async-data-validator/-/altheia-async-data-validator-5.0.13.tgz#be583644a148b70dcb51c6f6d792e7e437a4b362"
+  integrity sha512-Vbjkjc0BxJVqBsh/8JKb37/VkYGLtmqXHZkL9Msf0ZU4CZJ+4gSm0UWt9kBG6k4UXqi8ZDTHGKAXrQwghVnfnw==
   dependencies:
     lodash "^4.17.21"
 

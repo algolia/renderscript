@@ -75,7 +75,7 @@
   },
   "dependencies": {
     "@algolia/dns-filter": "1.1.24",
-    "altheia-async-data-validator": "5.0.12",
+    "altheia-async-data-validator": "5.0.13",
     "body-parser": "1.19.1",
     "cookie-parser": "1.4.6",
     "csurf": "1.11.0",
