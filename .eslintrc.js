@@ -5,7 +5,12 @@ module.exports = {
     es2020: true,
     jest: true,
   },
-  extends: ['algolia', 'algolia/typescript', 'plugin:import/typescript'],
+  extends: [
+    'algolia',
+    'algolia/jest',
+    'algolia/typescript',
+    'plugin:import/typescript',
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 11,
