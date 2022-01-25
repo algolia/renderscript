@@ -1,3 +1,10 @@
+## [1.11.22](https://github.com/algolia/renderscript/compare/v1.11.21...v1.11.22) (2022-01-25)
+
+
+### Bug Fixes
+
+* **deps:** update dependency undici to v4.12.2 ([#382](https://github.com/algolia/renderscript/issues/382)) ([2a8c00a](https://github.com/algolia/renderscript/commit/2a8c00a05499c60160bbd035e00764466ae50189))
+
 ## [1.11.21](https://github.com/algolia/renderscript/compare/v1.11.20...v1.11.21) (2022-01-22)
 
 
