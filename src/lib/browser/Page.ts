@@ -203,7 +203,6 @@ export class BrowserPage {
           return;
         }
         if (adblock && adblocker.match(new URL(reqUrl))) {
-          console.log('adblocked', reqUrl);
           this.#metrics.blockedRequests += 1;
           await req.abort();
           return;
