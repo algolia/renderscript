@@ -1,6 +1,7 @@
 import { request } from 'undici';
 
-const list = 'https://badmojr.github.io/1Hosts/Lite/domains.txt';
+const list =
+  'https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/domains.txt';
 
 /**
  * Dead simple adblocking by exact hostname.

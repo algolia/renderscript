@@ -2,132 +2,134 @@ import type { Protocol } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 
 import { sendLoginRequest } from './helpers';
 
-it('should error when no username', async () => {
-  const { res, body } = await sendLoginRequest({
-    url: 'http://localhost:3000/secure/login',
-    username: '',
-    password: 'password',
+describe('login', () => {
+  it('should error when no username', async () => {
+    const { res, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login',
+      username: '',
+      password: 'password',
+    });
+
+    expect(res.statusCode).toBe(400);
+
+    expect(JSON.parse(body)).toEqual({
+      details: [
+        {
+          label: 'username',
+          message: 'username is required',
+          type: 'required',
+        },
+      ],
+      error: true,
+      message: 'Bad Request',
+    });
   });
 
-  expect(res.statusCode).toEqual(400);
+  it('should error when no password', async () => {
+    const { res, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login',
+      username: 'admin',
+      password: '',
+    });
 
-  expect(JSON.parse(body)).toEqual({
-    details: [
-      {
-        label: 'username',
-        message: 'username is required',
-        type: 'required',
-      },
-    ],
-    error: true,
-    message: 'Bad Request',
-  });
-});
+    expect(res.statusCode).toBe(400);
 
-it('should error when no password', async () => {
-  const { res, body } = await sendLoginRequest({
-    url: 'http://localhost:3000/secure/login',
-    username: 'admin',
-    password: '',
-  });
-
-  expect(res.statusCode).toEqual(400);
-
-  expect(JSON.parse(body)).toEqual({
-    details: [
-      {
-        label: 'password',
-        message: 'password is required',
-        type: 'required',
-      },
-    ],
-    error: true,
-    message: 'Bad Request',
-  });
-});
-
-it('should works with correct credentials', async () => {
-  const { res, body } = await sendLoginRequest({
-    url: 'http://localhost:3000/secure/login',
-    username: 'admin',
-    password: 'password',
+    expect(JSON.parse(body)).toEqual({
+      details: [
+        {
+          label: 'password',
+          message: 'password is required',
+          type: 'required',
+        },
+      ],
+      error: true,
+      message: 'Bad Request',
+    });
   });
 
-  expect(res.statusCode).toEqual(200);
+  it('should works with correct credentials', async () => {
+    const { res, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login',
+      username: 'admin',
+      password: 'password',
+    });
 
-  const cookies = JSON.parse(body).cookies;
-  expect(
-    cookies.find(
-      (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
-    )
-  ).toMatchSnapshot();
-  // Check that we actually went through the form
-  expect(
-    cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
-  ).not.toBeUndefined();
-});
+    expect(res.statusCode).toBe(200);
 
-it('should works even with a 2-steps login', async () => {
-  const { res, body } = await sendLoginRequest({
-    url: 'http://localhost:3000/secure/login/step1',
-    username: 'admin',
-    password: 'password',
+    const cookies = JSON.parse(body).cookies;
+    expect(
+      cookies.find(
+        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
+      )
+    ).toMatchSnapshot();
+    // Check that we actually went through the form
+    expect(
+      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
+    ).toBeDefined();
   });
 
-  expect(res.statusCode).toEqual(200);
+  it('should works even with a 2-steps login', async () => {
+    const { res, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login/step1',
+      username: 'admin',
+      password: 'password',
+    });
 
-  const cookies = JSON.parse(body).cookies;
-  expect(
-    cookies.find(
-      (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
-    )
-  ).toMatchSnapshot();
-  // Check that we actually went through the form
-  expect(
-    cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
-  ).not.toBeUndefined();
-});
+    expect(res.statusCode).toBe(200);
 
-it('should works with a 2-steps JS login', async () => {
-  const { res, body } = await sendLoginRequest({
-    url: 'http://localhost:3000/secure/login/2steps',
-    username: 'admin',
-    password: 'password',
+    const cookies = JSON.parse(body).cookies;
+    expect(
+      cookies.find(
+        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
+      )
+    ).toMatchSnapshot();
+    // Check that we actually went through the form
+    expect(
+      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
+    ).toBeDefined();
   });
 
-  expect(res.statusCode).toEqual(200);
+  it('should works with a 2-steps JS login', async () => {
+    const { res, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login/2steps',
+      username: 'admin',
+      password: 'password',
+    });
 
-  const cookies = JSON.parse(body).cookies;
-  expect(
-    cookies.find(
-      (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
-    )
-  ).toMatchSnapshot();
-  // Check that we actually went through the form
-  expect(
-    cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
-  ).not.toBeUndefined();
-});
+    expect(res.statusCode).toBe(200);
 
-it('should works but not get a session token with bad credentials', async () => {
-  const { res, body } = await sendLoginRequest({
-    url: 'http://localhost:3000/secure/login',
-    username: 'admin',
-    password: 'admin',
+    const cookies = JSON.parse(body).cookies;
+    expect(
+      cookies.find(
+        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
+      )
+    ).toMatchSnapshot();
+    // Check that we actually went through the form
+    expect(
+      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
+    ).toBeDefined();
   });
 
-  expect(res.statusCode).toEqual(200);
+  it('should works but not get a session token with bad credentials', async () => {
+    const { res, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/secure/login',
+      username: 'admin',
+      password: 'admin',
+    });
 
-  const cookies = JSON.parse(body).cookies;
-  expect(
-    cookies.find(
-      (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
-    )
-  ).toBeUndefined();
-  // Check that we actually went through the form
-  expect(
-    cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
-  ).not.toBeUndefined();
+    expect(res.statusCode).toBe(200);
+
+    const cookies = JSON.parse(body).cookies;
+    expect(
+      cookies.find(
+        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
+      )
+    ).toBeUndefined();
+    // Check that we actually went through the form
+    expect(
+      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
+    ).toBeDefined();
+  });
 });
 
 describe('JavaScript redirect', () => {
@@ -141,10 +143,10 @@ describe('JavaScript redirect', () => {
 
     // Page rending crashes because of the JS redirection (c.f. _renderLoginResult()), with the following error:
     // Error: Execution context was destroyed, most likely because of a navigation.
-    expect(res.statusCode).toEqual(500);
+    expect(res.statusCode).toBe(500);
 
     const jsonBody = JSON.parse(body);
-    expect(jsonBody.error).toEqual('Invalid status code: undefined');
+    expect(jsonBody.error).toBe('Invalid status code: undefined');
   });
 
   it('should not try to render the body if renderHTML was not requested', async () => {
@@ -155,7 +157,7 @@ describe('JavaScript redirect', () => {
     });
 
     // Since we didn't try to render, it returns the current cookies, even if there is an ongoing JS redirection
-    expect(res.statusCode).toEqual(200);
+    expect(res.statusCode).toBe(200);
 
     const jsonBody = JSON.parse(body);
     expect(jsonBody.body).toBeUndefined();
