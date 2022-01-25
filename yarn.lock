@@ -6818,10 +6818,10 @@ undefsafe@^2.0.5:
   resolved "https://registry.yarnpkg.com/undefsafe/-/undefsafe-2.0.5.tgz#38733b9327bdcd226db889fb723a6efd162e6e2c"
   integrity sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==
 
-undici@4.3.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-4.3.1.tgz#f576638a3d6e157210a87c02b006236243c86780"
-  integrity sha512-Oy61gPuXBE4Em/1t8QeKOSHGSqbPHLW1iRbCztbyHuKusz5j7d7b4Z9Xi8b7yFqHyCNe57SSDjBgmSUjfPCymw==
+undici@4.12.2:
+  version "4.12.2"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-4.12.2.tgz#f2fc50ca77a774ed8c0e7067c9361ee18a2f422b"
+  integrity sha512-RZj6SbkQFs5O/pJCboGEo6l5DTCe3Zg4r/8Z/0/2qnIv08+s6zL4akohOPMYWKc3mzwv15WTvsfMWaafZcvYoQ==
 
 unique-filename@^1.1.1:
   version "1.1.1"
