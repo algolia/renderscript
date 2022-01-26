@@ -20,5 +20,9 @@ export async function getChromiumExecutablePath(): Promise<string> {
     console.info(`Downloaded Chromium rev ${revision}`);
   }
 
+  if (!revisionInfo) {
+    throw new Error('No RevisionInfo');
+  }
+
   return revisionInfo.executablePath;
 }
