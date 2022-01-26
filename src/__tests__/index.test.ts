@@ -144,7 +144,7 @@ describe('main', () => {
     expect(json.metrics.total).toBeLessThanOrEqual(2100);
     expect(json.metrics.page.layoutDuration).toBeLessThanOrEqual(10);
     expect(json.metrics.page.scriptDuration).toBeLessThanOrEqual(10);
-    expect(json.metrics.page.taskDuration).toBeLessThanOrEqual(30);
+    expect(json.metrics.page.taskDuration).toBeLessThanOrEqual(40);
     expect(json.metrics.page.jsHeapUsedSize).toBeLessThanOrEqual(1617360);
     expect(json.metrics.page.jsHeapTotalSize).toBeLessThanOrEqual(2639520);
     expect(json.metrics.page.requests).toBe(1);

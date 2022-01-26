@@ -11,16 +11,18 @@ export default async function setup() {
     curr += 1;
     try {
       const { statusCode } = await request('http://localhost:3000/ready');
-      console.log('API statusCode:', statusCode);
+      console.log('API statusCode:', statusCode, `(retries: ${curr})`);
 
       if (statusCode === 200) {
         console.log('API Ready');
-        break;
+        return;
       }
     } catch (e: any) {
       console.log(e.message);
     } finally {
-      await wait(500);
+      await wait(1000);
     }
   }
+
+  throw Error('API did not reach ready status');
 }

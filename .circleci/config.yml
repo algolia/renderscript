@@ -2,7 +2,7 @@
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: cimg/node:14.18.3-browsers
+    - image: cimg/node:16.13.1-browsers
   environment:
     NODE_ENV: 'test'
 
