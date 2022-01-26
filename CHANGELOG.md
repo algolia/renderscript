@@ -1,3 +1,24 @@
+## [1.11.22](https://github.com/algolia/renderscript/compare/v1.11.21...v1.11.22) (2022-01-25)
+
+
+### Bug Fixes
+
+* **deps:** update dependency undici to v4.12.2 ([#382](https://github.com/algolia/renderscript/issues/382)) ([2a8c00a](https://github.com/algolia/renderscript/commit/2a8c00a05499c60160bbd035e00764466ae50189))
+
+## [1.11.21](https://github.com/algolia/renderscript/compare/v1.11.20...v1.11.21) (2022-01-22)
+
+
+### Bug Fixes
+
+* **deps:** update dependency puppeteer-core to v13.1.1 ([#520](https://github.com/algolia/renderscript/issues/520)) ([d492fa2](https://github.com/algolia/renderscript/commit/d492fa2d8611ed25e5eb839862b6727380a13083))
+
+## [1.11.20](https://github.com/algolia/renderscript/compare/v1.11.19...v1.11.20) (2022-01-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency altheia-async-data-validator to v5.0.13 ([#515](https://github.com/algolia/renderscript/issues/515)) ([f63e4e3](https://github.com/algolia/renderscript/commit/f63e4e384ed298660da608bde7af3119d91fe851))
+
 ## [1.11.19](https://github.com/algolia/renderscript/compare/v1.11.18...v1.11.19) (2022-01-03)
 
 

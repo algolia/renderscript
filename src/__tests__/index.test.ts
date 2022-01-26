@@ -6,7 +6,7 @@ describe('main', () => {
   it('should error when no url', async () => {
     const { res, body } = await request('http://localhost:3000/render?');
 
-    expect(res.statusCode).toEqual(400);
+    expect(res.statusCode).toBe(400);
 
     expect(JSON.parse(body)).toEqual({
       details: [
@@ -23,7 +23,7 @@ describe('main', () => {
       'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html'
     );
 
-    expect(res.statusCode).toEqual(400);
+    expect(res.statusCode).toBe(400);
 
     expect(JSON.parse(body)).toEqual({
       error: true,
@@ -37,7 +37,7 @@ describe('main', () => {
       'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html&ua=Algolia+Crawler&waitTime[min]=foo&waitTime[max]=bar'
     );
 
-    expect(res.statusCode).toEqual(400);
+    expect(res.statusCode).toBe(400);
 
     expect(JSON.parse(body)).toEqual({
       error: true,
@@ -69,7 +69,7 @@ describe('main', () => {
       'http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fbasic.html&ua=Algolia+Crawler'
     );
 
-    expect(res.statusCode).toEqual(200);
+    expect(res.statusCode).toBe(200);
     expect(res.headers).toEqual({
       connection: 'keep-alive',
       'content-length': '99',
@@ -81,7 +81,7 @@ describe('main', () => {
       'keep-alive': 'timeout=5',
     });
 
-    expect(cleanString(body)).toEqual(
+    expect(cleanString(body)).toBe(
       `<html><head><base href="http://localhost:3000"></head><body>A basic page</body></html>`
     );
   });
@@ -93,7 +93,7 @@ describe('main', () => {
       )}&ua=Algolia+Crawler`
     );
 
-    expect(res.statusCode).toEqual(307);
+    expect(res.statusCode).toBe(307);
     expect(res.headers).toEqual({
       connection: 'keep-alive',
       'content-length': '0',
@@ -102,7 +102,7 @@ describe('main', () => {
       location: 'http://localhost:3000/test-website/basic.html',
     });
 
-    expect(cleanString(body)).toEqual('');
+    expect(cleanString(body)).toBe('');
   });
 
   it('should expose metrics', async () => {
@@ -119,7 +119,7 @@ describe('main', () => {
 
     const json = JSON.parse(body);
 
-    expect(res.statusCode).toEqual(200);
+    expect(res.statusCode).toBe(200);
 
     expect(json.metrics).toMatchObject({
       goto: expect.any(Number),
@@ -147,7 +147,7 @@ describe('main', () => {
     expect(json.metrics.page.taskDuration).toBeLessThanOrEqual(40);
     expect(json.metrics.page.jsHeapUsedSize).toBeLessThanOrEqual(1617360);
     expect(json.metrics.page.jsHeapTotalSize).toBeLessThanOrEqual(2639520);
-    expect(json.metrics.page.requests).toEqual(1);
-    expect(json.metrics.page.blockedRequests).toEqual(0);
+    expect(json.metrics.page.requests).toBe(1);
+    expect(json.metrics.page.blockedRequests).toBe(0);
   });
 });

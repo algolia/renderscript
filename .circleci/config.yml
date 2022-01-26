@@ -1,15 +1,15 @@
 ---
-version: 2.1
-
-orbs:
-  puppeteer: threetreeslight/puppeteer@0.1.2
-
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: cimg/node:16.13.1
+    - image: cimg/node:16.13.1-browsers
   environment:
     NODE_ENV: 'test'
+
+version: 2.1
+
+orbs:
+  browser-tools: circleci/browser-tools@1.2.4
 
 jobs:
   checkout:
@@ -18,7 +18,9 @@ jobs:
     steps:
       - checkout
 
-      - run: yarn install --non-interactive --cache-folder ~/.cache/yarn
+      - run:
+          name: install
+          command: yarn install --non-interactive --cache-folder ~/.cache/yarn
 
       - persist_to_workspace:
           root: .
@@ -41,6 +43,9 @@ jobs:
       - attach_workspace:
           at: ~/app/
 
+      - browser-tools/install-chrome
+      - browser-tools/install-chromedriver
+
       - run: yarn build
 
       - run:
@@ -48,8 +53,7 @@ jobs:
           background: true
 
       - run:
-          command: |
-            sleep 10s && yarn test
+          command: "yarn test"
 
   release:
     <<: *defaults
