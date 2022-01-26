@@ -16,7 +16,11 @@ COPY . /app/renderscript
 
 RUN true \
   && yarn build \
-  && yarn install --production=true
+  && yarn install --production=true \
+  && yarn cache clean \
+  && true
+
+RUN yarn docker:install
 
 # Base image
 FROM node:16.13.1-bullseye-slim
@@ -37,6 +41,8 @@ RUN true \
   && apt-get install -y --no-install-recommends \
   curl \
   chromium \
+  libatk-bridge2.0-0 \
+  libgtk-3-0 \
   fonts-ipafont-gothic \
   fonts-wqy-zenhei \
   fonts-thai-tlwg \
@@ -45,15 +51,12 @@ RUN true \
   libxss1 \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
-  && apt-get purge --auto-remove -y curl \
   && rm -rf /src/*.deb \
   && true
 
 WORKDIR /app/renderscript
 
 COPY --from=base /app/renderscript /app/renderscript
-
-RUN yarn docker:install
 
 RUN true \
   && groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \

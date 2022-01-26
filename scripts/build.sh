@@ -7,6 +7,7 @@ echo "Releasing: $current"
 echo ""
 
 docker build \
+  --platform=linux/amd64 \
   -t algolia/renderscript \
   -t "algolia/renderscript:${current}" \
   .
