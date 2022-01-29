@@ -1,3 +1,10 @@
+## [1.11.23](https://github.com/algolia/renderscript/compare/v1.11.22...v1.11.23) (2022-01-29)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @algolia/dns-filter to v1.1.25 ([#528](https://github.com/algolia/renderscript/issues/528)) ([9e94096](https://github.com/algolia/renderscript/commit/9e94096c2d3ef17b12c24ba8d2802f71331abe59))
+
 ## [1.11.22](https://github.com/algolia/renderscript/compare/v1.11.21...v1.11.22) (2022-01-25)
 
 
