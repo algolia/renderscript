@@ -74,8 +74,7 @@ jobs:
       - run:
           name: Test image
           command: |
-            CURRENT=$(node -e "console.log(require('./package.json').version)")
-            docker run -d --name renderscript -p 3000:3000 algolia/renderscript:$CURRENT
+            docker run -d --name renderscript -p 3000:3000 algolia/renderscript:$CIRCLE_SHA1
 
             sleep 30
 
