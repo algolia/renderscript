@@ -82,16 +82,16 @@ jobs:
             curl -XPOST http://localhost:3000/render?url=https://example.com&ua=circleci > test.json
             cat test.json
 
-      - run:
-          name: Docker publish
-          command: |
-            is_release=$(git log -1 --format='%h %s' | grep "chore.release")
-            if [[ is_release ]]; then
-              circleci-agent step halt;
-            fi
+      # - run:
+      #     name: Docker publish
+      #     command: |
+      #       is_release=$(git log -1 --format='%h %s' | grep "chore.release")
+      #       if [[ is_release ]]; then
+      #         circleci-agent step halt;
+      #       fi
 
-            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            yarn docker:release
+      #       echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      #       yarn docker:release
 
 workflows:
   version: 2
