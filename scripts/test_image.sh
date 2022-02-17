@@ -2,7 +2,8 @@
 
 set -ex
 
-docker run -d --platform linux/amd64 --name renderscript_test -p 3000:3000 algolia/renderscript:$CIRCLE_SHA1
+hash=$(git rev-parse HEAD) # the last commit change because of semantic-release
+docker run -d --platform linux/amd64 --name renderscript_test -p 3000:3000 algolia/renderscript:$hash
 
 echo "waiting for docker"
 sleep 20
