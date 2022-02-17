@@ -1,3 +1,10 @@
+## [1.11.29](https://github.com/algolia/renderscript/compare/v1.11.28...v1.11.29) (2022-02-17)
+
+
+### Bug Fixes
+
+* release taggign ([87dd5d1](https://github.com/algolia/renderscript/commit/87dd5d18eebf92bc9be260b8ea232b20d47bf83a))
+
 ## [1.11.28](https://github.com/algolia/renderscript/compare/v1.11.27...v1.11.28) (2022-02-17)
 
 
