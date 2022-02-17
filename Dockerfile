@@ -70,7 +70,7 @@ RUN true \
   fonts-wqy-zenhei \
   fonts-thai-tlwg \
   fonts-kacst \
-  ttf-freefont \
+  fonts-freefont-ttf \
   xvfb \
   && apt-get remove -y chromium \
   && apt-get clean \
