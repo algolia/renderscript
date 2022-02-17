@@ -73,19 +73,7 @@ jobs:
 
       - run:
           name: Test image
-          command: |
-            docker run -d --name renderscript -p 3000:3000 algolia/renderscript:$CIRCLE_SHA1
-
-            echo "waiting for docker"
-            sleep 20
-
-            echo "slept for 20s"
-            docker logs renderscript
-
-            curl -XPOST "http://localhost:3000/render?url=https://example.com&ua=circleci" > test.json
-            cat test.json
-
-            echo "testouille"
+          command: scripts/test_image.sh
 
       # - run:
       #     name: Docker publish
