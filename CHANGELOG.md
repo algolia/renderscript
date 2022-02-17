@@ -1,3 +1,12 @@
+## [1.11.28](https://github.com/algolia/renderscript/compare/v1.11.27...v1.11.28) (2022-02-17)
+
+
+### Bug Fixes
+
+* **docker:** test image in CI ([#547](https://github.com/algolia/renderscript/issues/547)) ([53d1d34](https://github.com/algolia/renderscript/commit/53d1d34f796a45517820f5e66b80f77043305ea6))
+* release condition ([7cd67d1](https://github.com/algolia/renderscript/commit/7cd67d156875e4a1b32fbd8e5c4f4a8c78b44d9c))
+* remove --max-old-space-size to allow prod to modify this value ([80f1aee](https://github.com/algolia/renderscript/commit/80f1aeeaf19031d4e9eb954df1a3b9a763bb9fb3))
+
 ## [1.11.27](https://github.com/algolia/renderscript/compare/v1.11.26...v1.11.27) (2022-02-17)
 
 
