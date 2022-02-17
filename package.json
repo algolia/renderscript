@@ -11,7 +11,7 @@
     "dev:run": "yarn build && NODE_ENV=development node -r dotenv/config dist/index.js",
     "docker:install": "node dist/lib/install.js",
     "docker:build": "./scripts/build.sh",
-    "docker:release": "VERSION=$(npx json -f package.json version) && docker push algolia/renderscript && docker push algolia/renderscript:$VERSION",
+    "docker:release": "/scripts/push.sh",
     "lint": "eslint --ext=jsx,ts,tsx,js .",
     "release": "yarn docker:build && yarn docker:release",
     "start": "UV_THREADPOOL_SIZE=100 node --max-old-space-size=520 dist/index.js",
