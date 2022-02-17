@@ -1,3 +1,31 @@
+## [1.11.26](https://github.com/algolia/renderscript/compare/v1.11.25...v1.11.26) (2022-02-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency undici to v4.13.0 ([#538](https://github.com/algolia/renderscript/issues/538)) ([25b1ac0](https://github.com/algolia/renderscript/commit/25b1ac04f71ecc291a93f38f6e2e99cdbeb61ae3))
+
+## [1.11.25](https://github.com/algolia/renderscript/compare/v1.11.24...v1.11.25) (2022-02-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency puppeteer-core to v13.1.3 ([#536](https://github.com/algolia/renderscript/issues/536)) ([21d08c0](https://github.com/algolia/renderscript/commit/21d08c07ff2354643fc3ab8e1b90256569ce4a79))
+
+## [1.11.24](https://github.com/algolia/renderscript/compare/v1.11.23...v1.11.24) (2022-01-29)
+
+
+### Bug Fixes
+
+* **deps:** update dependency puppeteer-core to v13.1.2 ([#529](https://github.com/algolia/renderscript/issues/529)) ([2cf3994](https://github.com/algolia/renderscript/commit/2cf3994fe25ab2b6fd891c9fbc6278e3b26e00fa))
+
+## [1.11.23](https://github.com/algolia/renderscript/compare/v1.11.22...v1.11.23) (2022-01-29)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @algolia/dns-filter to v1.1.25 ([#528](https://github.com/algolia/renderscript/issues/528)) ([9e94096](https://github.com/algolia/renderscript/commit/9e94096c2d3ef17b12c24ba8d2802f71331abe59))
+
 ## [1.11.22](https://github.com/algolia/renderscript/compare/v1.11.21...v1.11.22) (2022-01-25)
 
 
