@@ -75,16 +75,16 @@ jobs:
           name: Test image
           command: scripts/test_image.sh
 
-      # - run:
-      #     name: Docker publish
-      #     command: |
-      #       is_release=$(git log -1 --format='%h %s' | grep "chore.release")
-      #       if [[ is_release ]]; then
-      #         circleci-agent step halt;
-      #       fi
+      - run:
+          name: Docker publish
+          command: |
+            is_release=$(git log -1 --format='%h %s' | grep "chore.release")
+            if [[ is_release ]]; then
+              circleci-agent step halt;
+            fi
 
-      #       echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-      #       yarn docker:release
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            yarn docker:release
 
 workflows:
   version: 2

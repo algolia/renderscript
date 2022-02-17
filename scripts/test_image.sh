@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 set -ex
 
@@ -9,8 +9,11 @@ sleep 20
 
 echo "slept for 20s"
 
-launched=$(docker logs renderscript_test | grep "Browser is ready")
+launched=$(docker logs renderscript_test 2>&1 | grep "Browser is ready")
 
-if [ -z $launched ]; then
+if [ -z "$launched" ]; then
+  echo "Not ready"
   exit 1
 fi
+
+echo "Ready"
