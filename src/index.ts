@@ -6,13 +6,13 @@ console.info(`NODE_ENV = ${process.env.NODE_ENV}`);
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
-const api = new Api();
-
 // Uncaught Promise Rejection
 process.on('unhandledRejection', (reason) => {
   console.error('Unhandled rejection');
   console.error(reason);
 });
+
+const api = new Api();
 
 // Handle SIGINT
 // It doesn't seem to handle it correctly, but it's just `yarn` messing up

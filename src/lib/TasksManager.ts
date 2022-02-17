@@ -51,8 +51,11 @@ export class TasksManager {
   }
 
   async task(job: TaskParams): Promise<TaskFinal> {
-    if (this.#stopping || !this.#browser) {
-      throw new Error('Called task on a stopping Manager');
+    if (this.#stopping) {
+      throw new Error('Task can not be executed: stopping');
+    }
+    if (!this.#browser) {
+      throw new Error('Task can not be executed: no_browser');
     }
 
     const start = Date.now();
