@@ -78,6 +78,7 @@ jobs:
             if [[ is_release ]]; then
               circleci-agent step halt;
             fi
+
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             yarn docker:release
 

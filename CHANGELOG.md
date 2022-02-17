@@ -1,3 +1,12 @@
+## [1.11.27](https://github.com/algolia/renderscript/compare/v1.11.26...v1.11.27) (2022-02-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency puppeteer-core to v13.3.1 ([#546](https://github.com/algolia/renderscript/issues/546)) ([743ce27](https://github.com/algolia/renderscript/commit/743ce2760b0c7b9dd9a438fd6b382db48455fc81))
+* increase test margin ([c205c9b](https://github.com/algolia/renderscript/commit/c205c9b4c3f0200998220363b5ee28d1424c8192))
+* ttf-freefont unavailable ([cf3e068](https://github.com/algolia/renderscript/commit/cf3e068be0d14668f286fff50fedba9918e5bdc3))
+
 ## [1.11.26](https://github.com/algolia/renderscript/compare/v1.11.25...v1.11.26) (2022-02-04)
 
 
