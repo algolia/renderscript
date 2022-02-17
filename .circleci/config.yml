@@ -65,11 +65,23 @@ jobs:
       - setup_remote_docker:
           version: 19.03.13
 
-      - run: yarn semantic-release
+      # - run: yarn semantic-release
 
       - run:
           name: Docker Build
           command: yarn docker:build
+
+      - run:
+          name: Test image
+          command: |
+            CURRENT=$(node -e "console.log(require('./package.json').version)")
+            docker run -d --name renderscript -p 3000:3000 algolia/renderscript:$CURRENT
+
+            sleep 30
+
+            curl -XPOST http://localhost:3000/render?url=https://example.com&ua=circleci > test.json
+            cat test.json
+
       - run:
           name: Docker publish
           command: |
@@ -96,6 +108,6 @@ workflows:
           requires:
             - lint
             - test
-          filters:
-            branches:
-              only: master
+          # filters:
+          #   branches:
+          #     only: master
