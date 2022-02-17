@@ -9,12 +9,8 @@ sleep 20
 
 echo "slept for 20s"
 
-docker logs renderscript_test
+launched=$(docker logs renderscript_test | grep "Browser is ready")
 
-curl -XPOST -i "http://localhost:3000/render" \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://www.algolia.com", "ua": "test"}' >test.json
-
-cat test.json
-
-echo "testouille"
+if [ -z $launched ]; then
+  exit 1
+fi
