@@ -84,7 +84,7 @@
     "hot-shots": "9.0.0",
     "puppeteer-core": "13.3.2",
     "stream-to-string": "1.2.0",
-    "undici": "4.13.0",
+    "undici": "4.14.1",
     "uuid": "8.3.2"
   },
   "resolutions": {
