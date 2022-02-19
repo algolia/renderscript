@@ -1,3 +1,10 @@
+## [1.11.32](https://github.com/algolia/renderscript/compare/v1.11.31...v1.11.32) (2022-02-19)
+
+
+### Bug Fixes
+
+* **deps:** update dependency body-parser to v1.19.2 ([#553](https://github.com/algolia/renderscript/issues/553)) ([0ba2690](https://github.com/algolia/renderscript/commit/0ba26902483dd1d01f05d399c4421ab657b32f32))
+
 ## [1.11.31](https://github.com/algolia/renderscript/compare/v1.11.30...v1.11.31) (2022-02-18)
 
 
