@@ -1,3 +1,10 @@
+## [1.11.33](https://github.com/algolia/renderscript/compare/v1.11.32...v1.11.33) (2022-02-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency express to v4.17.3 ([#554](https://github.com/algolia/renderscript/issues/554)) ([f3b2001](https://github.com/algolia/renderscript/commit/f3b2001b8f42bc12a92f37f83ab85ec6bc98276d))
+
 ## [1.11.32](https://github.com/algolia/renderscript/compare/v1.11.31...v1.11.32) (2022-02-19)
 
 
