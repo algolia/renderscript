@@ -18,6 +18,9 @@ process.on('unhandledRejection', (reason) => {
     process.exit(1);
   }, 1);
 });
+process.on('uncaughtException', (reason) => {
+  report(new Error('uncaught exception'), { err: reason });
+});
 
 const api = new Api();
 
