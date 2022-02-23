@@ -271,7 +271,23 @@ export class BrowserPage {
       return await promiseWithTimeout(
         (async (): Promise<string | null> => {
           const start = Date.now();
-          const content = await this.#ref?.content();
+          // `getInnerHTML` unstable: https://github.com/whatwg/html/issues/8867
+          const content = await this.#ref?.evaluate(() => {
+            const doctype = document.doctype
+              ? new XMLSerializer().serializeToString(document.doctype)
+              : '';
+            if (!('getInnerHTML' in Element.prototype)) {
+              return `${doctype}${document.documentElement.outerHTML}`;
+            }
+            const body = (document.body as any).getInnerHTML();
+            const uid = crypto.randomUUID();
+            document.body.innerHTML = uid;
+            return `${doctype}${document.documentElement.outerHTML.replace(
+              uid,
+              body
+            )}`;
+          });
+
           stats.timing('renderscript.renderBody', Date.now() - start, {
             browser: this.#engine as string,
           });
