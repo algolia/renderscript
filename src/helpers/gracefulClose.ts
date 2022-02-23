@@ -27,14 +27,19 @@ async function close({ api, tasksManager }: Params): Promise<void> {
 }
 
 export async function gracefulClose(opts: Params): Promise<void> {
+  console.log('Graceful Exit');
   // If we receive multiple signals, swallow them
   if (gracefullyClosing) {
     return;
   }
 
-  gracefullyClosing = true;
-  await close(opts);
-  await reporting.drain();
+  try {
+    gracefullyClosing = true;
+    await close(opts);
+    await reporting.drain();
+  } catch (err) {
+    console.log('Graceful exit failed', err);
+  }
 
   // eslint-disable-next-line no-process-exit
   process.exit(0);

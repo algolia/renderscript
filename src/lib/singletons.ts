@@ -7,6 +7,7 @@ export const tasksManager = new TasksManager();
 tasksManager.launch().catch((err) => {
   report(new Error('Error during launch'), { err });
 
+  console.log('Exit');
   setTimeout(() => {
     // eslint-disable-next-line no-process-exit
     process.exit(1);

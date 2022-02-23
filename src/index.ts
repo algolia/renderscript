@@ -11,6 +11,7 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 process.on('unhandledRejection', (reason) => {
   report(new Error('unhandled rejection'), { err: reason });
 
+  console.log('Exit');
   // We are not sure if it's stable or not
   setTimeout(() => {
     // eslint-disable-next-line no-process-exit
