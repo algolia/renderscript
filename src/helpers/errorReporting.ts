@@ -10,7 +10,7 @@ Sentry.init({
 
 export function report(err: Error, extra: any = {}): void {
   if (!process.env.SENTRY_DSN) {
-    console.error(JSON.stringify(err), JSON.stringify(extra));
+    console.error(err, extra);
     return;
   }
 
