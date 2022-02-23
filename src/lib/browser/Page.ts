@@ -6,6 +6,7 @@ import type {
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 
 import { FetchError } from 'api/helpers/errors';
+import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import { adblocker } from 'lib/singletons';
@@ -28,6 +29,8 @@ const IGNORED_ERRORS = [
   'No resource with given identifier found',
   // Too big to fit in memory, or memory filled
   'Request content was evicted from inspector cache',
+  // Protocol error, js redirect or options
+  'This might happen if the request is a preflight request',
 ];
 
 export class BrowserPage {
@@ -119,11 +122,11 @@ export class BrowserPage {
         timeout,
         waitUntil: ['domcontentloaded', 'networkidle0'],
       });
-    } catch (e: any) {
-      if (e.message.match(/Navigation Timeout Exceeded/)) {
+    } catch (err: any) {
+      if (err.message.match(/Navigation Timeout Exceeded/)) {
         throw new FetchError('no_response', true);
       } else {
-        console.error('Caught error when loading page', e);
+        report(new Error('Loading error'), { err });
       }
     } finally {
       stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
@@ -163,8 +166,8 @@ export class BrowserPage {
       });
       try {
         await this.#page!.setCookie(...cookies);
-      } catch (e) {
-        console.error('failed to set cookie on page', url);
+      } catch (err) {
+        report(new Error('Failed to set cookie'), { err, url });
       }
     }
 
@@ -188,9 +191,10 @@ export class BrowserPage {
         });
       } catch (err: any) {
         if (!err.message.includes('ENOTFOUND')) {
-          console.error(err);
+          report(new Error('Blocker url'), { err, url: reqUrl });
           this.#metrics.blockedRequests += 1;
         }
+
         req.abort();
         return;
       }
@@ -202,6 +206,8 @@ export class BrowserPage {
           await req.abort();
           return;
         }
+
+        // Adblocker
         if (adblock && adblocker.match(new URL(reqUrl))) {
           this.#metrics.blockedRequests += 1;
           await req.abort();
@@ -217,9 +223,9 @@ export class BrowserPage {
           return;
         }
         await req.continue();
-      } catch (e: any) {
-        if (!e.message.match(/Request is already handled/)) {
-          throw e;
+      } catch (err: any) {
+        if (!err.message.match(/Request is already handled/)) {
+          report(err, { context: 'onRequest', url: url.href, with: reqUrl });
         }
         // Ignore Request is already handled error
       }
@@ -241,12 +247,13 @@ export class BrowserPage {
           // Not every request has the content-length header, the byteLength match perfectly
           // but does not necessarly represent what was transfered (if it was gzipped for example)
           cl = (await res.buffer()).byteLength;
-        } catch (e: any) {
-          if (IGNORED_ERRORS.some((msg) => e.message.includes(msg))) {
+        } catch (err: any) {
+          if (IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
             return;
           }
 
-          throw e;
+          // We can not throw in callback, it will go directly into unhandled
+          report(err, { context: 'onResponse', url: url.href });
         }
       }
 

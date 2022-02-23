@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
+import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
 
 import { Browser } from './browser/Browser';
@@ -83,8 +84,7 @@ export class TasksManager {
 
       await page.linkToTask(task);
       const taskPromise = task.process().catch((err) => {
-        // TO DO: log to sentry
-        console.error(err);
+        report(err);
       });
       this.#addTask({ id, taskPromise });
 
@@ -118,9 +118,10 @@ export class TasksManager {
       task = undefined;
 
       return { ...res, metrics };
-    } catch (e) {
+    } catch (err) {
       console.log('Fail', url, `(${id})`);
-      throw e;
+      // This error will be reported elsewhere
+      throw err;
     } finally {
       if (task) {
         this.#removeTask({ id });

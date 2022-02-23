@@ -24,51 +24,52 @@ The aim is to make a more reliable and more flexible version for long-term use.
 
 ## API
 
-> GET `/healthy` GET `/ready`
+### GET `/healthy` GET `/ready`
 
 For Kubernetes and others.
 
-> GET `/list`
+### GET `/list`
 
 List currenlty open pages.
 Useful to debug.
 
-> POST `/render`
+### POST `/render`
 
 Main endpoint. Renders the page and dumps a JSON with all the page information.
 
-Body parameters:
+#### Body parameters:
 
 * `url`: URL to render (for hash and query params support, use `encodeURIComponent` on it)
 * `ua`: User-Agent
 * `waitTime: { min: number, max: number}`: minimum and maximum execution time
 
-Returns `application/json`:
+#### Returns `application/json`:
 
 * `statusCode <number>`: HTTP Status Code
 * `headers <{ [key: string]: string }>`: Page headers (keys are lowercase)
 * `body <string>`: Page raw HTML content
 * `timeout <boolean>`: Present only if the page took too long to render
 
-> GET `/render`
+### GET `/render`
 
 Used for debug purposes. Dumps directly the HTML for easy inspection in your browser.
 
-Query parameters:
+#### Query parameters:
 
 * `url`: URL to render (for hash and query params support, use `encodeURIComponent` on it)
 * `ua`: User-Agent
 * `waitTime[min]&waitTime[max]`: minimum and maximum execution time
 
-Returns `text/html`.
+#### Returns `text/html`.
+
 (CSP headers are set to prevent script execution on the rendered page)
 
-> POST `/login`
+### POST `/login`
 
 This endpoint will load a given login page, look for `input` fields, enter the given credentials and validate the form.
 It allows retrieving programmatically a session-cookie from websites with [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) protection.
 
-Body parameters:
+#### Body parameters
 
 * `url`: URL of the login page
 * `username`: Username to enter on the login form. Renderscript expects to find an `input[type=text]` or `input[type=email]` on the login page.
@@ -76,7 +77,7 @@ Body parameters:
 * `ua`: User-Agent
 * `renderHTML`: Boolean (optional). If set to true, Renderscript will return the rendered HTML after the login request. Useful to debug visually.
 
-Returns `application/json`:
+#### Returns `application/json`
 
 * `statusCode <number>`: HTTP Status Code.
 * `headers <{ [key: string]: string }>`: Response headers received on the login request.
@@ -88,18 +89,18 @@ If `renderHTML: true`, returns `text/html`.
 
 ## Running it locally
 
+Development:
+
+```sh
+yarn dev
+```
+
 Docker image:
 
 ```sh
 yarn docker:build
 docker run -p 23000:3000 algolia/renderscript
 open http://localhost:3000/render?url=https%3A%2F%2Fwww.algolia.com&ua=Test+Renderscript
-```
-
-Development:
-
-```sh
-yarn dev
 ```
 
 ### Parameters
@@ -112,6 +113,7 @@ See `.env.example` to see which ones are installed by default (they still need t
   Example: `IP_PREFIXES_WHITELIST=127.,0.,::1` (these are the default values used when the variable is not provided alongside `ALLOW_LOCALHOST`)
 * `HEADERS_TO_FORWARD`: Comma-separated list of headers to forward on navigation request
   Example: `HEADERS_TO_FORWARD=Cookie,Authorization` (default value)
+* `SENTRY_DSN` Report errors to this Sentry URL.
 
 ## Credits
 

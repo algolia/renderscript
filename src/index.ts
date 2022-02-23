@@ -1,4 +1,5 @@
 import { Api } from 'api/index';
+import { report } from 'helpers/errorReporting';
 import { gracefulClose } from 'helpers/gracefulClose';
 import { tasksManager } from 'lib/singletons';
 
@@ -8,8 +9,13 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 
 // Uncaught Promise Rejection
 process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled rejection');
-  console.error(reason);
+  report(new Error('unhandled rejection'), { err: reason });
+
+  // We are not sure if it's stable or not
+  setTimeout(() => {
+    // eslint-disable-next-line no-process-exit
+    process.exit(1);
+  }, 1);
 });
 
 const api = new Api();

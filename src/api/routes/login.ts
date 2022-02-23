@@ -4,6 +4,7 @@ import { CSP_HEADERS } from 'api/constants';
 import { getDefaultParams, alt } from 'api/helpers/alt';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
+import { report } from 'helpers/errorReporting';
 import { tasksManager } from 'lib/singletons';
 
 export async function validate(
@@ -94,5 +95,6 @@ export async function processLogin(
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
+    report(err, { url, type: 'login' });
   }
 }

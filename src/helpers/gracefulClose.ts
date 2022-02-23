@@ -1,6 +1,8 @@
 import type { Api } from 'api/index';
 import type { TasksManager } from 'lib/TasksManager';
 
+import * as reporting from './errorReporting';
+
 interface Params {
   api: Api;
   tasksManager: TasksManager;
@@ -32,6 +34,7 @@ export async function gracefulClose(opts: Params): Promise<void> {
 
   gracefullyClosing = true;
   await close(opts);
+  await reporting.drain();
 
   // eslint-disable-next-line no-process-exit
   process.exit(0);
