@@ -1,3 +1,10 @@
+## [1.12.3](https://github.com/algolia/renderscript/compare/v1.12.2...v1.12.3) (2022-02-23)
+
+
+### Bug Fixes
+
+* **log:** be more verbose when exiting ([5bfa73d](https://github.com/algolia/renderscript/commit/5bfa73dc8d6050370656b307e2faec1872369a7d))
+
 ## [1.12.2](https://github.com/algolia/renderscript/compare/v1.12.1...v1.12.2) (2022-02-23)
 
 
