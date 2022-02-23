@@ -38,9 +38,9 @@ RUN \
 # Install dev deps and build UI
 # Then install only the prod dependencies
 RUN \
-  yarn install --production=false && \
+  yarn install && \
   yarn build && \
-  yarn install --production=true && \
+  yarn workspaces focus --all --production && \
   yarn cache clean
 
 RUN yarn docker:install
