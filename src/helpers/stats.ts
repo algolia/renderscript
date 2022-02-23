@@ -15,4 +15,16 @@ const client = new StatsD({
   },
 });
 
+export function close(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    client.close((err) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
 export const stats = client;

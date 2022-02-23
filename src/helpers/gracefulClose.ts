@@ -2,6 +2,7 @@ import type { Api } from 'api/index';
 import type { TasksManager } from 'lib/TasksManager';
 
 import * as reporting from './errorReporting';
+import * as stats from './stats';
 
 interface Params {
   api: Api;
@@ -37,6 +38,7 @@ export async function gracefulClose(opts: Params): Promise<void> {
     gracefullyClosing = true;
     await close(opts);
     await reporting.drain();
+    await stats.close();
   } catch (err) {
     console.log('Graceful exit failed', err);
   }
