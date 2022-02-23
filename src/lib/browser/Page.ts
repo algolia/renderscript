@@ -29,6 +29,8 @@ const IGNORED_ERRORS = [
   'No resource with given identifier found',
   // Too big to fit in memory, or memory filled
   'Request content was evicted from inspector cache',
+  // Protocol error, js redirect or options
+  'This might happen if the request is a preflight request',
 ];
 
 export class BrowserPage {
