@@ -29,14 +29,13 @@ RUN true \
 COPY . /app/tmp
 RUN ls -lah /app/tmp
 
-# Necessary to publish Sentry sourcemaps
 ARG VERSION
 ENV VERSION ${VERSION:-dev}
 
-# Builds the UI install only the prod dependencies
+# Builds the UI, install chrome and remove dev dependencies
 RUN true \
   && yarn build \
-  && yarn docker:install-inside \
+  && yarn install-chromium \
   && yarn workspaces focus --all --production \
   && rm -rf .yarn/
 
