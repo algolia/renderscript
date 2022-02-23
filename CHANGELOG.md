@@ -1,3 +1,10 @@
+## [1.11.34](https://github.com/algolia/renderscript/compare/v1.11.33...v1.11.34) (2022-02-23)
+
+
+### Bug Fixes
+
+* upgrade to yarn 3 ([#557](https://github.com/algolia/renderscript/issues/557)) ([38088e5](https://github.com/algolia/renderscript/commit/38088e58e8080b7f7fe1aacb2d5d8d0d8f16807c))
+
 ## [1.11.33](https://github.com/algolia/renderscript/compare/v1.11.32...v1.11.33) (2022-02-20)
 
 
