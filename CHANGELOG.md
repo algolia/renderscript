@@ -1,3 +1,10 @@
+## [1.12.1](https://github.com/algolia/renderscript/compare/v1.12.0...v1.12.1) (2022-02-23)
+
+
+### Bug Fixes
+
+* **docker:** use cache ([#558](https://github.com/algolia/renderscript/issues/558)) ([56698a0](https://github.com/algolia/renderscript/commit/56698a0a95e390e5f537699b9080a9ca8b7742de))
+
 # [1.12.0](https://github.com/algolia/renderscript/compare/v1.11.34...v1.12.0) (2022-02-23)
 
 
