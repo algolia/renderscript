@@ -44,6 +44,9 @@ RUN true \
 # This image must have the minimum amount of layers
 FROM node:16.13.1-slim
 
+ARG VERSION
+ENV VERSION ${VERSION:-dev}
+
 # Autolink repository https://docs.github.com/en/packages/learn-github-packages/connecting-a-repository-to-a-package
 LABEL org.opencontainers.image.source=https://github.com/algolia/renderscript
 LABEL org.opencontainers.image.revision=$VERSION
@@ -88,4 +91,4 @@ RUN true \
 
 USER pptruser
 
-CMD [ "npm", "start" ]
+CMD [ "node", "dist/index.js" ]
