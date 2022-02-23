@@ -1,3 +1,38 @@
+## [1.11.33](https://github.com/algolia/renderscript/compare/v1.11.32...v1.11.33) (2022-02-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency express to v4.17.3 ([#554](https://github.com/algolia/renderscript/issues/554)) ([f3b2001](https://github.com/algolia/renderscript/commit/f3b2001b8f42bc12a92f37f83ab85ec6bc98276d))
+
+## [1.11.32](https://github.com/algolia/renderscript/compare/v1.11.31...v1.11.32) (2022-02-19)
+
+
+### Bug Fixes
+
+* **deps:** update dependency body-parser to v1.19.2 ([#553](https://github.com/algolia/renderscript/issues/553)) ([0ba2690](https://github.com/algolia/renderscript/commit/0ba26902483dd1d01f05d399c4421ab657b32f32))
+
+## [1.11.31](https://github.com/algolia/renderscript/compare/v1.11.30...v1.11.31) (2022-02-18)
+
+
+### Bug Fixes
+
+* **deps:** update dependency undici to v4.14.1 ([#552](https://github.com/algolia/renderscript/issues/552)) ([c25dce6](https://github.com/algolia/renderscript/commit/c25dce6f102e88ada91fe2fa6beb6147783e4cc5))
+
+## [1.11.30](https://github.com/algolia/renderscript/compare/v1.11.29...v1.11.30) (2022-02-18)
+
+
+### Bug Fixes
+
+* **deps:** update dependency puppeteer-core to v13.3.2 ([#549](https://github.com/algolia/renderscript/issues/549)) ([b244949](https://github.com/algolia/renderscript/commit/b244949f002086abe671575f42de4c65f534e62d))
+
+## [1.11.29](https://github.com/algolia/renderscript/compare/v1.11.28...v1.11.29) (2022-02-17)
+
+
+### Bug Fixes
+
+* release taggign ([87dd5d1](https://github.com/algolia/renderscript/commit/87dd5d18eebf92bc9be260b8ea232b20d47bf83a))
+
 ## [1.11.28](https://github.com/algolia/renderscript/compare/v1.11.27...v1.11.28) (2022-02-17)
 
 
