@@ -36,7 +36,7 @@
   },
   "engines": {
     "node": "16.13.1",
-    "yarn": "^1.19.0"
+    "yarn": "^3.0.0"
   },
   "homepage": "https://github.com/algolia/renderscript#readme",
   "devDependencies": {
@@ -90,5 +90,6 @@
   },
   "resolutions": {
     "chalk": "4.1.2"
-  }
+  },
+  "packageManager": "yarn@3.1.1"
 }
