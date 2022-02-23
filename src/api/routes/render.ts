@@ -5,6 +5,7 @@ import { getDefaultParams, alt } from 'api/helpers/alt';
 import { revertUrl } from 'api/helpers/buildUrl';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
+import { report } from 'helpers/errorReporting';
 import { tasksManager } from 'lib/singletons';
 import type { TaskFromAPI } from 'lib/types';
 
@@ -60,7 +61,7 @@ export async function render(
     res.status(500).json({
       error: err.message,
     });
-    console.error(err);
+    report(err);
   }
 }
 
@@ -103,6 +104,6 @@ export async function renderJSON(
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
-    console.error(err);
+    report(err);
   }
 }

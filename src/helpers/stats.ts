@@ -1,5 +1,7 @@
 import { StatsD } from 'hot-shots';
 
+import { report } from './errorReporting';
+
 const client = new StatsD({
   host: process.env.DOGSTATSD_HOST || 'localhost',
   port: 8125,
@@ -9,7 +11,7 @@ const client = new StatsD({
     env: process.env.NODE_ENV === 'production' ? 'prod' : 'dev',
   },
   errorHandler(error: Error): void {
-    console.error(error);
+    report(error);
   },
 });
 

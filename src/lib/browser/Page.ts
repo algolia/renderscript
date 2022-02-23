@@ -6,6 +6,7 @@ import type {
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 
 import { FetchError } from 'api/helpers/errors';
+import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import { adblocker } from 'lib/singletons';
@@ -119,11 +120,11 @@ export class BrowserPage {
         timeout,
         waitUntil: ['domcontentloaded', 'networkidle0'],
       });
-    } catch (e: any) {
-      if (e.message.match(/Navigation Timeout Exceeded/)) {
+    } catch (err: any) {
+      if (err.message.match(/Navigation Timeout Exceeded/)) {
         throw new FetchError('no_response', true);
       } else {
-        console.error('Caught error when loading page', e);
+        report(new Error('Loading error'), { err });
       }
     } finally {
       stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
@@ -163,8 +164,8 @@ export class BrowserPage {
       });
       try {
         await this.#page!.setCookie(...cookies);
-      } catch (e) {
-        console.error('failed to set cookie on page', url);
+      } catch (err) {
+        report(new Error('Failed to set cookie'), { err, url });
       }
     }
 
@@ -188,9 +189,10 @@ export class BrowserPage {
         });
       } catch (err: any) {
         if (!err.message.includes('ENOTFOUND')) {
-          console.error(err);
+          report(new Error('Blocker url'), { err, url: reqUrl });
           this.#metrics.blockedRequests += 1;
         }
+
         req.abort();
         return;
       }
