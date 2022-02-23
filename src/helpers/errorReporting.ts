@@ -1,10 +1,9 @@
 import * as Sentry from '@sentry/node';
 
-import { version } from '../../package.json';
-
+console.log(process);
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
-  release: version,
+  release: process.env.npm_package_version,
   environment: process.env.NODE_ENV,
   serverName: 'renderscript',
   ignoreErrors: [],
