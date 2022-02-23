@@ -3,9 +3,10 @@ import * as Sentry from '@sentry/node';
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   release: process.env.npm_package_version,
-  environment: process.env.NODE_ENV,
+  environment: process.env.CLUSTER_NAME || process.env.NODE_ENV,
   serverName: 'renderscript',
   ignoreErrors: [],
+  maxBreadcrumbs: 10,
 });
 
 export function report(err: Error, extra: any = {}): void {
