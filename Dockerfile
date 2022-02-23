@@ -1,5 +1,5 @@
 # Base image
-FROM node:16.13.1-slim AS base
+FROM node:16.13.1 AS base
 
 # Install git
 # Others are dependencies of our gyp dependencies
@@ -10,45 +10,44 @@ RUN apt-get update && \
   make \
   python
 
-# Create tmp directory
-RUN mkdir -p /tmp/renderscript
-COPY . /tmp/renderscript
-WORKDIR /tmp/renderscript
+# Setup the app WORKDIR
+WORKDIR /app/tmp
 
-# Commit uncommitted files
-# Useful if you want to deploy from a branch without needing to commit
-RUN \
-  if [ -n "$(git status --porcelain)" ]; then \
-  git config --global user.email "docker@renderscript.algolia.com" && \
-  git config --global user.name "Renderscript Dockerfile" && \
-  git add -A . && \
-  git commit -a -m "dockerfile-temp-commit"; \
-  fi
+# Copy and install dependencies separately from the app's code
+# To leverage Docker's cache when no dependency has change
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn .yarn
+RUN ls -lah /app/tmp
 
-# Use git to only get what's not gitignored in /app/renderscript
-# Also useful to get the git repo with low depth
-RUN mkdir -p /app
-RUN git clone --depth=2 file:///tmp/renderscript /app/renderscript
-WORKDIR /app/renderscript
-RUN \
-  if [ "`git log -1 --pretty=%B`" = "dockerfile-temp-commit" ]; then \
-  git reset 'HEAD^'; \
-  fi
+# Install dev dependencies
+RUN true \
+  # Use local version instead of letting yarn auto upgrade itself
+  && yarn set version $(ls -d $PWD/.yarn/releases/*) \
+  && yarn install
 
-# Install dev deps and build UI
-# Then install only the prod dependencies
-RUN \
-  yarn install && \
-  yarn build && \
-  yarn workspaces focus --all --production && \
-  yarn cache clean
+# This step will invalidates cache
+COPY . /app/tmp
+RUN ls -lah /app/tmp
 
-RUN yarn docker:install
+# Necessary to publish Sentry sourcemaps
+ARG VERSION
+ENV VERSION ${VERSION:-dev}
+
+# Builds the UI install only the prod dependencies
+RUN true \
+  && yarn build \
+  && yarn docker:install-inside \
+  && yarn workspaces focus --all --production \
+  && rm -rf .yarn/
 
 # Resulting image
 # New, minimal image
 # This image must have the minimum amount of layers
 FROM node:16.13.1-slim
+
+# Autolink repository https://docs.github.com/en/packages/learn-github-packages/connecting-a-repository-to-a-package
+LABEL org.opencontainers.image.source=https://github.com/algolia/renderscript
+LABEL org.opencontainers.image.revision=$VERSION
 
 ENV NODE_ENV production
 ENV IN_DOCKER true
@@ -79,7 +78,7 @@ RUN true \
 
 WORKDIR /app/renderscript
 
-COPY --from=base /app/renderscript /app/renderscript
+COPY --from=base /app/tmp /app/renderscript
 
 RUN true \
   && groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \

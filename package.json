@@ -9,7 +9,7 @@
     "clean": "rm -rf dist/",
     "dev": "nodemon",
     "dev:run": "yarn build && NODE_ENV=development node -r dotenv/config dist/index.js",
-    "docker:install": "node dist/lib/install.js",
+    "docker:install-inside": "node dist/lib/install.js",
     "docker:build": "./scripts/build.sh",
     "docker:release": "./scripts/push.sh",
     "lint": "eslint --ext=jsx,ts,tsx,js .",
@@ -42,7 +42,6 @@
   "devDependencies": {
     "@semantic-release/changelog": "6.0.1",
     "@semantic-release/git": "10.0.1",
-    "@sentry/node": "6.17.9",
     "@types/cookie-parser": "1.4.2",
     "@types/csurf": "1.11.2",
     "@types/express": "4.17.13",
@@ -77,6 +76,7 @@
   },
   "dependencies": {
     "@algolia/dns-filter": "1.1.25",
+    "@sentry/node": "6.17.9",
     "altheia-async-data-validator": "5.0.13",
     "body-parser": "1.19.2",
     "cookie-parser": "1.4.6",
