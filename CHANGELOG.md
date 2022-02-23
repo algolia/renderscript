@@ -1,3 +1,10 @@
+## [1.12.2](https://github.com/algolia/renderscript/compare/v1.12.1...v1.12.2) (2022-02-23)
+
+
+### Bug Fixes
+
+* **reporting:** alternative for environment name ([7f3771c](https://github.com/algolia/renderscript/commit/7f3771c329228888412b0c24fb568ad6d1b92d2b))
+
 ## [1.12.1](https://github.com/algolia/renderscript/compare/v1.12.0...v1.12.1) (2022-02-23)
 
 
