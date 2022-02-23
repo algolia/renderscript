@@ -206,6 +206,8 @@ export class BrowserPage {
           await req.abort();
           return;
         }
+
+        // Adblocker
         if (adblock && adblocker.match(new URL(reqUrl))) {
           this.#metrics.blockedRequests += 1;
           await req.abort();
@@ -221,9 +223,9 @@ export class BrowserPage {
           return;
         }
         await req.continue();
-      } catch (e: any) {
-        if (!e.message.match(/Request is already handled/)) {
-          throw e;
+      } catch (err: any) {
+        if (!err.message.match(/Request is already handled/)) {
+          report(err, { context: 'onRequest', url: url.href, with: reqUrl });
         }
         // Ignore Request is already handled error
       }
@@ -245,12 +247,13 @@ export class BrowserPage {
           // Not every request has the content-length header, the byteLength match perfectly
           // but does not necessarly represent what was transfered (if it was gzipped for example)
           cl = (await res.buffer()).byteLength;
-        } catch (e: any) {
-          if (IGNORED_ERRORS.some((msg) => e.message.includes(msg))) {
+        } catch (err: any) {
+          if (IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
             return;
           }
 
-          throw e;
+          // We can not throw in callback, it will go directly into unhandled
+          report(err, { context: 'onResponse', url: url.href });
         }
       }
 

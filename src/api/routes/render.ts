@@ -61,7 +61,7 @@ export async function render(
     res.status(500).json({
       error: err.message,
     });
-    report(err);
+    report(err, { type: 'render', url: rawUrl });
   }
 }
 
@@ -104,6 +104,6 @@ export async function renderJSON(
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
-    report(err);
+    report(err, { type: 'renderJSON', url: rawUrl });
   }
 }

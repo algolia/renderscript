@@ -17,8 +17,8 @@ export default async function setup() {
         console.log('API Ready');
         return;
       }
-    } catch (e: any) {
-      console.log(e.message);
+    } catch (err: any) {
+      console.log(err.message);
     } finally {
       await wait(1000);
     }

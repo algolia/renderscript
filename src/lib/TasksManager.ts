@@ -118,9 +118,10 @@ export class TasksManager {
       task = undefined;
 
       return { ...res, metrics };
-    } catch (e) {
+    } catch (err) {
       console.log('Fail', url, `(${id})`);
-      throw e;
+      // This error will be reported elsewhere
+      throw err;
     } finally {
       if (task) {
         this.#removeTask({ id });
