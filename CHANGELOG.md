@@ -1,3 +1,12 @@
+## [1.12.4](https://github.com/algolia/renderscript/compare/v1.12.3...v1.12.4) (2022-02-23)
+
+
+### Bug Fixes
+
+* catch uncaugh exception ([00bf8d7](https://github.com/algolia/renderscript/commit/00bf8d737968564aa3e36c22bd4da0307a6eaf14))
+* **docker:** do not use npm to run command ([8781163](https://github.com/algolia/renderscript/commit/878116360f7c642eddb4b936f17be19f8188a654))
+* **exit:** await stats close ([25ac22e](https://github.com/algolia/renderscript/commit/25ac22e6ff5f1a7264c09b40d8266256e936e34d))
+
 ## [1.12.3](https://github.com/algolia/renderscript/compare/v1.12.2...v1.12.3) (2022-02-23)
 
 
