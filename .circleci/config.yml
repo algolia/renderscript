@@ -20,7 +20,7 @@ jobs:
 
       - run:
           name: install
-          command: yarn install --non-interactive --cache-folder ~/.cache/yarn
+          command: yarn install --immutable
 
       - persist_to_workspace:
           root: .
