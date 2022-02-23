@@ -65,7 +65,7 @@ jobs:
       - setup_remote_docker:
           version: 19.03.13
 
-      - run: yarn semantic-release
+      # - run: yarn semantic-release
 
       - run:
           name: Docker Build
@@ -75,18 +75,18 @@ jobs:
           name: Test image
           command: scripts/test_image.sh
 
-      - run:
-          name: Docker publish
-          command: |
-            is_release=$(git log -1 --format='%h %s' | grep "chore.release")
-            if [[ -z is_release ]]; then
-              echo "Not a release $is_release"
-              circleci-agent step halt;
-            fi
+      # - run:
+      #     name: Docker publish
+      #     command: |
+      #       is_release=$(git log -1 --format='%h %s' | grep "chore.release")
+      #       if [[ -z is_release ]]; then
+      #         echo "Not a release $is_release"
+      #         circleci-agent step halt;
+      #       fi
 
-            echo "Releasing..."
-            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            yarn docker:release
+      #       echo "Releasing..."
+      #       echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+      #       yarn docker:release
 
 workflows:
   version: 2
@@ -103,6 +103,6 @@ workflows:
           requires:
             - lint
             - test
-          filters:
-            branches:
-              only: master
+          # filters:
+          #   branches:
+          #     only: master
