@@ -120,18 +120,13 @@ export class TasksManager {
 
       console.log('Done', url, `(${id})`);
 
-      task = undefined;
-
       return { ...res, metrics };
     } catch (err) {
       console.log('Fail', url, `(${id})`);
       // This error will be reported elsewhere
       throw err;
     } finally {
-      if (task) {
-        await task.close();
-        this.#removeTask(id);
-      }
+      this.#removeTask(id);
     }
   }
 
@@ -156,11 +151,14 @@ export class TasksManager {
     this.#tasks.set(id, { id, createdAt: new Date() });
   }
 
-  #removeTask(id: string): void {
-    // Should never happen
-    if (!this.#tasks.has(id)) {
+  async #removeTask(id: string): Promise<void> {
+    const task = this.#tasks.get(id);
+    if (!task) {
+      // Should never happen but never know
       throw new Error(`Could not find task: ${id}`);
     }
+
+    if (task.task) await task.task?.close();
 
     this.#tasks.delete(id);
   }
