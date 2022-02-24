@@ -19,7 +19,8 @@ import type { TaskObject, TaskParams, TaskFinal } from './types';
 export class TasksManager {
   #browser: Browser | null = null;
   #stopping: boolean = true;
-  #tasks: Map<string, TaskObject & { task?: Task }> = new Map();
+  #tasks: Map<string, TaskObject & { execPromise: Promise<TaskFinal> }> =
+    new Map();
 
   get healthy(): boolean {
     if (this.#stopping) {
@@ -60,7 +61,23 @@ export class TasksManager {
     this.#stopping = false;
   }
 
+  /**
+   * Register and execute a task.
+   */
   async task(job: TaskParams): Promise<TaskFinal> {
+    const id = uuid();
+
+    const task = this.#exec(id, job);
+    this.#tasks.set(id, { id, createdAt: new Date(), execPromise: task });
+    return await task;
+  }
+
+  /**
+   * Actual execution of a task.
+   * It will create a browser, a page, launch the task (render, login), close everything.
+   * Any unexpected error will be thrown.
+   */
+  async #exec(id: string, job: TaskParams): Promise<TaskFinal> {
     if (this.#stopping) {
       throw new Error('Task can not be executed: stopping');
     }
@@ -69,11 +86,9 @@ export class TasksManager {
     }
 
     const url = job.url.toString();
-    const id = uuid();
     console.log('Processing:', url, `(${job.type})(${id})`);
 
     const start = Date.now();
-    this.#registerTask(id);
 
     const jobParam: TaskParams = {
       ...job,
@@ -95,6 +110,8 @@ export class TasksManager {
         (async (): Promise<void> => {
           await wait(MAX_WAIT_FOR_NEW_PAGE);
 
+          console.debug(id, 'Can not create a BrowserPage');
+
           // Stopping has we can not trust puppeteer
           // Health check will collect the rest of this container
           this.stop();
@@ -109,23 +126,24 @@ export class TasksManager {
       } else {
         task = new RenderTask(jobParam, page);
       }
-      const obj = this.#tasks.get(id)!;
-      obj.task = task;
 
       console.debug(id, 'linking task');
       await page.linkToTask(task);
-      obj.taskPromise = task.process().catch((err) => {
-        report(err);
-      });
 
-      console.debug(id, 'waiting task');
+      try {
+        console.debug(id, 'waiting task');
+        await task.process();
+      } catch (err: any) {
+        // Task itself should never break the whole execution
+        report(err, { jobParam });
+      }
 
-      await obj.taskPromise;
       const res = task.results!;
 
       console.debug(id, 'closing task');
 
-      await task.close();
+      // Required to get metrics
+      await task.saveMetrics();
 
       // ---- Reporting
       stats.timing('renderscript.task', Date.now() - start, undefined, {
@@ -155,21 +173,33 @@ export class TasksManager {
       throw err;
     } finally {
       console.log('Finally', url, `(${id})`);
-      await this.#removeTask(id);
+
+      // No matter what happen we want to kill everything gracefully
+      try {
+        if (task) {
+          await task.close();
+        }
+        this.#tasks.delete(id);
+      } catch (err) {
+        report(new Error('Error during close'), { err, jobParam });
+      }
     }
   }
 
+  /**
+   * Stop the task manager.
+   */
   async stop(): Promise<void> {
     this.#stopping = true;
     console.info(`Tasks Manager stopping...`);
 
+    // We wait for all tasks to finish before closing
     const promises: Array<Promise<void>> = [];
-    this.#tasks.forEach(({ taskPromise }) => {
-      if (taskPromise) {
-        promises.push(taskPromise);
-      }
+    this.#tasks.forEach((task) => {
+      promises.push(this.#removeTask(task.id));
     });
     await Promise.all(promises);
+
     this.#tasks.clear();
 
     if (this.#browser) {
@@ -178,21 +208,18 @@ export class TasksManager {
     }
   }
 
-  #registerTask(id: string): void {
-    this.#tasks.set(id, { id, createdAt: new Date() });
-  }
-
   async #removeTask(id: string): Promise<void> {
     const task = this.#tasks.get(id);
     if (!task) {
-      // Should never happen but never know
       throw new Error(`Could not find task: ${id}`);
     }
 
-    if (task.task) {
-      await task.task?.close();
+    try {
+      if (task.execPromise) {
+        await task.execPromise;
+      }
+    } catch (err) {
+      //
     }
-
-    this.#tasks.delete(id);
   }
 }
