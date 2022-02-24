@@ -80,8 +80,11 @@ export class TasksManager {
     let task: Task | undefined;
 
     try {
+      console.debug('create page');
       const page = new BrowserPage();
       await page.create(this.#browser);
+
+      console.debug('page created');
 
       if (jobParam.type === 'login') {
         task = new LoginTask(jobParam, page);
@@ -91,15 +94,21 @@ export class TasksManager {
       const obj = this.#tasks.get(id)!;
       obj.task = task;
 
+      console.debug('linking task');
       await page.linkToTask(task);
       obj.taskPromise = task.process().catch((err) => {
         report(err);
       });
+      console.debug('task linked');
 
       await obj.taskPromise;
       const res = task.results!;
 
+      console.debug('closing task');
+
       await task.close();
+
+      console.debug('task closed');
 
       // ---- Reporting
       stats.timing('renderscript.task', Date.now() - start, undefined, {

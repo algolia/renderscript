@@ -87,4 +87,4 @@ export const WAIT_TIME = {
   max: 20000,
 };
 
-export const UNHEALTHY_TASK_TTL = 5 * 60 * 1000;
+export const UNHEALTHY_TASK_TTL = 1 * 60 * 1000;
