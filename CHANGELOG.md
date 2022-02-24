@@ -1,3 +1,10 @@
+## [1.12.6](https://github.com/algolia/renderscript/compare/v1.12.5...v1.12.6) (2022-02-24)
+
+
+### Bug Fixes
+
+* metrics can fail ([#560](https://github.com/algolia/renderscript/issues/560)) ([4b4f5c0](https://github.com/algolia/renderscript/commit/4b4f5c0e98cf56973b3ad8dabf03b3757fb05d54))
+
 ## [1.12.5](https://github.com/algolia/renderscript/compare/v1.12.4...v1.12.5) (2022-02-24)
 
 
