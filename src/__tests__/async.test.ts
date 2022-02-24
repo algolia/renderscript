@@ -58,8 +58,7 @@ describe('async', () => {
 
     const json = JSON.parse(body);
     expect(res.statusCode).toBe(200);
-    expect(json.metrics.total).toBeGreaterThanOrEqual(6000);
-    expect(json.metrics.total).toBeLessThanOrEqual(7000);
+    expect(json.metrics.total).toBeLessThanOrEqual(6000);
     expect(json.body).toMatch('5. setTimeout 5000');
   });
 
@@ -70,15 +69,17 @@ describe('async', () => {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        url: 'http://localhost:3000/test-website/async.html',
+        url: 'http://localhost:3000/test-website/slow.html',
         ua: 'Algolia Crawler',
         waitTime: {
-          min: 5000,
+          min: 4000,
+          max: 5000,
         },
       }),
     });
 
     const json = JSON.parse(body);
+    console.log(json, json.body);
     expect(res.statusCode).toBe(200);
     expect(json.metrics.total).toBeGreaterThanOrEqual(6000);
     expect(json.metrics.total).toBeLessThanOrEqual(7000);

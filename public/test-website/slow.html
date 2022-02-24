@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+  <div id="id"></div>
+  <script>
+    let i = 1;
+    setInterval(async () => {
+      i += 1;
+
+      // Do a fetch to block networkidle0
+      await fetch('http://localhost/test-website/async.html');
+
+      document.getElementById('id').appendChild(`<div>${i}</div>`);
+    }, 100);
+  </script>
+</body>
+
+</html>
