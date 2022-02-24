@@ -61,6 +61,7 @@ export class TasksManager {
     if (!this.#browser) {
       throw new Error('Task can not be executed: no_browser');
     }
+    console.log('Processing:', url, `(${job.type})(${id})`);
 
     const start = Date.now();
     const id = uuid();
@@ -76,7 +77,6 @@ export class TasksManager {
     const url = job.url.toString();
     let task: Task | undefined;
 
-    console.log('Processing:', url, `(${job.type})(${id})`);
     try {
       const page = new BrowserPage();
       await page.create(this.#browser);
@@ -126,6 +126,7 @@ export class TasksManager {
       // This error will be reported elsewhere
       throw err;
     } finally {
+      console.log('Finally', url, `(${id})`);
       this.#removeTask(id);
     }
   }
