@@ -114,6 +114,7 @@ export class BrowserPage {
 
     const start = Date.now();
     try {
+      // Response can be assigned here or on('response')
       response = await this.#page!.goto(url.href, {
         timeout,
         waitUntil: ['domcontentloaded', 'networkidle0'],
@@ -122,7 +123,7 @@ export class BrowserPage {
       // This error is expected has most page will reach timeout
       if (err.message.match(/Navigation timeout/)) {
         this.#hasTimeout = true;
-        throw new FetchError('timeout', true);
+        report(new FetchError('timeout', true), { url: url.href });
       }
 
       report(new Error('Loading error'), { err });
