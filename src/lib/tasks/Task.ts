@@ -22,6 +22,7 @@ export abstract class Task<TTaskType = TaskBaseParams> {
   get isProcessed(): boolean {
     return typeof this.results !== 'undefined';
   }
+
   async close(): Promise<void> {
     if (this.closed) {
       return;
