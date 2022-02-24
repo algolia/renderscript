@@ -5,6 +5,7 @@ defaults: &defaults
     - image: cimg/node:16.13.1-browsers
   environment:
     NODE_ENV: 'test'
+    MAX_WAIT_FOR_NEW_PAGE: 40000
 
 version: 2.1
 

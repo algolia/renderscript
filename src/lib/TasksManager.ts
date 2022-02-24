@@ -138,35 +138,8 @@ export class TasksManager {
         report(err, { jobParam });
       }
 
-      const res = task.results!;
-
-      console.debug(id, 'closing task');
-
       // Required to get metrics
       await task.saveMetrics();
-
-      // ---- Reporting
-      stats.timing('renderscript.task', Date.now() - start, undefined, {
-        type: job.type,
-      });
-      const metrics = task.metrics;
-
-      if (metrics.page) {
-        Object.entries(metrics.page).forEach(([key, value]) => {
-          if (key.endsWith('Duration')) {
-            stats.timing(`renderscript.task.${key}`, value);
-            return;
-          }
-
-          stats.histogram(`renderscript.task.${key}`, value);
-          stats.increment(`renderscript.task.${key}.amount`, value);
-        });
-      }
-      // --- /done
-
-      console.log('Done', url, `(${id})`);
-
-      return { ...res, metrics };
     } catch (err) {
       console.log('Fail', url, `(${id})`);
       // This error will be reported elsewhere
@@ -184,6 +157,30 @@ export class TasksManager {
         report(new Error('Error during close'), { err, jobParam });
       }
     }
+
+    // ---- Reporting
+    stats.timing('renderscript.task', Date.now() - start, undefined, {
+      type: job.type,
+    });
+    const metrics = task.metrics;
+
+    if (metrics.page) {
+      Object.entries(metrics.page).forEach(([key, value]) => {
+        if (key.endsWith('Duration')) {
+          stats.timing(`renderscript.task.${key}`, value);
+          return;
+        }
+
+        stats.histogram(`renderscript.task.${key}`, value);
+        stats.increment(`renderscript.task.${key}.amount`, value);
+      });
+    }
+    // --- /reporting
+
+    console.log('Done', url, `(${id})`);
+
+    const res = task.results!;
+    return { ...res, metrics };
   }
 
   /**
