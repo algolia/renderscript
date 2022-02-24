@@ -94,6 +94,10 @@ export class TasksManager {
         page.create(this.#browser),
         (async (): Promise<void> => {
           await wait(MAX_WAIT_FOR_NEW_PAGE);
+
+          // Stopping has we can not trust puppeteer
+          // Health check will collect the rest of this container
+          this.stop();
           throw new Error('Can not create a BrowserPage');
         })(),
       ]);
@@ -113,6 +117,8 @@ export class TasksManager {
       obj.taskPromise = task.process().catch((err) => {
         report(err);
       });
+
+      console.debug(id, 'waiting task');
 
       await obj.taskPromise;
       const res = task.results!;
@@ -159,7 +165,9 @@ export class TasksManager {
 
     const promises: Array<Promise<void>> = [];
     this.#tasks.forEach(({ taskPromise }) => {
-      if (taskPromise) promises.push(taskPromise);
+      if (taskPromise) {
+        promises.push(taskPromise);
+      }
     });
     await Promise.all(promises);
     this.#tasks.clear();
