@@ -5,7 +5,6 @@ import type {
   Page,
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 
-import { FetchError } from 'api/helpers/errors';
 import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
@@ -43,6 +42,7 @@ export class BrowserPage {
     contentLength: 0,
     contentLengthTotal: 0,
   };
+  #hasTimeout: boolean = false;
 
   get page(): Page | undefined {
     return this.#page;
@@ -113,17 +113,20 @@ export class BrowserPage {
 
     const start = Date.now();
     try {
+      // Response can be assigned here or on('response')
       response = await this.#page!.goto(url.href, {
         timeout,
         waitUntil: ['domcontentloaded', 'networkidle0'],
       });
     } catch (err: any) {
-      // This error is expected has most page will reach timeout
       if (err.message.match(/Navigation timeout/)) {
-        throw new FetchError('no_response', true);
+        // This error is expected has most page will reach timeout
+        this.#hasTimeout = true;
+        report(new Error('goto_timeout'), { url: url.href });
+      } else {
+        report(new Error('goto_error'), { err, url: url.href });
       }
-
-      report(new Error('Loading error'), { err });
+      // we want to continue because we can still have a response
     } finally {
       stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
         success: response ? 'true' : 'false',
@@ -132,7 +135,7 @@ export class BrowserPage {
 
     /* Fetch errors */
     if (!response) {
-      throw new FetchError('no_response');
+      throw new Error('goto_no_response');
     }
     return response;
   }
@@ -171,6 +174,12 @@ export class BrowserPage {
     this.#page!.on('request', async (req) => {
       const reqUrl = req.url();
       this.#metrics.requests += 1;
+
+      if (this.#hasTimeout) {
+        // If the page was killed in the meantime we don't want to process anything else
+        req.abort();
+        return;
+      }
 
       // Skip data URIs
       if (DATA_REGEXP.test(reqUrl)) {
@@ -233,6 +242,11 @@ export class BrowserPage {
     this.#page!.on('response', async (res) => {
       const headers = res.headers();
 
+      if (this.#hasTimeout) {
+        // If the page was killed in the meantime we don't want to process anything else
+        return;
+      }
+
       let cl = 0;
 
       if (headers['content-length']) {
@@ -241,28 +255,28 @@ export class BrowserPage {
 
       const status = res.status();
       // Redirection does not have a body
-      if (status < 300 || status >= 400) {
-        try {
-          // Not every request has the content-length header, the byteLength match perfectly
-          // but does not necessarly represent what was transfered (if it was gzipped for example)
-          cl = (await res.buffer()).byteLength;
-        } catch (err: any) {
-          if (
-            RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))
-          ) {
-            return;
-          }
+      if (status > 300 && status < 400) {
+        return;
+      }
 
-          // We can not throw in callback, it will go directly into unhandled
-          report(err, { context: 'onResponse', url: url.href });
+      try {
+        // Not every request has the content-length header, the byteLength match perfectly
+        // but does not necessarly represent what was transfered (if it was gzipped for example)
+        cl = (await res.buffer()).byteLength;
+
+        if (res.url() === url.href) {
+          this.#metrics.contentLength = cl;
         }
-      }
 
-      if (res.url() === url.href) {
-        this.#metrics.contentLength = cl;
-      }
+        this.#metrics.contentLengthTotal += cl;
+      } catch (err: any) {
+        if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+          return;
+        }
 
-      this.#metrics.contentLengthTotal += cl;
+        // We can not throw in callback, it will go directly into unhandled
+        report(err, { context: 'onResponse', url: url.href });
+      }
     });
   }
 }

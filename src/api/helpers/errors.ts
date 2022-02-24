@@ -29,12 +29,3 @@ export function badRequest({
     details,
   });
 }
-
-export class FetchError extends Error {
-  timeout: boolean;
-
-  constructor(msg: string, timeout: boolean = false) {
-    super(msg);
-    this.timeout = timeout;
-  }
-}

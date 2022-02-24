@@ -62,6 +62,35 @@ describe('async', () => {
     expect(json.metrics.total).toBeLessThanOrEqual(7000);
     expect(json.body).toMatch('5. setTimeout 5000');
   });
+
+  it('should wait 5000ms', async () => {
+    const { res, body } = await request('http://localhost:3000/render', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        url: 'http://localhost:3000/test-website/slow.html',
+        ua: 'Algolia Crawler',
+        waitTime: {
+          min: 4000,
+          max: 5000,
+        },
+      }),
+    });
+
+    const json = JSON.parse(body);
+    expect(res.statusCode).toBe(200);
+    expect(json.metrics.goto).toBeLessThanOrEqual(5010);
+    expect(json.metrics.goto).toBeGreaterThan(5000);
+
+    // We count the dot because there is no way to have precise execution
+    // There should be around 25 dots (one fetch every 200ms during 5s = 25 dots)
+    // We check for 20 to have some margin
+    // And no more than 30 to check that it was not executed more than 5s
+    expect(json.body).toMatch('.'.repeat(20));
+    expect(json.body).not.toMatch('.'.repeat(30));
+  });
 });
 
 describe('redirects', () => {

@@ -6,6 +6,8 @@ export const RESPONSE_IGNORED_ERRORS = [
   'Request content was evicted from inspector cache',
   // Protocol error, js redirect or options
   'This might happen if the request is a preflight request',
+  // Can happen if the page that trigger this response was closed in the meantime
+  'Target closed.',
 ];
 
 export const REQUEST_IGNORED_ERRORS = ['Request is already handled'];
