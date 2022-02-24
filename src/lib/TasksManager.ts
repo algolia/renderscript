@@ -85,11 +85,12 @@ export class TasksManager {
       throw new Error('Task can not be executed: no_browser');
     }
 
-    const url = job.url.toString();
+    const url = job.url.href;
     console.log('Processing:', url, `(${job.type})(${id})`);
 
     const start = Date.now();
 
+    // Do not print this or pass it to reporting, it contains secrets
     const jobParam: TaskParams = {
       ...job,
       waitTime: {
@@ -100,7 +101,6 @@ export class TasksManager {
     let task: Task | undefined;
 
     try {
-      console.debug(id, 'create page');
       const page = new BrowserPage();
 
       // It seems page creation can hang infinitely in puppeteer
@@ -110,7 +110,7 @@ export class TasksManager {
         (async (): Promise<void> => {
           await wait(MAX_WAIT_FOR_NEW_PAGE);
 
-          console.debug(id, 'Can not create a BrowserPage');
+          console.log(id, 'Can not create a BrowserPage');
 
           // Stopping has we can not trust puppeteer
           // Health check will collect the rest of this container
@@ -119,23 +119,19 @@ export class TasksManager {
         })(),
       ]);
 
-      console.debug(id, 'page created');
-
       if (jobParam.type === 'login') {
         task = new LoginTask(jobParam, page);
       } else {
         task = new RenderTask(jobParam, page);
       }
 
-      console.debug(id, 'linking task');
       await page.linkToTask(task);
 
       try {
-        console.debug(id, 'waiting task');
         await task.process();
       } catch (err: any) {
         // Task itself should never break the whole execution
-        report(err, { jobParam });
+        report(err, { url });
       }
 
       // Required to get metrics
@@ -154,7 +150,7 @@ export class TasksManager {
         }
         this.#tasks.delete(id);
       } catch (err) {
-        report(new Error('Error during close'), { err, jobParam });
+        report(new Error('Error during close'), { err, url });
       }
     }
 
