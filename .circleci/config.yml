@@ -80,11 +80,11 @@ jobs:
       - run:
           name: Docker publish
           command: |
-            # is_release=$(git log -1 --format='%h %s' | grep "chore.release")
-            # if [[ -z is_release ]]; then
-            #   echo "Not a release $is_release"
-            #   circleci-agent step halt;
-            # fi
+            is_release=$(git log -1 --format='%h %s' | grep "chore.release")
+            if [[ -z is_release ]]; then
+              echo "Not a release $is_release"
+              circleci-agent step halt;
+            fi
 
             echo "Releasing..."
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -105,6 +105,6 @@ workflows:
           requires:
             - lint
             - test
-          # filters:
-          #   branches:
-          #     only: master
+          filters:
+            branches:
+              only: master
