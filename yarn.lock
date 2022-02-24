@@ -54,7 +54,7 @@ __metadata:
     jest: 27.5.1
     nodemon: 2.0.15
     prettier: 2.5.1
-    puppeteer-core: 11.0.0
+    puppeteer-core: 12.0.1
     semantic-release: 19.0.2
     stream-to-string: 1.2.0
     ts-jest: 27.1.3
@@ -3289,10 +3289,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"devtools-protocol@npm:0.0.901419":
-  version: 0.0.901419
-  resolution: "devtools-protocol@npm:0.0.901419"
-  checksum: de68331ddfb35b828ad743d939d9237e122f76d4a6cbf1e64f6c6d8e9c2c5cc65a5f1994db0fead90192cca1aa9dbed2ea822a7da7b58104cd041a90e215b9a3
+"devtools-protocol@npm:0.0.937139":
+  version: 0.0.937139
+  resolution: "devtools-protocol@npm:0.0.937139"
+  checksum: 4ac9d9e5fad229fca6786d2afe95bac4ee87a8e188092ce088a0fba222b20397ec61f8eff8d1703b96e3dab27927cb91a5c6f84d151342e0603c09d4378ab62d
   languageName: node
   linkType: hard
 
@@ -7853,12 +7853,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer-core@npm:11.0.0":
-  version: 11.0.0
-  resolution: "puppeteer-core@npm:11.0.0"
+"puppeteer-core@npm:12.0.1":
+  version: 12.0.1
+  resolution: "puppeteer-core@npm:12.0.1"
   dependencies:
     debug: 4.3.2
-    devtools-protocol: 0.0.901419
+    devtools-protocol: 0.0.937139
     extract-zip: 2.0.1
     https-proxy-agent: 5.0.0
     node-fetch: 2.6.5
@@ -7869,7 +7869,7 @@ __metadata:
     tar-fs: 2.1.1
     unbzip2-stream: 1.4.3
     ws: 8.2.3
-  checksum: 7f336902d7df8aef08488d2df8101ec1ff76bc1e22ec51eb3f6d6541e367b573365afd22aba2753f46ab790563e1d0dfad93efb2c3804c7cfa3f7b042e050028
+  checksum: b495a7b73bf36e8724ab7f811cbc2618634541011ab9a29a1f8bcb6fdbd8afb943a817e8f69b9b3c9f8cd7c709dcab92c1a26a7a9ae73b47bd563299a9afa2aa
   languageName: node
   linkType: hard
 

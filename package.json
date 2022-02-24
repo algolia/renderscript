@@ -83,7 +83,7 @@
     "csurf": "1.11.0",
     "express": "4.17.3",
     "hot-shots": "9.0.0",
-    "puppeteer-core": "11.0.0",
+    "puppeteer-core": "12.0.1",
     "stream-to-string": "1.2.0",
     "undici": "4.14.1",
     "uuid": "8.3.2"
