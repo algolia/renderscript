@@ -1,6 +1,6 @@
 {
   "name": "@algolia/renderscript",
-  "version": "1.12.7",
+  "version": "1.12.8",
   "description": "A custom JavaScript rendering engine based on puppeteer",
   "main": "dist/index.js",
   "scripts": {
