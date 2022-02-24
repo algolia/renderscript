@@ -128,7 +128,7 @@ export class TasksManager {
       throw err;
     } finally {
       console.log('Finally', url, `(${id})`);
-      this.#removeTask(id);
+      await this.#removeTask(id);
     }
   }
 
