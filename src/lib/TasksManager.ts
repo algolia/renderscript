@@ -61,10 +61,12 @@ export class TasksManager {
     if (!this.#browser) {
       throw new Error('Task can not be executed: no_browser');
     }
+
+    const url = job.url.toString();
+    const id = uuid();
     console.log('Processing:', url, `(${job.type})(${id})`);
 
     const start = Date.now();
-    const id = uuid();
     this.#registerTask(id);
 
     const jobParam: TaskParams = {
@@ -74,7 +76,6 @@ export class TasksManager {
         ...job.waitTime,
       },
     };
-    const url = job.url.toString();
     let task: Task | undefined;
 
     try {
