@@ -5,7 +5,6 @@ import type {
   Page,
 } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 
-import { FetchError } from 'api/helpers/errors';
 import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
@@ -120,13 +119,14 @@ export class BrowserPage {
         waitUntil: ['domcontentloaded', 'networkidle0'],
       });
     } catch (err: any) {
-      // This error is expected has most page will reach timeout
       if (err.message.match(/Navigation timeout/)) {
+        // This error is expected has most page will reach timeout
         this.#hasTimeout = true;
-        report(new FetchError('timeout', true), { url: url.href });
+        report(new Error('goto_timeout'), { url: url.href });
+      } else {
+        report(new Error('goto_error'), { err, url: url.href });
       }
-
-      report(new Error('Loading error'), { err });
+      // we want to continue because we can still have a response
     } finally {
       stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
         success: response ? 'true' : 'false',
@@ -135,7 +135,7 @@ export class BrowserPage {
 
     /* Fetch errors */
     if (!response) {
-      throw new FetchError('no_response');
+      throw new Error('goto_no_response');
     }
     return response;
   }
