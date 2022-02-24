@@ -1,5 +1,6 @@
 import type { HTTPResponse } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
 
+import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { RenderTaskParams } from 'lib/types';
@@ -26,6 +27,7 @@ export class RenderTask extends Task<RenderTaskParams> {
       };
       return;
     }
+
     this.metrics.goto = Date.now() - start;
 
     const statusCode = response.status();
@@ -68,10 +70,12 @@ export class RenderTask extends Task<RenderTaskParams> {
           return;
         }
       }
-    } catch (e) {
-      console.log(
-        'Error while trying to check for meta[http-equive="refresh"]',
-        e
+    } catch (err) {
+      report(
+        new Error(
+          'Error while trying to check for meta[http-equive="refresh"]'
+        ),
+        { err }
       );
     }
 
