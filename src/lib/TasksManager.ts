@@ -2,10 +2,15 @@ import { v4 as uuid } from 'uuid';
 
 import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
+import { wait } from 'helpers/wait';
 
 import { Browser } from './browser/Browser';
 import { BrowserPage } from './browser/Page';
-import { UNHEALTHY_TASK_TTL, WAIT_TIME } from './constants';
+import {
+  MAX_WAIT_FOR_NEW_PAGE,
+  UNHEALTHY_TASK_TTL,
+  WAIT_TIME,
+} from './constants';
 import { LoginTask } from './tasks/Login';
 import { RenderTask } from './tasks/Render';
 import type { Task } from './tasks/Task';
@@ -80,11 +85,20 @@ export class TasksManager {
     let task: Task | undefined;
 
     try {
-      console.debug('create page');
+      console.debug(id, 'create page');
       const page = new BrowserPage();
-      await page.create(this.#browser);
 
-      console.debug('page created');
+      // It seems page creation can hang infinitely in puppeteer
+      // so we want it fail as soon as possible to retry on an other pod
+      await Promise.race([
+        page.create(this.#browser),
+        (async (): Promise<void> => {
+          await wait(MAX_WAIT_FOR_NEW_PAGE);
+          throw new Error('Can not create a BrowserPage');
+        })(),
+      ]);
+
+      console.debug(id, 'page created');
 
       if (jobParam.type === 'login') {
         task = new LoginTask(jobParam, page);
@@ -94,21 +108,18 @@ export class TasksManager {
       const obj = this.#tasks.get(id)!;
       obj.task = task;
 
-      console.debug('linking task');
+      console.debug(id, 'linking task');
       await page.linkToTask(task);
       obj.taskPromise = task.process().catch((err) => {
         report(err);
       });
-      console.debug('task linked');
 
       await obj.taskPromise;
       const res = task.results!;
 
-      console.debug('closing task');
+      console.debug(id, 'closing task');
 
       await task.close();
-
-      console.debug('task closed');
 
       // ---- Reporting
       stats.timing('renderscript.task', Date.now() - start, undefined, {
