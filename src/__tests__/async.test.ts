@@ -82,7 +82,7 @@ describe('async', () => {
     const json = JSON.parse(body);
     expect(res.statusCode).toBe(200);
     expect(json.metrics.goto).toBeLessThanOrEqual(5010);
-    expect(json.metrics.goto).toBeGreaterThan(5000);
+    expect(json.metrics.goto).toBeGreaterThanOrEqual(5000);
 
     // We count the dot because there is no way to have precise execution
     // There should be around 25 dots (one fetch every 200ms during 5s = 25 dots)
