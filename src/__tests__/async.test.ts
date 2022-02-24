@@ -62,6 +62,28 @@ describe('async', () => {
     expect(json.metrics.total).toBeLessThanOrEqual(7000);
     expect(json.body).toMatch('5. setTimeout 5000');
   });
+
+  it('should wait 5000ms', async () => {
+    const { res, body } = await request('http://localhost:3000/render', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        url: 'http://localhost:3000/test-website/async.html',
+        ua: 'Algolia Crawler',
+        waitTime: {
+          min: 5000,
+        },
+      }),
+    });
+
+    const json = JSON.parse(body);
+    expect(res.statusCode).toBe(200);
+    expect(json.metrics.total).toBeGreaterThanOrEqual(6000);
+    expect(json.metrics.total).toBeLessThanOrEqual(7000);
+    expect(json.body).toMatch('5. setTimeout 5000');
+  });
 });
 
 describe('redirects', () => {
