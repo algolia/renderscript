@@ -5,17 +5,20 @@
 </head>
 
 <body>
+  <div id="count"></div>
   <div id="id"></div>
   <script>
     let i = 1;
     setInterval(async () => {
       i += 1;
 
+      document.getElementById('id').append('.');
+      document.getElementById('count').innerHTML = i;
       // Do a fetch to block networkidle0
-      await fetch('http://localhost/test-website/async.html');
-
-      document.getElementById('id').appendChild(`<div>${i}</div>`);
-    }, 100);
+      try {
+        // await fetch('http://localhost/test-website/async.html');
+      } catch (e) { }
+    }, 200);
   </script>
 </body>
 
