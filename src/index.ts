@@ -20,6 +20,13 @@ process.on('unhandledRejection', (reason) => {
 });
 process.on('uncaughtException', (reason) => {
   report(new Error('uncaught exception'), { err: reason });
+
+  console.log('Exit');
+  // We are not sure if it's stable or not
+  setTimeout(() => {
+    // eslint-disable-next-line no-process-exit
+    process.exit(1);
+  }, 1);
 });
 
 const api = new Api();

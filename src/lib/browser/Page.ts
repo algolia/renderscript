@@ -22,16 +22,11 @@ import {
 } from '../constants';
 
 import type { Browser } from './Browser';
-
-const IGNORED_ERRORS = [
-  // 200 no body, HEAD, OPTIONS
-  'No data found for resource with given identifier',
-  'No resource with given identifier found',
-  // Too big to fit in memory, or memory filled
-  'Request content was evicted from inspector cache',
-  // Protocol error, js redirect or options
-  'This might happen if the request is a preflight request',
-];
+import {
+  REQUEST_IGNORED_ERRORS,
+  RESPONSE_IGNORED_ERRORS,
+  VALIDATE_URL_IGNORED_ERRORS,
+} from './constants';
 
 export class BrowserPage {
   #page: Page | undefined;
@@ -123,11 +118,12 @@ export class BrowserPage {
         waitUntil: ['domcontentloaded', 'networkidle0'],
       });
     } catch (err: any) {
-      if (err.message.match(/Navigation Timeout Exceeded/)) {
+      // This error is expected has most page will reach timeout
+      if (err.message.match(/Navigation timeout/)) {
         throw new FetchError('no_response', true);
-      } else {
-        report(new Error('Loading error'), { err });
       }
+
+      report(new Error('Loading error'), { err });
     } finally {
       stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
         success: response ? 'true' : 'false',
@@ -190,8 +186,10 @@ export class BrowserPage {
           ipPrefixes: RESTRICTED_IPS,
         });
       } catch (err: any) {
-        if (!err.message.includes('ENOTFOUND')) {
-          report(new Error('Blocker url'), { err, url: reqUrl });
+        if (
+          !VALIDATE_URL_IGNORED_ERRORS.some((msg) => err.message.includes(msg))
+        ) {
+          report(new Error('Blocked url'), { err, url: reqUrl });
           this.#metrics.blockedRequests += 1;
         }
 
@@ -224,10 +222,11 @@ export class BrowserPage {
         }
         await req.continue();
       } catch (err: any) {
-        if (!err.message.match(/Request is already handled/)) {
-          report(err, { context: 'onRequest', url: url.href, with: reqUrl });
+        if (REQUEST_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+          return;
         }
-        // Ignore Request is already handled error
+
+        report(err, { context: 'onRequest', url: url.href, with: reqUrl });
       }
     });
 
@@ -248,7 +247,9 @@ export class BrowserPage {
           // but does not necessarly represent what was transfered (if it was gzipped for example)
           cl = (await res.buffer()).byteLength;
         } catch (err: any) {
-          if (IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+          if (
+            RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))
+          ) {
             return;
           }
 

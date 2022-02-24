@@ -79,6 +79,6 @@ export interface NewPage {
 
 export interface TaskObject {
   id: string;
-  taskPromise: Promise<void>;
+  taskPromise?: Promise<void>;
   createdAt: Date;
 }

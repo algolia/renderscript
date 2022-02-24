@@ -22,7 +22,15 @@ export abstract class Task<TTaskType = TaskBaseParams> {
     return typeof this.results !== 'undefined';
   }
 
+  get isClosed(): boolean {
+    return this.metrics.page !== null;
+  }
+
   async close(): Promise<void> {
+    if (this.isClosed) {
+      return;
+    }
+
     this.metrics.page = await this.page.metrics();
     await this.page.close();
   }

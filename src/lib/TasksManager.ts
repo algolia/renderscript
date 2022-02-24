@@ -14,7 +14,7 @@ import type { TaskObject, TaskParams, TaskFinal } from './types';
 export class TasksManager {
   #browser: Browser | null = null;
   #stopping: boolean = true;
-  #currentTasks: TaskObject[] = [];
+  #tasks: Map<string, TaskObject & { task?: Task }> = new Map();
 
   get healthy(): boolean {
     if (this.#stopping) {
@@ -22,8 +22,11 @@ export class TasksManager {
     }
 
     // Tasks lifecycle
-    const lostTask = this.#currentTasks.some((task) => {
-      return Date.now() - task.createdAt.getTime() > UNHEALTHY_TASK_TTL;
+    let lostTask = 0;
+    this.#tasks.forEach((task) => {
+      if (Date.now() - task.createdAt.getTime() > UNHEALTHY_TASK_TTL) {
+        lostTask += 1;
+      }
     });
     if (lostTask) {
       return false;
@@ -41,7 +44,7 @@ export class TasksManager {
   }
 
   get currentConcurrency(): number {
-    return this.#currentTasks.length;
+    return this.#tasks.size;
   }
 
   async launch(): Promise<void> {
@@ -59,8 +62,13 @@ export class TasksManager {
       throw new Error('Task can not be executed: no_browser');
     }
 
-    const start = Date.now();
+    const url = job.url.toString();
     const id = uuid();
+    console.log('Processing:', url, `(${job.type})(${id})`);
+
+    const start = Date.now();
+    this.#registerTask(id);
+
     const jobParam: TaskParams = {
       ...job,
       waitTime: {
@@ -68,10 +76,8 @@ export class TasksManager {
         ...job.waitTime,
       },
     };
-    const url = job.url.toString();
     let task: Task | undefined;
 
-    console.log('Processing:', url, `(${job.type})(${id})`);
     try {
       const page = new BrowserPage();
       await page.create(this.#browser);
@@ -81,17 +87,17 @@ export class TasksManager {
       } else {
         task = new RenderTask(jobParam, page);
       }
+      const obj = this.#tasks.get(id)!;
+      obj.task = task;
 
       await page.linkToTask(task);
-      const taskPromise = task.process().catch((err) => {
+      obj.taskPromise = task.process().catch((err) => {
         report(err);
       });
-      this.#addTask({ id, taskPromise });
 
-      await taskPromise;
+      await obj.taskPromise;
       const res = task.results!;
 
-      this.#removeTask({ id });
       await task.close();
 
       // ---- Reporting
@@ -115,18 +121,14 @@ export class TasksManager {
 
       console.log('Done', url, `(${id})`);
 
-      task = undefined;
-
       return { ...res, metrics };
     } catch (err) {
       console.log('Fail', url, `(${id})`);
       // This error will be reported elsewhere
       throw err;
     } finally {
-      if (task) {
-        this.#removeTask({ id });
-        task.close();
-      }
+      console.log('Finally', url, `(${id})`);
+      this.#removeTask(id);
     }
   }
 
@@ -134,7 +136,12 @@ export class TasksManager {
     this.#stopping = true;
     console.info(`Tasks Manager stopping...`);
 
-    await Promise.all(this.#currentTasks.map(({ taskPromise }) => taskPromise));
+    const promises: Array<Promise<void>> = [];
+    this.#tasks.forEach(({ taskPromise }) => {
+      if (taskPromise) promises.push(taskPromise);
+    });
+    await Promise.all(promises);
+    this.#tasks.clear();
 
     if (this.#browser) {
       await this.#browser.stop();
@@ -142,18 +149,19 @@ export class TasksManager {
     }
   }
 
-  #addTask({ id, taskPromise }: Pick<TaskObject, 'id' | 'taskPromise'>): void {
-    this.#currentTasks.push({ id, taskPromise, createdAt: new Date() });
+  #registerTask(id: string): void {
+    this.#tasks.set(id, { id, createdAt: new Date() });
   }
 
-  #removeTask({ id }: Pick<TaskObject, 'id'>): void {
-    const idx = this.#currentTasks.findIndex(({ id: _id }) => id === _id);
-
-    // Should never happen
-    if (idx === -1) {
-      throw new Error('Could not find task');
+  async #removeTask(id: string): Promise<void> {
+    const task = this.#tasks.get(id);
+    if (!task) {
+      // Should never happen but never know
+      throw new Error(`Could not find task: ${id}`);
     }
 
-    this.#currentTasks.splice(idx, 1);
+    if (task.task) await task.task?.close();
+
+    this.#tasks.delete(id);
   }
 }
