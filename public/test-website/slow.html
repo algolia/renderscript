@@ -14,9 +14,9 @@
 
       document.getElementById('id').append('.');
       document.getElementById('count').innerHTML = i;
-      // Do a fetch to block networkidle0
       try {
-        // await fetch('http://localhost/test-website/async.html');
+        // Do a fetch to block networkidle0
+        await fetch('http://localhost/test-website/async.html');
       } catch (e) { }
     }, 200);
   </script>

@@ -58,7 +58,8 @@ describe('async', () => {
 
     const json = JSON.parse(body);
     expect(res.statusCode).toBe(200);
-    expect(json.metrics.total).toBeLessThanOrEqual(6000);
+    expect(json.metrics.total).toBeGreaterThanOrEqual(6000);
+    expect(json.metrics.total).toBeLessThanOrEqual(7000);
     expect(json.body).toMatch('5. setTimeout 5000');
   });
 
@@ -82,6 +83,8 @@ describe('async', () => {
     expect(res.statusCode).toBe(200);
     expect(json.metrics.goto).toBeLessThanOrEqual(5010);
     expect(json.metrics.goto).toBeGreaterThan(5000);
+
+    // We count the dot because there is no way to have precise execution
     expect(json.body).toMatch('.'.repeat(20));
     console.log(json.body);
   });
