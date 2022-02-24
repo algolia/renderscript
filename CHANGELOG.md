@@ -1,3 +1,11 @@
+## [1.12.7](https://github.com/algolia/renderscript/compare/v1.12.6...v1.12.7) (2022-02-24)
+
+
+### Bug Fixes
+
+* orEqual ([dc973d8](https://github.com/algolia/renderscript/commit/dc973d8c5087477ace41b32fec7ebd1ca0e98e69))
+* test max wait ([#561](https://github.com/algolia/renderscript/issues/561)) ([4e94a32](https://github.com/algolia/renderscript/commit/4e94a32e200163c98db63212035863a60b194417))
+
 ## [1.12.6](https://github.com/algolia/renderscript/compare/v1.12.5...v1.12.6) (2022-02-24)
 
 
