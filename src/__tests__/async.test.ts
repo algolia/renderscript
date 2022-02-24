@@ -85,8 +85,11 @@ describe('async', () => {
     expect(json.metrics.goto).toBeGreaterThan(5000);
 
     // We count the dot because there is no way to have precise execution
+    // There should be around 25 dots (one fetch every 200ms during 5s = 25 dots)
+    // We check for 20 to have some margin
+    // And no more than 30 to check that it was not executed more than 5s
     expect(json.body).toMatch('.'.repeat(20));
-    console.log(json.body);
+    expect(json.body).not.toMatch('.'.repeat(30));
   });
 });
 
