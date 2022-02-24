@@ -9,8 +9,6 @@ echo ""
 
 docker build \
   --progress plain \
-  -t algolia/renderscript \
-  -t "algolia/renderscript:${current}" \
   -t "algolia/renderscript:${hash}" \
   --build-arg "VERSION=${current}" \
   .
