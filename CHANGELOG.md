@@ -1,3 +1,10 @@
+## [1.12.5](https://github.com/algolia/renderscript/compare/v1.12.4...v1.12.5) (2022-02-24)
+
+
+### Bug Fixes
+
+* **tasks:** try to improve tracking and error reporting ([#559](https://github.com/algolia/renderscript/issues/559)) ([e4c132c](https://github.com/algolia/renderscript/commit/e4c132ca3fbf06069a48b56f7fb1dd42d8518d46))
+
 ## [1.12.4](https://github.com/algolia/renderscript/compare/v1.12.3...v1.12.4) (2022-02-23)
 
 
