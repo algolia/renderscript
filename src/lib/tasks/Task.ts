@@ -12,6 +12,7 @@ export abstract class Task<TTaskType = TaskBaseParams> {
     total: null,
     page: null,
   };
+  closed: boolean = false;
 
   constructor(params: TTaskType, page: BrowserPage) {
     this.params = params;
@@ -22,16 +23,18 @@ export abstract class Task<TTaskType = TaskBaseParams> {
     return typeof this.results !== 'undefined';
   }
 
-  get isClosed(): boolean {
-    return this.metrics.page !== null;
-  }
-
   async close(): Promise<void> {
-    if (this.isClosed) {
+    if (this.closed) {
       return;
     }
 
-    this.metrics.page = await this.page.metrics();
+    this.closed = true;
+
+    try {
+      this.metrics.page = await this.page.metrics();
+    } catch (err) {
+      // Can happen if target is already closed or redirection
+    }
     await this.page.close();
   }
 

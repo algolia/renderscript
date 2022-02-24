@@ -29,6 +29,7 @@ export class TasksManager {
       }
     });
     if (lostTask) {
+      report(new Error('Many lost tasks'), { lostTask });
       return false;
     }
 
@@ -128,7 +129,7 @@ export class TasksManager {
       throw err;
     } finally {
       console.log('Finally', url, `(${id})`);
-      this.#removeTask(id);
+      await this.#removeTask(id);
     }
   }
 
@@ -160,7 +161,9 @@ export class TasksManager {
       throw new Error(`Could not find task: ${id}`);
     }
 
-    if (task.task) await task.task?.close();
+    if (task.task) {
+      await task.task?.close();
+    }
 
     this.#tasks.delete(id);
   }
