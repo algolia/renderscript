@@ -123,11 +123,12 @@ export class BrowserPage {
         waitUntil: ['domcontentloaded', 'networkidle0'],
       });
     } catch (err: any) {
-      if (err.message.match(/Navigation Timeout Exceeded/)) {
+      // This error is expected has most page will reach timeout
+      if (err.message.match(/Navigation timeout/)) {
         throw new FetchError('no_response', true);
-      } else {
-        report(new Error('Loading error'), { err });
       }
+
+      report(new Error('Loading error'), { err });
     } finally {
       stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
         success: response ? 'true' : 'false',
