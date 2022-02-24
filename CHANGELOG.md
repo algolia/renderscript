@@ -1,3 +1,10 @@
+## [1.12.9](https://github.com/algolia/renderscript/compare/v1.12.8...v1.12.9) (2022-02-24)
+
+
+### Bug Fixes
+
+* rollback to puppeteer v12 ([#564](https://github.com/algolia/renderscript/issues/564)) ([2e2d4e6](https://github.com/algolia/renderscript/commit/2e2d4e676308ae0c39bafdfa60ea7e17667ac4e8))
+
 ## [1.12.8](https://github.com/algolia/renderscript/compare/v1.12.7...v1.12.8) (2022-02-24)
 
 
