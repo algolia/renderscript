@@ -60,9 +60,12 @@ export class BrowserPage {
    * Create an empty page in a browser.
    */
   async create(browser: Browser): Promise<void> {
+    let start = Date.now();
     const context = await browser.instance!.createIncognitoBrowserContext();
+    stats.timing('renderscript.context.create', Date.now() - start);
+    console.debug('context create ', Date.now() - start);
 
-    const start = Date.now();
+    start = Date.now();
     const page = await context.newPage();
 
     await page.setUserAgent('Algolia Crawler Renderscript');
@@ -76,6 +79,7 @@ export class BrowserPage {
     // });
 
     stats.timing('renderscript.page.create', Date.now() - start);
+    console.debug('page create ', Date.now() - start);
     this.#page = page;
     this.#context = context;
   }

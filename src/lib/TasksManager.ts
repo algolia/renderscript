@@ -34,7 +34,7 @@ export class TasksManager {
         lostTask += 1;
       }
     });
-    if (lostTask) {
+    if (lostTask > 0) {
       report(new Error('Many lost tasks'), { lostTask });
       return false;
     }
