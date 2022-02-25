@@ -52,6 +52,10 @@ export class BrowserPage {
     return this.#context;
   }
 
+  get isReady(): boolean {
+    return Boolean(this.#page && this.#context);
+  }
+
   /**
    * Create an empty page in a browser.
    */

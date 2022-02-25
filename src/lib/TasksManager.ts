@@ -110,6 +110,10 @@ export class TasksManager {
         (async (): Promise<void> => {
           await wait(MAX_WAIT_FOR_NEW_PAGE);
 
+          if (page.isReady) {
+            return;
+          }
+
           console.log(id, 'Can not create a BrowserPage');
 
           // Stopping has we can not trust puppeteer
