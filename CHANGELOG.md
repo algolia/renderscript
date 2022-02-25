@@ -1,3 +1,10 @@
+## [1.12.11](https://github.com/algolia/renderscript/compare/v1.12.10...v1.12.11) (2022-02-25)
+
+
+### Bug Fixes
+
+* add debug ([a62f1ca](https://github.com/algolia/renderscript/commit/a62f1ca4a9439ba60d0210dcfa784ba1f37f7eb9))
+
 ## [1.12.10](https://github.com/algolia/renderscript/compare/v1.12.9...v1.12.10) (2022-02-25)
 
 
