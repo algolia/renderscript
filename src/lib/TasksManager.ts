@@ -2,10 +2,15 @@ import { v4 as uuid } from 'uuid';
 
 import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
+import { wait } from 'helpers/wait';
 
 import { Browser } from './browser/Browser';
 import { BrowserPage } from './browser/Page';
-import { UNHEALTHY_TASK_TTL, WAIT_TIME } from './constants';
+import {
+  MAX_WAIT_FOR_NEW_PAGE,
+  UNHEALTHY_TASK_TTL,
+  WAIT_TIME,
+} from './constants';
 import { LoginTask } from './tasks/Login';
 import { RenderTask } from './tasks/Render';
 import type { Task } from './tasks/Task';
@@ -14,7 +19,8 @@ import type { TaskObject, TaskParams, TaskFinal } from './types';
 export class TasksManager {
   #browser: Browser | null = null;
   #stopping: boolean = true;
-  #tasks: Map<string, TaskObject & { task?: Task }> = new Map();
+  #tasks: Map<string, TaskObject & { execPromise: Promise<TaskFinal> }> =
+    new Map();
 
   get healthy(): boolean {
     if (this.#stopping) {
@@ -55,7 +61,23 @@ export class TasksManager {
     this.#stopping = false;
   }
 
+  /**
+   * Register and execute a task.
+   */
   async task(job: TaskParams): Promise<TaskFinal> {
+    const id = uuid();
+
+    const task = this.#exec(id, job);
+    this.#tasks.set(id, { id, createdAt: new Date(), execPromise: task });
+    return await task;
+  }
+
+  /**
+   * Actual execution of a task.
+   * It will create a browser, a page, launch the task (render, login), close everything.
+   * Any unexpected error will be thrown.
+   */
+  async #exec(id: string, job: TaskParams): Promise<TaskFinal> {
     if (this.#stopping) {
       throw new Error('Task can not be executed: stopping');
     }
@@ -63,13 +85,12 @@ export class TasksManager {
       throw new Error('Task can not be executed: no_browser');
     }
 
-    const url = job.url.toString();
-    const id = uuid();
+    const url = job.url.href;
     console.log('Processing:', url, `(${job.type})(${id})`);
 
     const start = Date.now();
-    this.#registerTask(id);
 
+    // Do not print this or pass it to reporting, it contains secrets
     const jobParam: TaskParams = {
       ...job,
       waitTime: {
@@ -81,67 +102,101 @@ export class TasksManager {
 
     try {
       const page = new BrowserPage();
-      await page.create(this.#browser);
+
+      // It seems page creation can hang infinitely in puppeteer
+      // so we want it fail as soon as possible to retry on an other pod
+      await Promise.race([
+        page.create(this.#browser),
+        (async (): Promise<void> => {
+          await wait(MAX_WAIT_FOR_NEW_PAGE);
+
+          if (page.isReady) {
+            return;
+          }
+
+          console.log(id, 'Can not create a BrowserPage');
+
+          // Stopping has we can not trust puppeteer
+          // Health check will collect the rest of this container
+          this.stop();
+          throw new Error('Can not create a BrowserPage');
+        })(),
+      ]);
 
       if (jobParam.type === 'login') {
         task = new LoginTask(jobParam, page);
       } else {
         task = new RenderTask(jobParam, page);
       }
-      const obj = this.#tasks.get(id)!;
-      obj.task = task;
 
       await page.linkToTask(task);
-      obj.taskPromise = task.process().catch((err) => {
-        report(err);
-      });
 
-      await obj.taskPromise;
-      const res = task.results!;
-
-      await task.close();
-
-      // ---- Reporting
-      stats.timing('renderscript.task', Date.now() - start, undefined, {
-        type: job.type,
-      });
-      const metrics = task.metrics;
-
-      if (metrics.page) {
-        Object.entries(metrics.page).forEach(([key, value]) => {
-          if (key.endsWith('Duration')) {
-            stats.timing(`renderscript.task.${key}`, value);
-            return;
-          }
-
-          stats.histogram(`renderscript.task.${key}`, value);
-          stats.increment(`renderscript.task.${key}.amount`, value);
-        });
+      try {
+        await task.process();
+      } catch (err: any) {
+        // Task itself should never break the whole execution
+        report(err, { url });
       }
-      // --- /done
 
-      console.log('Done', url, `(${id})`);
-
-      return { ...res, metrics };
+      // Required to get metrics
+      await task.saveMetrics();
     } catch (err) {
       console.log('Fail', url, `(${id})`);
       // This error will be reported elsewhere
       throw err;
     } finally {
       console.log('Finally', url, `(${id})`);
-      await this.#removeTask(id);
+
+      // No matter what happen we want to kill everything gracefully
+      try {
+        if (task) {
+          await task.close();
+        }
+        this.#tasks.delete(id);
+      } catch (err) {
+        report(new Error('Error during close'), { err, url });
+      }
     }
+
+    // ---- Reporting
+    stats.timing('renderscript.task', Date.now() - start, undefined, {
+      type: job.type,
+    });
+    const metrics = task.metrics;
+
+    if (metrics.page) {
+      Object.entries(metrics.page).forEach(([key, value]) => {
+        if (key.endsWith('Duration')) {
+          stats.timing(`renderscript.task.${key}`, value);
+          return;
+        }
+
+        stats.histogram(`renderscript.task.${key}`, value);
+        stats.increment(`renderscript.task.${key}.amount`, value);
+      });
+    }
+    // --- /reporting
+
+    console.log('Done', url, `(${id})`);
+
+    const res = task.results!;
+    return { ...res, metrics };
   }
 
+  /**
+   * Stop the task manager.
+   */
   async stop(): Promise<void> {
     this.#stopping = true;
     console.info(`Tasks Manager stopping...`);
 
+    // We wait for all tasks to finish before closing
     const promises: Array<Promise<void>> = [];
-    this.#tasks.forEach(({ taskPromise }) => {
-      if (taskPromise) promises.push(taskPromise);
+    this.#tasks.forEach((task) => {
+      promises.push(this.#removeTask(task.id));
     });
     await Promise.all(promises);
+
     this.#tasks.clear();
 
     if (this.#browser) {
@@ -150,21 +205,18 @@ export class TasksManager {
     }
   }
 
-  #registerTask(id: string): void {
-    this.#tasks.set(id, { id, createdAt: new Date() });
-  }
-
   async #removeTask(id: string): Promise<void> {
     const task = this.#tasks.get(id);
     if (!task) {
-      // Should never happen but never know
       throw new Error(`Could not find task: ${id}`);
     }
 
-    if (task.task) {
-      await task.task?.close();
+    try {
+      if (task.execPromise) {
+        await task.execPromise;
+      }
+    } catch (err) {
+      //
     }
-
-    this.#tasks.delete(id);
   }
 }

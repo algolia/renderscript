@@ -87,4 +87,8 @@ export const WAIT_TIME = {
   max: 20000,
 };
 
-export const UNHEALTHY_TASK_TTL = 5 * 60 * 1000;
+export const UNHEALTHY_TASK_TTL = 21 * 1000;
+
+export const MAX_WAIT_FOR_NEW_PAGE = process.env.MAX_WAIT_FOR_NEW_PAGE
+  ? parseInt(process.env.MAX_WAIT_FOR_NEW_PAGE, 10)
+  : 2000; // In feb 2022 it never took more than 1.5s

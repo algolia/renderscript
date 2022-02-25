@@ -23,18 +23,20 @@ export abstract class Task<TTaskType = TaskBaseParams> {
     return typeof this.results !== 'undefined';
   }
 
+  async saveMetrics(): Promise<void> {
+    try {
+      this.metrics.page = await this.page.metrics();
+    } catch (err) {
+      // Can happen if target is already closed or redirection
+    }
+  }
+
   async close(): Promise<void> {
     if (this.closed) {
       return;
     }
 
     this.closed = true;
-
-    try {
-      this.metrics.page = await this.page.metrics();
-    } catch (err) {
-      // Can happen if target is already closed or redirection
-    }
     await this.page.close();
   }
 
