@@ -1,3 +1,10 @@
+## [1.12.10](https://github.com/algolia/renderscript/compare/v1.12.9...v1.12.10) (2022-02-25)
+
+
+### Bug Fixes
+
+* handle puppeteer hanging ([#562](https://github.com/algolia/renderscript/issues/562)) ([4b0c728](https://github.com/algolia/renderscript/commit/4b0c7282b07005224b9ae6fd5430cb35a5595173))
+
 ## [1.12.9](https://github.com/algolia/renderscript/compare/v1.12.8...v1.12.9) (2022-02-24)
 
 
