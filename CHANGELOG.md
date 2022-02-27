@@ -1,3 +1,10 @@
+## [1.12.12](https://github.com/algolia/renderscript/compare/v1.12.11...v1.12.12) (2022-02-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @sentry/node to v6.18.0 ([#570](https://github.com/algolia/renderscript/issues/570)) ([e65c1da](https://github.com/algolia/renderscript/commit/e65c1da0edac48a3572b551b511338bcfaae8ca7))
+
 ## [1.12.11](https://github.com/algolia/renderscript/compare/v1.12.10...v1.12.11) (2022-02-25)
 
 
