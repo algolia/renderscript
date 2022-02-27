@@ -1,5 +1,5 @@
 # Base image
-FROM node:16.13.1 AS base
+FROM node:16.14.0 AS base
 
 # Install git
 # Others are dependencies of our gyp dependencies
@@ -42,7 +42,7 @@ RUN true \
 # Resulting image
 # New, minimal image
 # This image must have the minimum amount of layers
-FROM node:16.13.1-slim
+FROM node:16.14.0-slim
 
 ARG VERSION
 ENV VERSION ${VERSION:-dev}
