@@ -76,7 +76,7 @@
   },
   "dependencies": {
     "@algolia/dns-filter": "1.1.25",
-    "@sentry/node": "6.17.9",
+    "@sentry/node": "6.18.0",
     "altheia-async-data-validator": "5.0.13",
     "body-parser": "1.19.2",
     "cookie-parser": "1.4.6",
