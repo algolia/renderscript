@@ -29,10 +29,6 @@ export async function healthy(
     }
   );
 
-  console.debug(
-    'healthy reported',
-    JSON.stringify({ isHealthy, tasksRunning, pagesOpen })
-  );
   res
     .status(isHealthy ? 200 : 503)
     .json({ ready: isHealthy, tasksRunning, pagesOpen });

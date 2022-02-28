@@ -63,7 +63,6 @@ export class BrowserPage {
     let start = Date.now();
     const context = await browser.instance!.createIncognitoBrowserContext();
     stats.timing('renderscript.context.create', Date.now() - start);
-    console.debug('context create ', Date.now() - start);
 
     start = Date.now();
     const page = await context.newPage();
@@ -79,7 +78,6 @@ export class BrowserPage {
     // });
 
     stats.timing('renderscript.page.create', Date.now() - start);
-    console.debug('page create ', Date.now() - start);
     this.#page = page;
     this.#context = context;
   }
