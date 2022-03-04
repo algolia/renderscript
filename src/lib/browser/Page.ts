@@ -21,11 +21,17 @@ export class BrowserPage {
   #page: Page | undefined;
   #context: BrowserContext | undefined;
   #metrics: PageMetrics = {
-    downloadDuration: 0,
-    requests: 0,
-    blockedRequests: 0,
-    contentLength: 0,
-    contentLengthTotal: 0,
+    timings: {
+      download: 0,
+    },
+    requests: {
+      total: 0,
+      blocked: 0,
+    },
+    contentLength: {
+      main: 0,
+      total: 0,
+    },
     mem: {
       jsHeapUsedSize: null,
       jsHeapTotalSize: null,
@@ -57,7 +63,6 @@ export class BrowserPage {
     const page = await this.#context!.newPage();
 
     stats.timing('renderscript.page.create', Date.now() - start);
-    console.debug('page create ', Date.now() - start);
     this.#page = page;
 
     page.on('crash', () => {
@@ -126,7 +131,7 @@ export class BrowserPage {
   /**
    * Get performance metrics from the page.
    */
-  async getMetrics(): Promise<PageMetrics> {
+  async saveMetrics(): Promise<PageMetrics> {
     const perf: {
       curr: PerformanceNavigationTiming;
       all: PerformanceEntryList;
@@ -146,14 +151,12 @@ export class BrowserPage {
       })
     );
 
-    return {
-      ...this.#metrics,
-      downloadDuration: Math.round(perf.curr.duration || 0),
-      mem: {
-        jsHeapUsedSize: perf.mem.usedJSHeapSize || 0,
-        jsHeapTotalSize: perf.mem.totalJSHeapSize || 0,
-      },
+    this.#metrics.timings.download = Math.round(perf.curr.duration || 0);
+    this.#metrics.mem = {
+      jsHeapUsedSize: perf.mem.usedJSHeapSize || 0,
+      jsHeapTotalSize: perf.mem.totalJSHeapSize || 0,
     };
+    return this.#metrics;
   }
 
   /**
@@ -209,7 +212,7 @@ export class BrowserPage {
     return async (route: Route): Promise<void> => {
       const req = route.request();
       const reqUrl = req.url();
-      this.#metrics.requests += 1;
+      this.#metrics.requests.total += 1;
 
       if (this.#hasTimeout) {
         // If the page was killed in the meantime we don't want to process anything else
@@ -219,7 +222,7 @@ export class BrowserPage {
 
       // Skip data URIs
       if (DATA_REGEXP.test(reqUrl)) {
-        this.#metrics.blockedRequests += 1;
+        this.#metrics.requests.blocked += 1;
         await route.abort('blockedbyclient');
         return;
       }
@@ -235,7 +238,7 @@ export class BrowserPage {
           !VALIDATE_URL_IGNORED_ERRORS.some((msg) => err.message.includes(msg))
         ) {
           report(new Error('Blocked url'), { err, url: reqUrl });
-          this.#metrics.blockedRequests += 1;
+          this.#metrics.requests.blocked += 1;
         }
 
         await route.abort('blockedbyclient');
@@ -245,7 +248,7 @@ export class BrowserPage {
       try {
         // Ignore some type of resources
         if (IGNORED_RESOURCES.includes(req.resourceType())) {
-          this.#metrics.blockedRequests += 1;
+          this.#metrics.requests.blocked += 1;
 
           await route.abort('blockedbyclient');
           return;
@@ -253,7 +256,7 @@ export class BrowserPage {
 
         // Adblocking
         if (adblock && adblocker.match(new URL(reqUrl))) {
-          this.#metrics.blockedRequests += 1;
+          this.#metrics.requests.blocked += 1;
 
           await route.abort('blockedbyclient');
           return;
@@ -279,7 +282,9 @@ export class BrowserPage {
     };
   }
 
-  getOnResponseHandler(): (res: Response) => Promise<void> {
+  getOnResponseHandler({
+    url,
+  }: TaskBaseParams): (res: Response) => Promise<void> {
     return async (res: Response) => {
       if (this.#hasTimeout) {
         // If the page was killed in the meantime we don't want to process anything else
@@ -287,7 +292,6 @@ export class BrowserPage {
       }
 
       const reqUrl = res.url();
-      const pageUrl = this.page!.url();
       const headers = await res.allHeaders();
       let length = 0;
 
@@ -303,25 +307,25 @@ export class BrowserPage {
       }
 
       try {
-        if (!length) {
+        if (length === 0) {
           // Not every request has the content-length header, the byteLength match perfectly
           // but does not necessarly represent what was transfered (if it was gzipped for example)
           length = (await res.body()).byteLength;
         }
 
-        if (reqUrl === pageUrl) {
+        if (reqUrl === url.href) {
           // If this is our original URL we log it to a dedicated metric
-          this.#metrics.contentLength = length;
+          this.#metrics.contentLength.main = length;
         }
 
-        this.#metrics.contentLengthTotal += length;
+        this.#metrics.contentLength.total += length;
       } catch (err: any) {
         if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
           return;
         }
 
         // We can not throw in callback, it will go directly into unhandled
-        report(err, { context: 'onResponse', pageUrl, reqUrl });
+        report(err, { context: 'onResponse', pageUrl: url.href, reqUrl });
       }
     };
   }

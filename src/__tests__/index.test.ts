@@ -72,12 +72,12 @@ describe('main', () => {
     expect(res.statusCode).toBe(200);
     expect(res.headers).toEqual({
       connection: 'keep-alive',
-      'content-length': '99',
+      'content-length': '114',
       'content-security-policy':
         "default-src 'none'; style-src * 'unsafe-inline'; img-src * data:; font-src *",
       'content-type': 'text/html; charset=utf-8',
       date: expect.any(String),
-      etag: 'W/"63-ATTA7nqzk1rd80EwnOV2527LOMU"',
+      etag: 'W/"72-04PIukRCuHHMZy/XC0YF6D6TDfc"',
       'keep-alive': 'timeout=5',
     });
 

@@ -34,7 +34,10 @@ export class RenderTask extends Task<RenderTaskParams> {
     this.metrics.goto = Date.now() - start;
     await this.saveStatus(response);
 
+    // Check for html refresh
+    start = Date.now();
     const redirect = await this.page.checkForHttpEquivRefresh();
+    this.metrics.equiv = Date.now() - start;
     if (redirect) {
       this.results.resolvedUrl = redirect.href;
 
@@ -49,7 +52,9 @@ export class RenderTask extends Task<RenderTaskParams> {
     }
 
     // --- Basic checks passed we wait a bit more to page to render
+    start = Date.now();
     await page.waitForLoadState('networkidle');
+    this.metrics.ready = Date.now() - start;
 
     await this.minWait();
 

@@ -50,7 +50,10 @@ export interface TaskResult {
 }
 
 export interface Metrics {
+  context: number | null;
   goto: number | null;
+  equiv: number | null;
+  ready: number | null;
   minWait: number | null;
   serialize: number | null;
   total: number | null;
@@ -58,19 +61,26 @@ export interface Metrics {
 }
 
 export interface PageMetrics {
-  downloadDuration: number | null;
+  timings: {
+    download: number | null;
+  };
   mem: {
     jsHeapUsedSize: number | null;
     jsHeapTotalSize: number | null;
   };
-  requests: number;
-  blockedRequests: number;
-  contentLength: number;
-  contentLengthTotal: number;
+  requests: {
+    total: number;
+    blocked: number;
+  };
+  contentLength: {
+    main: number;
+    total: number;
+  };
 }
 
 export interface TaskObject {
   id: string;
+  url: string;
   taskPromise?: Promise<void>;
   createdAt: Date;
 }

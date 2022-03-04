@@ -15,6 +15,7 @@ export class TasksManager {
   #stopping: boolean = true;
   #tasks: Map<string, TaskObject & { execPromise: Promise<TaskFinal> }> =
     new Map();
+  #totalRun: number = 0;
 
   get healthy(): boolean {
     if (this.#stopping) {
@@ -22,13 +23,13 @@ export class TasksManager {
     }
 
     // Tasks lifecycle
-    let lostTask = 0;
+    const lostTask: string[][] = [];
     this.#tasks.forEach((task) => {
       if (Date.now() - task.createdAt.getTime() > UNHEALTHY_TASK_TTL) {
-        lostTask += 1;
+        lostTask.push([task.id, task.url]);
       }
     });
-    if (lostTask > 0) {
+    if (lostTask.length > 0) {
       report(new Error('Many lost tasks'), { lostTask });
       return false;
     }
@@ -48,6 +49,10 @@ export class TasksManager {
     return this.#tasks.size;
   }
 
+  get totalRun(): number {
+    return this.#totalRun;
+  }
+
   async launch(): Promise<void> {
     const browser = new Browser();
     await browser.create();
@@ -63,7 +68,13 @@ export class TasksManager {
     const id = uuid();
 
     const task = this.#exec(id, job);
-    this.#tasks.set(id, { id, createdAt: new Date(), execPromise: task });
+    this.#totalRun += 1;
+    this.#tasks.set(id, {
+      id,
+      url: job.url.href,
+      createdAt: new Date(),
+      execPromise: task,
+    });
     return await task;
   }
 
@@ -110,8 +121,6 @@ export class TasksManager {
       // Task itself should never break the whole execution
       report(err, { url });
     }
-
-    console.log('Done', url, `(${id})`);
 
     // No matter what happen we want to kill everything gracefully
     try {

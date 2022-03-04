@@ -89,5 +89,5 @@ If `renderHTML: true`, returns `text/html`.
 
 ## Credits
 
-This project is heavily inspired by [`GoogleChrome/rendertron`](https://github.com/GoogleChrome/rendertron).
-It is based on [`puppeteer-core`](https://github.com/GoogleChrome/puppeteer).
+This project was heavily inspired by [`GoogleChrome/rendertron`](https://github.com/GoogleChrome/rendertron).
+It was based on [`puppeteer-core`](https://github.com/GoogleChrome/puppeteer) but we switched to [Playwright](https://playwright.dev/).

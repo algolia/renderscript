@@ -9,7 +9,8 @@ describe('manager', () => {
     expect(JSON.parse(body)).toEqual({
       ready: true,
       tasksRunning: 0,
-      pagesOpen: 1,
+      pagesOpen: 0,
+      totalRun: 0,
     });
 
     // Process something
@@ -34,7 +35,8 @@ describe('manager', () => {
     expect(JSON.parse(bodyAfter)).toEqual({
       ready: true,
       tasksRunning: 0,
-      pagesOpen: 1,
+      pagesOpen: 0,
+      totalRun: 1,
     });
   });
 });

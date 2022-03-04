@@ -71,7 +71,11 @@ export class Browser {
   }
 
   getCurrentConcurrency(): number {
-    return this.#browser!.contexts().reduce((i, ctx) => {
+    if (!this.#browser) {
+      return 0;
+    }
+
+    return this.#browser.contexts().reduce((i, ctx) => {
       return i + ctx.pages().length;
     }, 0);
   }
