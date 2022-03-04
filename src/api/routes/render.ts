@@ -73,7 +73,7 @@ export async function render(
 
 export async function renderJSON(
   req: express.Request<any, any, TaskFromAPI>,
-  res: express.Response<PostRender | Res500>
+  res: express.Response<PostRender>
 ): Promise<void> {
   const { url: rawUrl, ua, waitTime, adblock } = req.body;
   const headersToForward = getForwardedHeadersFromRequest(req);

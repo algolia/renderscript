@@ -1,3 +1,5 @@
+import type { PostRenderSuccess } from 'api/responses';
+
 import { request } from './helpers';
 
 jest.setTimeout(10000);
@@ -15,11 +17,13 @@ describe('native', () => {
       }),
     });
 
-    const json = JSON.parse(body);
+    const json: PostRenderSuccess = JSON.parse(body);
 
     expect(res.statusCode).toBe(200);
-    expect(json.metrics.page.requests).toBe(11);
-    expect(json.metrics.page.blockedRequests).toBe(6);
+    expect(json.metrics.page!.requests).toStrictEqual({
+      total: 10,
+      blocked: 5,
+    });
   });
 });
 
@@ -37,10 +41,12 @@ describe('adblocker', () => {
       }),
     });
 
-    const json = JSON.parse(body);
+    const json: PostRenderSuccess = JSON.parse(body);
 
     expect(res.statusCode).toBe(200);
-    expect(json.metrics.page.requests).toBe(11);
-    expect(json.metrics.page.blockedRequests).toBe(9);
+    expect(json.metrics.page!.requests).toStrictEqual({
+      total: 10,
+      blocked: 8,
+    });
   });
 });

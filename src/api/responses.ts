@@ -1,6 +1,8 @@
 import type { Metrics } from 'lib/types';
 
-export interface PostRender {
+export type PostRender = PostRenderSuccess | Res500;
+
+export interface PostRenderSuccess {
   statusCode: number | null;
   metrics: Metrics;
   headers: Record<string, string>;

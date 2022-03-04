@@ -2,7 +2,7 @@
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: cimg/node:16.14.0
+    - image: cimg/node:16.14.0-browsers
   environment:
     NODE_ENV: 'test'
     MAX_WAIT_FOR_NEW_PAGE: 40000
@@ -24,7 +24,6 @@ jobs:
           name: install browser
           command: |
             npx playwright install
-            npx playwright install-deps
 
       - persist_to_workspace:
           root: .

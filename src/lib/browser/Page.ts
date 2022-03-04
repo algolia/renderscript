@@ -246,9 +246,9 @@ export class BrowserPage {
           !VALIDATE_URL_IGNORED_ERRORS.some((msg) => err.message.includes(msg))
         ) {
           report(new Error('Blocked url'), { err, url: reqUrl });
-          this.#metrics.requests.blocked += 1;
         }
 
+        this.#metrics.requests.blocked += 1;
         await route.abort('blockedbyclient');
         return;
       }
