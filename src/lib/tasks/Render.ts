@@ -1,5 +1,3 @@
-import type { HTTPResponse } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
-
 import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
@@ -9,15 +7,14 @@ import { Task } from './Task';
 
 export class RenderTask extends Task<RenderTaskParams> {
   async process(): Promise<void> {
-    const { url, waitTime } = this.params;
-    const { page } = this.page;
-    const baseHref = url.origin;
+    await this.createContext();
 
-    const total = Date.now();
+    const { url, waitTime } = this.params;
+    const baseHref = url.origin;
     const minWait = waitTime!.min;
     let start = Date.now();
-
     let response: HTTPResponse;
+
     try {
       response = await this.page.goto(url);
     } catch (err: any) {
@@ -35,7 +32,7 @@ export class RenderTask extends Task<RenderTaskParams> {
 
     start = Date.now();
     if (statusCode === 200 && minWait) {
-      await page!.waitForTimeout(minWait - (Date.now() - total));
+      await page!.waitForTimeout(minWait - (Date.now() - start));
     }
     this.metrics.minWait = Date.now() - start;
 
@@ -110,7 +107,6 @@ export class RenderTask extends Task<RenderTaskParams> {
       return;
     }
 
-    this.metrics.total = Date.now() - total;
     this.results = {
       statusCode,
       headers,

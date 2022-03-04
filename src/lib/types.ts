@@ -1,8 +1,4 @@
-import type {
-  Page,
-  BrowserContext,
-  Protocol,
-} from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
+import type { Cookie } from 'playwright';
 
 export type TaskFromAPI = Omit<TaskBaseParams, 'type' | 'url' | 'userAgent'> & {
   url: string;
@@ -49,7 +45,7 @@ export interface TaskResult {
   timeout?: boolean;
   error?: string;
   resolvedUrl?: string;
-  cookies?: Protocol.Network.Cookie[];
+  cookies?: Cookie[];
 }
 
 export interface Metrics {
@@ -70,11 +66,6 @@ export interface PageMetrics {
   blockedRequests: number;
   contentLength: number;
   contentLengthTotal: number;
-}
-
-export interface NewPage {
-  page: Page;
-  context: BrowserContext;
 }
 
 export interface TaskObject {

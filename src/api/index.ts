@@ -13,8 +13,15 @@ import { ready } from 'api/routes/ready';
 import * as routeRender from 'api/routes/render';
 import projectRoot from 'helpers/projectRoot';
 
-import { DELETE_COOKIE, SESSION_COOKIE } from './constants';
 import { list } from './routes/list';
+import {
+  getLogin,
+  getStep1,
+  getTest,
+  getTwoSteps,
+  postLogin,
+  postStep2,
+} from './routes/privates/login';
 
 export class Api {
   server: http.Server;
@@ -92,100 +99,14 @@ export class Api {
     );
 
     // Login form with CSRF protection
-    this._app.get('/secure/login', this._csrfProtection, (req, res) => {
-      res.render('login', {
-        baseUrl: req.baseUrl,
-        csrfToken: req.csrfToken(),
-      });
-    });
+    this._app
+      .get('/secure/login', this._csrfProtection, getLogin)
+      .post('/secure/login', this._csrfProtection, postLogin)
+      .get('/secure/test', getTest)
 
-    this._app.post('/secure/login', this._csrfProtection, (req, res) => {
-      const { username, password, redirect } = req.body;
-      this._renderLoginResult({
-        username,
-        password,
-        redirect,
-        res,
-      });
-    });
-
-    this._app.get('/secure/test', (req, res) => {
-      const cookie = req.get('Cookie') || '';
-      const cookies = cookie.split(';').map((c) => c.trim());
-      const granted = cookies.includes(SESSION_COOKIE);
-      console.log(
-        `[/secure/test] granted: ${granted}, received cookie: ${cookie}`
-      );
-      res
-        .contentType('text/html')
-        .status(granted ? 200 : 401)
-        .send(
-          `<!DOCTYPE html><html lang="en"><body>${
-            granted ? 'OK' : 'NOK'
-          }</body></html>`
-        );
-    });
-
-    // 2-steps login form with CSRF protection
-    this._app.get('/secure/login/step1', this._csrfProtection, (req, res) => {
-      res.render('login-step1', {
-        baseUrl: req.baseUrl,
-        csrfToken: req.csrfToken(),
-      });
-    });
-
-    this._app.post('/secure/login/step2', this._csrfProtection, (req, res) => {
-      const { username } = req.body;
-      res.render('login-step2', {
-        baseUrl: req.baseUrl,
-        csrfToken: req.csrfToken(),
-        username,
-      });
-    });
-
-    this._app.get('/secure/login/2steps', this._csrfProtection, (req, res) => {
-      const { username } = req.body;
-      res.render('login-2steps-js', {
-        baseUrl: req.baseUrl,
-        csrfToken: req.csrfToken(),
-        username,
-      });
-    });
-  }
-
-  private _renderLoginResult({
-    username,
-    password,
-    redirect,
-    res,
-  }: {
-    username: string;
-    password: string;
-    redirect?: boolean;
-    res: express.Response;
-  }): void {
-    const granted = username === 'admin' && password === 'password';
-    const setCookie = `${
-      granted ? SESSION_COOKIE : DELETE_COOKIE
-    }; SameSite=Strict`;
-    console.log(
-      `[renderLoginResult] username: ${username}, password: ${password} => set-cookie: ${setCookie}`
-    );
-    res
-      .contentType('text/html')
-      .set('Set-Cookie', setCookie)
-      .status(granted ? 200 : 401)
-      .send(
-        `<!DOCTYPE html><html lang="en">${
-          redirect
-            ? `<script>
-// Redirect after 500ms to reproduce https://github.com/algolia/renderscript/pull/394
-setTimeout(() => {
-  window.location = new URL('/secure/test', window.location);
-}, 500);
-</script>`
-            : ''
-        }<body>${granted ? 'OK' : 'NOK'}</body></html>`
-      );
+      // 2-steps login form with CSRF protection
+      .get('/secure/login/step1', this._csrfProtection, getStep1)
+      .post('/secure/login/step2', this._csrfProtection, postStep2)
+      .get('/secure/login/2steps', this._csrfProtection, getTwoSteps);
   }
 }

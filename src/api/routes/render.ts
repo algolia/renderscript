@@ -43,15 +43,18 @@ export async function render(
       waitTime,
       adblock,
     });
+
     if (error) {
       res.status(400).json({ error });
       return;
     }
+
     if (resolvedUrl && resolvedUrl !== url.href) {
       const location = revertUrl(resolvedUrl).href;
       res.status(307).header('Location', location).send();
       return;
     }
+
     res
       .status(statusCode!)
       .header('Content-Type', 'text/html')

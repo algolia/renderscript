@@ -2,15 +2,9 @@ import { v4 as uuid } from 'uuid';
 
 import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
-import { wait } from 'helpers/wait';
 
 import { Browser } from './browser/Browser';
-import { BrowserPage } from './browser/Page';
-import {
-  MAX_WAIT_FOR_NEW_PAGE,
-  UNHEALTHY_TASK_TTL,
-  WAIT_TIME,
-} from './constants';
+import { UNHEALTHY_TASK_TTL, WAIT_TIME } from './constants';
 import { LoginTask } from './tasks/Login';
 import { RenderTask } from './tasks/Render';
 import type { Task } from './tasks/Task';
@@ -98,64 +92,34 @@ export class TasksManager {
         ...job.waitTime,
       },
     };
+
     let task: Task | undefined;
+    if (jobParam.type === 'login') {
+      task = new LoginTask(jobParam, this.#browser);
+    } else {
+      task = new RenderTask(jobParam, this.#browser);
+    }
 
     try {
-      const page = new BrowserPage();
-
-      // It seems page creation can hang infinitely in puppeteer
-      // so we want it fail as soon as possible to retry on an other pod
-      await Promise.race([
-        page.create(this.#browser),
-        (async (): Promise<void> => {
-          await wait(MAX_WAIT_FOR_NEW_PAGE);
-
-          if (page.isReady) {
-            return;
-          }
-
-          console.log(id, 'Can not create a BrowserPage');
-
-          // Stopping has we can not trust puppeteer
-          // Health check will collect the rest of this container
-          this.stop();
-          throw new Error('Can not create a BrowserPage');
-        })(),
-      ]);
-
-      if (jobParam.type === 'login') {
-        task = new LoginTask(jobParam, page);
-      } else {
-        task = new RenderTask(jobParam, page);
-      }
-
-      await page.linkToTask(task);
-
-      try {
-        await task.process();
-      } catch (err: any) {
-        // Task itself should never break the whole execution
-        report(err, { url });
-      }
+      await task.process();
 
       // Required to get metrics
       await task.saveMetrics();
-    } catch (err) {
-      console.log('Fail', url, `(${id})`);
-      // This error will be reported elsewhere
-      throw err;
-    } finally {
-      console.log('Finally', url, `(${id})`);
+    } catch (err: any) {
+      // Task itself should never break the whole execution
+      report(err, { url });
+    }
 
-      // No matter what happen we want to kill everything gracefully
-      try {
-        if (task) {
-          await task.close();
-        }
-        this.#tasks.delete(id);
-      } catch (err) {
-        report(new Error('Error during close'), { err, url });
+    console.log('Done', url, `(${id})`);
+
+    // No matter what happen we want to kill everything gracefully
+    try {
+      if (task) {
+        await task.close();
       }
+      this.#tasks.delete(id);
+    } catch (err) {
+      report(new Error('Error during close'), { err, url });
     }
 
     // ---- Reporting
