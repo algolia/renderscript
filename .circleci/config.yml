@@ -2,15 +2,12 @@
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: cimg/node:16.14.0-browsers
+    - image: cimg/node:16.14.0
   environment:
     NODE_ENV: 'test'
     MAX_WAIT_FOR_NEW_PAGE: 40000
 
 version: 2.1
-
-orbs:
-  browser-tools: circleci/browser-tools@1.2.4
 
 jobs:
   checkout:
@@ -20,8 +17,11 @@ jobs:
       - checkout
 
       - run:
-          name: install
+          name: install node_modules
           command: yarn install --immutable
+      - run:
+          name: install browser
+          command: npx playwright install
 
       - persist_to_workspace:
           root: .
@@ -43,9 +43,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/app/
-
-      - browser-tools/install-chrome
-      - browser-tools/install-chromedriver
 
       - run: yarn build
 

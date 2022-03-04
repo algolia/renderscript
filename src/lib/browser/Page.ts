@@ -78,7 +78,7 @@ export class BrowserPage {
   }
 
   /**
-   * Just there to wrap.
+   * We wrap goto to handle timeout.
    */
   async goto(
     url: string,
@@ -112,6 +112,7 @@ export class BrowserPage {
     stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
       success: response ? 'true' : 'false',
     });
+    // We remove listener, because we don't want more response
     this.#page!.removeListener('response', onResponse);
 
     if (!response) {
@@ -122,6 +123,9 @@ export class BrowserPage {
     return response;
   }
 
+  /**
+   * Get performance metrics from the page.
+   */
   async getMetrics(): Promise<PageMetrics> {
     const perf: {
       curr: PerformanceNavigationTiming;
@@ -151,45 +155,6 @@ export class BrowserPage {
       },
     };
   }
-
-  // async goto(url: URL): Promise<HTTPResponse> {
-  //   let response: HTTPResponse | null = null;
-  //   const timeout = this.#task!.params.waitTime!.max;
-
-  //   this.#page!.on('response', (r) => {
-  //     if (!response) {
-  //       response = r;
-  //     }
-  //   });
-
-  //   const start = Date.now();
-  //   try {
-  //     // Response can be assigned here or on('response')
-  //     response = await this.#page!.goto(url.href, {
-  //       timeout,
-  //       waitUntil: ['domcontentloaded', 'networkidle0'],
-  //     });
-  //   } catch (err: any) {
-  //     if (err.message.match(/Navigation timeout/)) {
-  //       // This error is expected has most page will reach timeout
-  //       this.#hasTimeout = true;
-  //       report(new Error('goto_timeout'), { url: url.href });
-  //     } else {
-  //       report(new Error('goto_error'), { err, url: url.href });
-  //     }
-  //     // we want to continue because we can still have a response
-  //   } finally {
-  //     stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
-  //       success: response ? 'true' : 'false',
-  //     });
-  //   }
-
-  //   /* Fetch errors */
-  //   if (!response) {
-  //     throw new Error('goto_no_response');
-  //   }
-  //   return response;
-  // }
 
   /**
    * Output body as a string at the moment it is requested.
@@ -393,125 +358,9 @@ export class BrowserPage {
 
       return redirectURL;
     } catch (err) {
-      report(
-        new Error(
-          'Error while trying to check for meta[http-equive="refresh"]'
-        ),
-        { err }
-      );
+      report(new Error('Error while trying to check for meta refresh'), {
+        err,
+      });
     }
   }
-
-  // async #updateContext(): Promise<void> {
-  //   const { url, headersToForward, userAgent, adblock } = this.#task!.params!;
-
-  //   /* Ignore useless/dangerous resources */
-  //   this.#page!.on('request', async (req) => {
-  // const reqUrl = req.url();
-  // this.#metrics.requests += 1;
-
-  // if (this.#hasTimeout) {
-  //   // If the page was killed in the meantime we don't want to process anything else
-  //   req.abort();
-  //   return;
-  // }
-
-  // // Skip data URIs
-  // if (DATA_REGEXP.test(reqUrl)) {
-  //   this.#metrics.blockedRequests += 1;
-  //   req.abort();
-  //   return;
-  // }
-
-  // // check for ssrf attempts
-  // try {
-  //   await validateURL({
-  //     url: reqUrl,
-  //     ipPrefixes: RESTRICTED_IPS,
-  //   });
-  // } catch (err: any) {
-  //   if (
-  //     !VALIDATE_URL_IGNORED_ERRORS.some((msg) => err.message.includes(msg))
-  //   ) {
-  //     report(new Error('Blocked url'), { err, url: reqUrl });
-  //     this.#metrics.blockedRequests += 1;
-  //   }
-
-  //   req.abort();
-  //   return;
-  // }
-
-  // try {
-  //   // Ignore some type of resources
-  //   if (IGNORED_RESOURCES.includes(req.resourceType())) {
-  //     this.#metrics.blockedRequests += 1;
-  //     await req.abort();
-  //     return;
-  //   }
-
-  //   // Adblocker
-  //   if (adblock && adblocker.match(new URL(reqUrl))) {
-  //     this.#metrics.blockedRequests += 1;
-  //     await req.abort();
-  //     return;
-  //   }
-
-  //   if (req.isNavigationRequest()) {
-  //     const headers = req.headers();
-  //     await req.continue({
-  //       // headers ignore values set for `Cookie`, relies to page.setCookie instead
-  //       headers: { ...headers, ...headersToForward },
-  //     });
-  //     return;
-  //   }
-  //   await req.continue();
-  // } catch (err: any) {
-  //   if (REQUEST_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
-  //     return;
-  //   }
-
-  //   report(err, { context: 'onRequest', url: url.href, with: reqUrl });
-  // }
-  // });
-
-  // this.#page!.on('response', async (res) => {
-  // const headers = res.headers();
-
-  // if (this.#hasTimeout) {
-  //   // If the page was killed in the meantime we don't want to process anything else
-  //   return;
-  // }
-
-  // let cl = 0;
-
-  // if (headers['content-length']) {
-  //   cl = parseInt(headers['content-length'], 10);
-  // }
-
-  // const status = res.status();
-  // // Redirection does not have a body
-  // if (status > 300 && status < 400) {
-  //   return;
-  // }
-
-  // try {
-  //   // Not every request has the content-length header, the byteLength match perfectly
-  //   // but does not necessarly represent what was transfered (if it was gzipped for example)
-  //   cl = (await res.buffer()).byteLength;
-
-  //   if (res.url() === url.href) {
-  //     this.#metrics.contentLength = cl;
-  //   }
-
-  //   this.#metrics.contentLengthTotal += cl;
-  // } catch (err: any) {
-  //   if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
-  //     return;
-  //   }
-
-  //   // We can not throw in callback, it will go directly into unhandled
-  //   report(err, { context: 'onResponse', url: url.href });
-  // }
-  //   });
-  // }
 }

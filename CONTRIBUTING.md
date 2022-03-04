@@ -1,5 +1,35 @@
 # Contributing
 
+## Running it locally
+
+Development:
+
+```sh
+yarn
+npx playwright install
+yarn dev
+```
+
+Docker image:
+
+```sh
+yarn docker:build
+docker run -p 23000:3000 algolia/renderscript
+open http://localhost:3000/render?url=https%3A%2F%2Fwww.algolia.com&ua=Test+Renderscript
+```
+
+### Parameters
+
+See `.env.example` to see which ones are installed by default (they still need to be provided to `docker run` to be enabled).
+
+* `ALLOW_LOCALHOST`: Allow calls on localhost IPs
+  Example: `ALLOW_LOCALHOST=true`
+* `IP_PREFIXES_WHITELIST`: Comma-separated list of prefixes to whitelist when `ALLOW_LOCALHOST` is set to true.
+  Example: `IP_PREFIXES_WHITELIST=127.,0.,::1` (these are the default values used when the variable is not provided alongside `ALLOW_LOCALHOST`)
+* `HEADERS_TO_FORWARD`: Comma-separated list of headers to forward on navigation request
+  Example: `HEADERS_TO_FORWARD=Cookie,Authorization` (default value)
+* `SENTRY_DSN` Report errors to this Sentry URL.
+
 ## Releasing
 
 > The release is an automated process in the CI, there is nothing to do.
