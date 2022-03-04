@@ -1,7 +1,7 @@
 import { Api } from 'api/index';
 import { report } from 'helpers/errorReporting';
 import { gracefulClose } from 'helpers/gracefulClose';
-import { tasksManager } from 'lib/singletons';
+import * as singletons from 'lib/singletons';
 
 console.info(`NODE_ENV = ${process.env.NODE_ENV}`);
 
@@ -18,6 +18,7 @@ process.on('unhandledRejection', (reason) => {
     process.exit(1);
   }, 1);
 });
+
 process.on('uncaughtException', (reason) => {
   report(new Error('uncaught exception'), { err: reason });
 
@@ -29,18 +30,21 @@ process.on('uncaughtException', (reason) => {
   }, 1);
 });
 
-const api = new Api();
+(async (): Promise<void> => {
+  const api = new Api();
+  api.start(PORT);
 
-// Handle SIGINT
-// It doesn't seem to handle it correctly, but it's just `yarn` messing up
-// Try running
-//
-//     yarn build && NODE_ENV=development node dist/index.js
-//
-// to see that it works fine
-const gracefulCloseParams = { api, tasksManager };
-const boundGracefulClose = gracefulClose.bind(null, gracefulCloseParams);
-process.on('SIGINT', boundGracefulClose);
-process.on('SIGTERM', boundGracefulClose);
+  await singletons.init();
 
-api.start(PORT);
+  // Handle SIGINT
+  // It doesn't seem to handle it correctly, but it's just `yarn` messing up
+  // Try running
+  //
+  //     yarn build && NODE_ENV=development node dist/index.js
+  //
+  // to see that it works fine
+  const gracefulCloseParams = { api, tasksManager: singletons.tasksManager };
+  const boundGracefulClose = gracefulClose.bind(null, gracefulCloseParams);
+  process.on('SIGINT', boundGracefulClose);
+  process.on('SIGTERM', boundGracefulClose);
+})();

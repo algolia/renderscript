@@ -51,6 +51,7 @@ export class TasksManager {
   async launch(): Promise<void> {
     const browser = new Browser();
     await browser.create();
+
     this.#browser = browser;
     this.#stopping = false;
   }

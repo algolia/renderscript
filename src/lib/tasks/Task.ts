@@ -1,13 +1,23 @@
-import type { BrowserContext } from 'playwright';
+import type { BrowserContext, Response } from 'playwright';
 
 import type { Browser } from 'lib/browser/Browser';
 import { BrowserPage } from 'lib/browser/Page';
+import { WAIT_TIME } from 'lib/constants';
 import type { Metrics, TaskBaseParams, TaskResult } from 'lib/types';
 
 export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   params;
   page?: BrowserPage;
-  results: TaskResult | undefined;
+  results: TaskResult = {
+    startAt: Date.now(),
+    statusCode: undefined,
+    body: undefined,
+    headers: {},
+    timeout: undefined,
+    error: undefined,
+    resolvedUrl: undefined,
+    cookies: undefined,
+  };
   metrics: Metrics = {
     goto: null,
     minWait: null,
@@ -15,8 +25,9 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     total: null,
     page: null,
   };
-  closed: boolean = false;
 
+  #closed: boolean = false;
+  #processed: boolean = false;
   #context?: BrowserContext;
   #browser?: Browser;
 
@@ -30,11 +41,11 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   }
 
   async close(): Promise<void> {
-    if (this.closed) {
+    if (this.#closed) {
       return;
     }
 
-    this.closed = true;
+    this.#closed = true;
     await this.page?.close();
     await this.#context?.close();
 
@@ -43,9 +54,13 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   }
 
   async createContext(): Promise<void> {
+    this.#processed = true;
+    this.results.startAt = Date.now();
+
     const context = await this.#browser!.getNewContext({
       userAgent: this.params.userAgent,
     });
+    context.setDefaultTimeout(WAIT_TIME.max);
 
     const page = new BrowserPage(context);
     this.page = page;
@@ -57,8 +72,31 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
       page.setCookies(this.params);
     }
 
-    await page.disableServiceWorker();
     await context.route('**/*', page.getOnRequestHandler(this.params));
+    await page.disableServiceWorker();
+
+    page.page!.on('response', page.getOnResponseHandler());
+  }
+
+  /**
+   * Save status in results.
+   */
+  async saveStatus(response: Response): Promise<void> {
+    this.results.statusCode = response.status();
+    this.results.headers = await response.allHeaders();
+  }
+
+  async minWait(): Promise<void> {
+    const start = Date.now();
+    const minWait = this.params.waitTime!.min;
+    const currentDuration = Date.now() - this.results.startAt;
+
+    if (minWait && minWait > currentDuration) {
+      console.log(`Waiting ${minWait - currentDuration} extra ms...`);
+      await this.page!.page!.waitForTimeout(minWait - currentDuration);
+    }
+
+    this.metrics.minWait = Date.now() - start;
   }
 
   async saveMetrics(): Promise<void> {

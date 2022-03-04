@@ -1,4 +1,4 @@
-import type { Protocol } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
+import type { Cookie } from 'playwright';
 
 import { sendLoginRequest } from './helpers';
 
@@ -56,16 +56,12 @@ describe('login', () => {
 
     expect(res.statusCode).toBe(200);
 
-    const cookies = JSON.parse(body).cookies;
+    const cookies: Cookie[] = JSON.parse(body).cookies;
     expect(
-      cookies.find(
-        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
-      )
+      cookies.find((cookie) => cookie.name === 'sessionToken')
     ).toMatchSnapshot();
     // Check that we actually went through the form
-    expect(
-      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
-    ).toBeDefined();
+    expect(cookies.find((cookie) => cookie.name === '_csrf')).toBeDefined();
   });
 
   it('should works even with a 2-steps login', async () => {
@@ -77,16 +73,12 @@ describe('login', () => {
 
     expect(res.statusCode).toBe(200);
 
-    const cookies = JSON.parse(body).cookies;
+    const cookies: Cookie[] = JSON.parse(body).cookies;
     expect(
-      cookies.find(
-        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
-      )
+      cookies.find((cookie) => cookie.name === 'sessionToken')
     ).toMatchSnapshot();
     // Check that we actually went through the form
-    expect(
-      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
-    ).toBeDefined();
+    expect(cookies.find((cookie) => cookie.name === '_csrf')).toBeDefined();
   });
 
   it('should works with a 2-steps JS login', async () => {
@@ -98,16 +90,12 @@ describe('login', () => {
 
     expect(res.statusCode).toBe(200);
 
-    const cookies = JSON.parse(body).cookies;
+    const cookies: Cookie[] = JSON.parse(body).cookies;
     expect(
-      cookies.find(
-        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
-      )
+      cookies.find((cookie) => cookie.name === 'sessionToken')
     ).toMatchSnapshot();
     // Check that we actually went through the form
-    expect(
-      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
-    ).toBeDefined();
+    expect(cookies.find((cookie) => cookie.name === '_csrf')).toBeDefined();
   });
 
   it('should works but not get a session token with bad credentials', async () => {
@@ -119,16 +107,12 @@ describe('login', () => {
 
     expect(res.statusCode).toBe(200);
 
-    const cookies = JSON.parse(body).cookies;
+    const cookies: Cookie[] = JSON.parse(body).cookies;
     expect(
-      cookies.find(
-        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
-      )
+      cookies.find((cookie) => cookie.name === 'sessionToken')
     ).toBeUndefined();
     // Check that we actually went through the form
-    expect(
-      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
-    ).toBeDefined();
+    expect(cookies.find((cookie) => cookie.name === '_csrf')).toBeDefined();
   });
 });
 

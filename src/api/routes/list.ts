@@ -6,15 +6,15 @@ import { tasksManager } from 'lib/singletons';
  * List currently opened page.
  * Useful to debug non-killed page.
  */
-export async function list(
-  req: express.Request,
-  res: express.Response
-): Promise<void> {
-  const open = tasksManager.currentBrowser
-    ? (await tasksManager.currentBrowser.instance!.pages()).map((page) => {
-        return page.url();
-      })
-    : [];
+export function list(req: express.Request, res: express.Response): void {
+  const open: string[] = [];
+  if (tasksManager.currentBrowser) {
+    tasksManager.currentBrowser.instance!.contexts().forEach((ctx) => {
+      ctx.pages().forEach((page) => {
+        open.push(page.url());
+      });
+    });
+  }
 
   res.status(200).json({ open });
 }

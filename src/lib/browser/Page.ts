@@ -1,9 +1,8 @@
 import { validateURL } from '@algolia/dns-filter';
-import type { BrowserContext, Page, Route } from 'playwright';
+import type { BrowserContext, Page, Route, Response } from 'playwright';
 
 import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
-import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import { adblocker } from 'lib/singletons';
 import type { PageMetrics, TaskBaseParams } from 'lib/types';
 
@@ -22,15 +21,15 @@ export class BrowserPage {
   #page: Page | undefined;
   #context: BrowserContext | undefined;
   #metrics: PageMetrics = {
-    layoutDuration: null,
-    scriptDuration: null,
-    taskDuration: null,
-    jsHeapUsedSize: null,
-    jsHeapTotalSize: null,
+    downloadDuration: 0,
     requests: 0,
     blockedRequests: 0,
     contentLength: 0,
     contentLengthTotal: 0,
+    mem: {
+      jsHeapUsedSize: null,
+      jsHeapTotalSize: null,
+    },
   };
   #hasTimeout: boolean = false;
 
@@ -60,6 +59,14 @@ export class BrowserPage {
     stats.timing('renderscript.page.create', Date.now() - start);
     console.debug('page create ', Date.now() - start);
     this.#page = page;
+
+    page.on('crash', () => {
+      // e.g: crash happen on OOM.
+      report(new Error('Page crashed'), { pageUrl: page.url() });
+    });
+    page.on('popup', () => {
+      report(new Error('Popup created'), { pageUrl: page.url() });
+    });
   }
 
   /**
@@ -70,21 +77,80 @@ export class BrowserPage {
     await this.#context?.close();
   }
 
-  async goto(url: string, opts: Page['goto']): Promise<Response> {
-    return this.#page!.goto(url, opts);
+  /**
+   * Just there to wrap.
+   */
+  async goto(
+    url: string,
+    opts: Parameters<Page['goto']>[1]
+  ): Promise<Response> {
+    let response: Response | null = null;
+
+    function onResponse(res: Response): void {
+      // We listen to response because "goto" will throw on timeout but we still want to process the doc in that case
+      if (!response) {
+        response = res;
+      }
+    }
+    this.#page!.on('response', onResponse);
+
+    const start = Date.now();
+    try {
+      // Response can be assigned here or on('response')
+      response = await this.#page!.goto(url, opts);
+    } catch (err: any) {
+      if (!err.message.match(/Navigation timeout/)) {
+        throw err;
+      }
+
+      // This error is expected has most page will reach timeout
+      // we want to continue because we can still have a response
+      this.#hasTimeout = true;
+      report(new Error('goto_timeout'), { pageUrl: url });
+    }
+
+    stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
+      success: response ? 'true' : 'false',
+    });
+    this.#page!.removeListener('response', onResponse);
+
+    if (!response) {
+      // Just in case
+      throw new Error('goto_no_response');
+    }
+
+    return response;
   }
 
-  // async getMetrics(): Promise<PageMetrics> {
-  //   const metrics = await this.#page!.metrics();
-  //   return {
-  //     ...this.#metrics,
-  //     layoutDuration: Math.round((metrics.LayoutDuration || 0) * 1000),
-  //     scriptDuration: Math.round((metrics.ScriptDuration || 0) * 1000),
-  //     taskDuration: Math.round((metrics.TaskDuration || 0) * 1000),
-  //     jsHeapUsedSize: metrics.JSHeapUsedSize || 0,
-  //     jsHeapTotalSize: metrics.JSHeapTotalSize || 0,
-  //   };
-  // }
+  async getMetrics(): Promise<PageMetrics> {
+    const perf: {
+      curr: PerformanceNavigationTiming;
+      all: PerformanceEntryList;
+      mem: {
+        jsHeapSizeLimit?: number;
+        totalJSHeapSize?: number;
+        usedJSHeapSize?: number;
+      };
+    } = JSON.parse(
+      await this.#page!.evaluate(() => {
+        return JSON.stringify({
+          curr: performance.getEntriesByType('navigation')[0],
+          all: performance.getEntries(),
+          // @ts-expect-error only exists in chromium
+          mem: performance.memory || {},
+        });
+      })
+    );
+
+    return {
+      ...this.#metrics,
+      downloadDuration: Math.round(perf.curr.duration || 0),
+      mem: {
+        jsHeapUsedSize: perf.mem.usedJSHeapSize || 0,
+        jsHeapTotalSize: perf.mem.totalJSHeapSize || 0,
+      },
+    };
+  }
 
   // async goto(url: URL): Promise<HTTPResponse> {
   //   let response: HTTPResponse | null = null;
@@ -128,12 +194,9 @@ export class BrowserPage {
   /**
    * Output body as a string at the moment it is requested.
    */
-  async renderBody(url: URL): Promise<string> {
-    console.log(`Rendering page ${url.href}...`);
-    const baseHref = `${url.protocol}//${url.host}`;
-
-    await this.#page!.evaluate(injectBaseHref, baseHref);
-    return await this.#page!.evaluate('document.firstElementChild.outerHTML');
+  async renderBody(): Promise<string> {
+    console.log(`Rendering page...`);
+    return await this.#page!.content();
   }
 
   /**
@@ -161,6 +224,11 @@ export class BrowserPage {
     await this.#context!.addInitScript(() => {
       // @ts-expect-error read-only prop
       delete window.navigator.serviceWorker;
+    });
+    this.#page!.on('worker', () => {
+      report(new Error('WebWorker disabled but created'), {
+        pageUrl: this.#page!.url(),
+      });
     });
   }
 
@@ -246,43 +314,91 @@ export class BrowserPage {
     };
   }
 
-  async #onResponse(): Promise<void> {
-    const headers = res.headers();
-
-    if (this.#hasTimeout) {
-      // If the page was killed in the meantime we don't want to process anything else
-      return;
-    }
-
-    let cl = 0;
-
-    if (headers['content-length']) {
-      cl = parseInt(headers['content-length'], 10);
-    }
-
-    const status = res.status();
-    // Redirection does not have a body
-    if (status > 300 && status < 400) {
-      return;
-    }
-
-    try {
-      // Not every request has the content-length header, the byteLength match perfectly
-      // but does not necessarly represent what was transfered (if it was gzipped for example)
-      cl = (await res.buffer()).byteLength;
-
-      if (res.url() === url.href) {
-        this.#metrics.contentLength = cl;
-      }
-
-      this.#metrics.contentLengthTotal += cl;
-    } catch (err: any) {
-      if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+  getOnResponseHandler(): (res: Response) => Promise<void> {
+    return async (res: Response) => {
+      if (this.#hasTimeout) {
+        // If the page was killed in the meantime we don't want to process anything else
         return;
       }
 
-      // We can not throw in callback, it will go directly into unhandled
-      report(err, { context: 'onResponse', url: url.href });
+      const reqUrl = res.url();
+      const pageUrl = this.page!.url();
+      const headers = await res.allHeaders();
+      let length = 0;
+
+      if (headers['content-length']) {
+        length = parseInt(headers['content-length'], 10);
+      }
+
+      const status = res.status();
+
+      // Redirections do not have a body
+      if (status > 300 && status < 400) {
+        return;
+      }
+
+      try {
+        if (!length) {
+          // Not every request has the content-length header, the byteLength match perfectly
+          // but does not necessarly represent what was transfered (if it was gzipped for example)
+          length = (await res.body()).byteLength;
+        }
+
+        if (reqUrl === pageUrl) {
+          // If this is our original URL we log it to a dedicated metric
+          this.#metrics.contentLength = length;
+        }
+
+        this.#metrics.contentLengthTotal += length;
+      } catch (err: any) {
+        if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+          return;
+        }
+
+        // We can not throw in callback, it will go directly into unhandled
+        report(err, { context: 'onResponse', pageUrl, reqUrl });
+      }
+    };
+  }
+
+  /**
+   * Returns the URL if found.
+   */
+  async checkForHttpEquivRefresh(): Promise<URL | void> {
+    try {
+      const metaRefreshElement = await this.page!.$(
+        'meta[http-equiv="refresh"]'
+      );
+
+      if (!metaRefreshElement) {
+        return;
+      }
+
+      const metaRefreshContent = await metaRefreshElement.getProperty(
+        'content'
+      );
+      const refreshContent = await metaRefreshContent?.jsonValue();
+      const match = refreshContent?.match(/\d+;\s(?:url|URL)=(.*)/);
+      if (!match) {
+        return;
+      }
+
+      const url = new URL(this.page!.url());
+
+      // Sometimes URLs are surrounded by quotes
+      const matchedURL = match[1].replace(/'/g, '');
+      const redirectURL = new URL(matchedURL, url);
+
+      console.log(`Meta refresh found. Redirecting to ${redirectURL.href}...`);
+
+      return redirectURL;
+    } catch (err) {
+      report(
+        new Error(
+          'Error while trying to check for meta[http-equive="refresh"]'
+        ),
+        { err }
+      );
     }
   }
 

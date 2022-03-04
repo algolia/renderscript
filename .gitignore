@@ -14,3 +14,9 @@ vendors/
 .yarn/*
 !.yarn/releases
 !.yarn/plugins
+
+.idea
+.DS_Store
+.vscode
+.scannerwork
+*~

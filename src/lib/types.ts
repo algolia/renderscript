@@ -39,6 +39,7 @@ export interface TaskFinal extends TaskResult {
 }
 
 export interface TaskResult {
+  startAt: number;
   statusCode?: number;
   body?: string;
   headers?: Record<string, string>;
@@ -57,11 +58,11 @@ export interface Metrics {
 }
 
 export interface PageMetrics {
-  layoutDuration: number | null;
-  scriptDuration: number | null;
-  taskDuration: number | null;
-  jsHeapUsedSize: number | null; // currently active to render the page
-  jsHeapTotalSize: number | null; // total allocated
+  downloadDuration: number | null;
+  mem: {
+    jsHeapUsedSize: number | null;
+    jsHeapTotalSize: number | null;
+  };
   requests: number;
   blockedRequests: number;
   contentLength: number;

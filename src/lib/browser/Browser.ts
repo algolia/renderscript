@@ -27,6 +27,49 @@ export class Browser {
     return this.#browser;
   }
 
+  /**
+   * Create a puppeteer instance.
+   */
+  async create(): Promise<void> {
+    console.info(`Browser ${this.#id} creating...`);
+
+    const env: { [s: string]: string } = {};
+    if (process.env.DISPLAY) {
+      env.DISPLAY = process.env.DISPLAY;
+    }
+
+    let start = Date.now();
+    const browser = await chromium.launch({
+      headless: true,
+      env,
+      handleSIGINT: false,
+      handleSIGHUP: false,
+      handleSIGTERM: false,
+      args: flags,
+    });
+    this.#browser = browser;
+    stats.timing('renderscript.create', Date.now() - start);
+
+    // Try to load a test page first
+    start = Date.now();
+    const context = await this.getNewContext({});
+    const testPage = await context.newPage();
+    await testPage.goto('about://settings', {
+      waitUntil: 'networkidle',
+      timeout: 2000,
+    });
+    stats.timing('renderscript.page.initial', Date.now() - start);
+    await testPage.close();
+    await context.close();
+
+    this.#ready = true;
+    console.log(`Browser is ready`);
+  }
+
+  async stop(): Promise<void> {
+    await this.#browser?.close();
+  }
+
   getCurrentConcurrency(): number {
     return this.#browser!.contexts().reduce((i, ctx) => {
       return i + ctx.pages().length;
@@ -57,48 +100,5 @@ export class Browser {
     stats.timing('renderscript.context.create', Date.now() - start);
 
     return ctx;
-  }
-
-  /**
-   * Create a puppeteer instance.
-   */
-  async create(): Promise<void> {
-    console.info(`Browser ${this.#id} creating...`);
-
-    const env: { [s: string]: string } = {};
-    if (process.env.DISPLAY) {
-      env.DISPLAY = process.env.DISPLAY;
-    }
-
-    let start = Date.now();
-    const browser = await chromium.launch({
-      headless: true,
-      env,
-      handleSIGINT: false,
-      handleSIGHUP: false,
-      handleSIGTERM: false,
-      args: flags,
-    });
-    stats.timing('renderscript.create', Date.now() - start);
-
-    // Try to load a test page first
-    start = Date.now();
-    const context = await this.getNewContext({});
-    const testPage = await context.newPage();
-    await testPage.goto('about://settings', {
-      waitUntil: 'networkidle',
-      timeout: 2000,
-    });
-    stats.timing('renderscript.page.initial', Date.now() - start);
-    await testPage.close();
-    await context.close();
-
-    this.#browser = browser;
-    this.#ready = true;
-    console.log(`Browser is ready`);
-  }
-
-  async stop(): Promise<void> {
-    await this.#browser?.close();
   }
 }
