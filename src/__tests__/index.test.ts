@@ -82,7 +82,7 @@ describe('main', () => {
     });
 
     expect(cleanString(body)).toBe(
-      `<html><head><base href="http://localhost:3000"></head><body>A basic page</body></html>`
+      `<!DOCTYPE html><html><head><base href="http://localhost:3000"></head><body>A basic page</body></html>`
     );
   });
 
@@ -103,51 +103,5 @@ describe('main', () => {
     });
 
     expect(cleanString(body)).toBe('');
-  });
-
-  it('should expose metrics', async () => {
-    const { res, body } = await request('http://localhost:3000/render', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: 'http://localhost:3000/test-website/async.html',
-        ua: 'Algolia Crawler',
-      }),
-    });
-
-    const json = JSON.parse(body);
-
-    expect(res.statusCode).toBe(200);
-
-    expect(json.metrics).toMatchObject({
-      goto: expect.any(Number),
-      minWait: expect.any(Number),
-      serialize: expect.any(Number),
-      total: expect.any(Number),
-      page: {
-        layoutDuration: expect.any(Number),
-        scriptDuration: expect.any(Number),
-        taskDuration: expect.any(Number),
-        jsHeapUsedSize: expect.any(Number),
-        jsHeapTotalSize: expect.any(Number),
-        requests: expect.any(Number),
-        blockedRequests: expect.any(Number),
-        contentLength: 763,
-        contentLengthTotal: 763,
-      },
-    });
-    expect(json.metrics.goto).toBeLessThanOrEqual(1100);
-    expect(json.metrics.minWait).toBeLessThanOrEqual(1100);
-    expect(json.metrics.serialize).toBeLessThanOrEqual(20);
-    expect(json.metrics.total).toBeLessThanOrEqual(2100);
-    expect(json.metrics.page.layoutDuration).toBeLessThanOrEqual(10);
-    expect(json.metrics.page.scriptDuration).toBeLessThanOrEqual(10);
-    expect(json.metrics.page.taskDuration).toBeLessThanOrEqual(50);
-    expect(json.metrics.page.jsHeapUsedSize).toBeLessThanOrEqual(1637360);
-    expect(json.metrics.page.jsHeapTotalSize).toBeLessThanOrEqual(2639520);
-    expect(json.metrics.page.requests).toBe(1);
-    expect(json.metrics.page.blockedRequests).toBe(0);
   });
 });

@@ -90,7 +90,15 @@ export async function renderJSON(
       })
     );
 
-    res.status(200).json(task);
+    res.status(200).json({
+      body: task.body,
+      headers: task.headers,
+      metrics: task.metrics,
+      resolvedUrl: task.resolvedUrl,
+      statusCode: task.statusCode,
+      timeout: task.timeout,
+      error: task.error,
+    });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
     report(err, { type: 'renderJSON', url: rawUrl });

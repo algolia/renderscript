@@ -1,3 +1,5 @@
+import type { PostRenderSuccess } from 'api/responses';
+
 import { cleanString, request } from './helpers';
 
 jest.setTimeout(10000);
@@ -35,7 +37,7 @@ describe('async', () => {
       }),
     });
 
-    const json = JSON.parse(body);
+    const json: PostRenderSuccess = JSON.parse(body);
     expect(res.statusCode).toBe(200);
     expect(json.metrics.total).toBeLessThanOrEqual(2000);
     expect(json.body).not.toMatch('4. setTimeout 1000');
@@ -56,8 +58,10 @@ describe('async', () => {
       }),
     });
 
-    const json = JSON.parse(body);
+    const json: PostRenderSuccess = JSON.parse(body);
     expect(res.statusCode).toBe(200);
+
+    expect(json.metrics.minWait).toBeGreaterThanOrEqual(5000);
     expect(json.metrics.total).toBeGreaterThanOrEqual(6000);
     expect(json.metrics.total).toBeLessThanOrEqual(7000);
     expect(json.body).toMatch('5. setTimeout 5000');
@@ -79,10 +83,16 @@ describe('async', () => {
       }),
     });
 
-    const json = JSON.parse(body);
+    const json: PostRenderSuccess = JSON.parse(body);
     expect(res.statusCode).toBe(200);
-    expect(json.metrics.goto).toBeLessThanOrEqual(5010);
-    expect(json.metrics.goto).toBeGreaterThanOrEqual(5000);
+    expect(json.metrics.goto).toBeLessThanOrEqual(20);
+
+    // In that case the page is slow so min is not used
+    expect(json.metrics.minWait).toBe(0);
+
+    expect(json.metrics.ready).toBeLessThanOrEqual(5020);
+    expect(json.metrics.total).toBeGreaterThanOrEqual(4000);
+    expect(json.metrics.total).toBeLessThanOrEqual(5120);
 
     // We count the dot because there is no way to have precise execution
     // There should be around 25 dots (one fetch every 200ms during 5s = 25 dots)
@@ -96,7 +106,7 @@ describe('async', () => {
 describe('redirects', () => {
   describe('server redirect', () => {
     it('should return the redirection', async () => {
-      const { res } = await request('http://localhost:3000/render', {
+      const { res, body } = await request('http://localhost:3000/render', {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -107,8 +117,10 @@ describe('redirects', () => {
         }),
       });
 
+      const json: PostRenderSuccess = JSON.parse(body);
       expect(res.statusCode).toBe(200);
-      expect(res.headers.location).toBe(
+
+      expect(json.resolvedUrl).toBe(
         'http://localhost:3000/test-website/basic.html'
       );
     });
@@ -116,7 +128,7 @@ describe('redirects', () => {
 
   describe('client redirect', () => {
     it('should return the redirection', async () => {
-      const { res } = await request('http://localhost:3000/render', {
+      const { res, body } = await request('http://localhost:3000/render', {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -127,14 +139,16 @@ describe('redirects', () => {
         }),
       });
 
-      expect(res.statusCode).toBe(307);
-      expect(res.headers.location).toBe(
+      const json: PostRenderSuccess = JSON.parse(body);
+      expect(res.statusCode).toBe(200);
+
+      expect(json.resolvedUrl).toBe(
         'http://localhost:3000/test-website/basic.html'
       );
     });
 
     it('should return the redirection even if not executed yet', async () => {
-      const { res } = await request('http://localhost:3000/render', {
+      const { res, body } = await request('http://localhost:3000/render', {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
@@ -143,11 +157,16 @@ describe('redirects', () => {
           // The client redirection happens after 5 seconds
           url: 'http://localhost:3000/test-website/meta-refresh-5.html',
           ua: 'Algolia Crawler',
+          waitTime: {
+            max: 2000,
+          },
         }),
       });
 
-      expect(res.statusCode).toBe(307);
-      expect(res.headers.location).toBe(
+      const json: PostRenderSuccess = JSON.parse(body);
+      expect(res.statusCode).toBe(200);
+
+      expect(json.resolvedUrl).toBe(
         'http://localhost:3000/test-website/basic.html'
       );
     });

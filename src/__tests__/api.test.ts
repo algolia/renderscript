@@ -1,5 +1,8 @@
 import { request } from './helpers';
 
+/**
+ * Test the schema only on this file.
+ */
 describe('POST /render', () => {
   it('should validate 200', async () => {
     const { res, body } = await request('http://localhost:3000/render', {

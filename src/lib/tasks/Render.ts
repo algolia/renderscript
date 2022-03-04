@@ -54,7 +54,11 @@ export class RenderTask extends Task<RenderTaskParams> {
     // --- Basic checks passed we wait a bit more to page to render
     start = Date.now();
     try {
-      await page.waitForLoadState('networkidle');
+      // Computing maxWait minus what we already consumed
+      const maxWait = Math.max(0, waitTime!.max - this.metrics.goto);
+      await page.waitForLoadState('networkidle', {
+        timeout: maxWait,
+      });
     } catch (err: any) {
       this.page.throwIfNotTimeout(err);
     }

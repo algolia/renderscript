@@ -8,6 +8,8 @@ export interface PostRenderSuccess {
   headers: Record<string, string>;
   body: string | null;
   timeout: boolean;
+  resolvedUrl: string | null;
+  error: string | null;
 }
 
 export interface Res500 {
