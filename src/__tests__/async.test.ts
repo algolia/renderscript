@@ -145,6 +145,7 @@ describe('redirects', () => {
       expect(json.resolvedUrl).toBe(
         'http://localhost:3000/test-website/basic.html'
       );
+      expect(json.error).toBeNull(); // Make sure we blocked navigation
     });
 
     it('should return the redirection even if not executed yet', async () => {

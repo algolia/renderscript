@@ -76,6 +76,12 @@ export class BrowserPage {
     page.on('popup', () => {
       report(new Error('Popup created'), { pageUrl: page.url() });
     });
+    page.on('framenavigated', (frame) => {
+      report(new Error('unexpected navigation'), {
+        pageUrl: page.url(),
+        to: frame.url(),
+      });
+    });
   }
 
   /**
@@ -372,6 +378,7 @@ export class BrowserPage {
     } catch (err) {
       report(new Error('Error while trying to check for meta refresh'), {
         err,
+        timeout: this.#hasTimeout,
       });
     }
   }
