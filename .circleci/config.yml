@@ -22,7 +22,9 @@ jobs:
           command: yarn install --immutable
       - run:
           name: install browser
-          command: npx playwright install
+          command: |
+            npx playwright install
+            npx playwright install-deps
 
       - persist_to_workspace:
           root: .

@@ -6,9 +6,8 @@ import { Task } from './Task';
 
 export class LoginTask extends Task<LoginTaskParams> {
   async process(): Promise<void> {
-    await this.createContext();
     if (!this.page) {
-      return;
+      throw new Error('Calling process before createContext()');
     }
 
     /* Setup */

@@ -8,9 +8,8 @@ import { Task } from './Task';
 
 export class RenderTask extends Task<RenderTaskParams> {
   async process(): Promise<void> {
-    await this.createContext();
     if (!this.page) {
-      return;
+      throw new Error('Calling process before createContext()');
     }
 
     /* Setup */
@@ -27,6 +26,7 @@ export class RenderTask extends Task<RenderTaskParams> {
       });
     } catch (err: any) {
       this.results.error = err.message;
+
       return;
     }
 
@@ -53,15 +53,19 @@ export class RenderTask extends Task<RenderTaskParams> {
 
     // --- Basic checks passed we wait a bit more to page to render
     start = Date.now();
-    await page.waitForLoadState('networkidle');
+    try {
+      await page.waitForLoadState('networkidle');
+    } catch (err: any) {
+      this.page.throwIfNotTimeout(err);
+    }
     this.metrics.ready = Date.now() - start;
 
     await this.minWait();
 
     if (page.url() !== url.href) {
-      console.error('ERROR redirection not caught');
       // Redirection was not caught this should not happen
-      this.results.error = 'redirection';
+      console.error('ERROR redirection not caught');
+      this.results.error = 'wrong_redirection';
       this.results.resolvedUrl = page.url();
 
       return;

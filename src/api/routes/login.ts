@@ -6,6 +6,7 @@ import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
 import { report } from 'helpers/errorReporting';
 import { tasksManager } from 'lib/singletons';
+import { LoginTask } from 'lib/tasks/Login';
 
 export async function validate(
   req: express.Request,
@@ -53,18 +54,19 @@ export async function processLogin(
 
   try {
     const { error, statusCode, headers, body, cookies, timeout } =
-      await tasksManager.task({
-        type: 'login',
-        url: new URL(url),
-        headersToForward,
-        userAgent: ua,
-        login: {
-          username,
-          password,
-        },
-        renderHTML: renderHTMLInBoolean,
-        waitTime,
-      });
+      await tasksManager.task(
+        new LoginTask({
+          url: new URL(url),
+          headersToForward,
+          userAgent: ua,
+          login: {
+            username,
+            password,
+          },
+          renderHTML: renderHTMLInBoolean,
+          waitTime,
+        })
+      );
 
     if (error) {
       if (renderHTMLInBoolean) {

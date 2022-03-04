@@ -51,6 +51,10 @@ export class BrowserPage {
     return Boolean(this.#page && this.#context);
   }
 
+  get hasTimeout(): boolean {
+    return this.#hasTimeout;
+  }
+
   constructor(context: BrowserContext) {
     this.#context = context;
   }
@@ -104,14 +108,7 @@ export class BrowserPage {
       // Response can be assigned here or on('response')
       response = await this.#page!.goto(url, opts);
     } catch (err: any) {
-      if (!err.message.match(/Navigation timeout/)) {
-        throw err;
-      }
-
-      // This error is expected has most page will reach timeout
-      // we want to continue because we can still have a response
-      this.#hasTimeout = true;
-      report(new Error('goto_timeout'), { pageUrl: url });
+      this.throwIfNotTimeout(err);
     }
 
     stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
@@ -198,6 +195,17 @@ export class BrowserPage {
         pageUrl: this.#page!.url(),
       });
     });
+  }
+
+  throwIfNotTimeout(err: any): Error {
+    if (!(err instanceof Error) || err.name !== 'TimeoutError') {
+      throw err;
+    }
+
+    // This error is expected has most page will reach timeout
+    // we want to continue because we can still have a response
+    this.#hasTimeout = true;
+    return err;
   }
 
   /**

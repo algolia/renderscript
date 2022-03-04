@@ -1,4 +1,5 @@
 import type { BrowserContext, Response } from 'playwright';
+import { v4 as uuid } from 'uuid';
 
 import type { Browser } from 'lib/browser/Browser';
 import { BrowserPage } from 'lib/browser/Page';
@@ -6,17 +7,18 @@ import { WAIT_TIME } from 'lib/constants';
 import type { Metrics, TaskBaseParams, TaskResult } from 'lib/types';
 
 export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
+  id: string;
   params;
   page?: BrowserPage;
+  createdAt?: Date;
+  startedAt?: Date;
   results: TaskResult = {
-    startAt: Date.now(),
-    statusCode: undefined,
-    body: undefined,
+    statusCode: null,
+    body: null,
     headers: {},
-    timeout: undefined,
-    error: undefined,
-    resolvedUrl: undefined,
-    cookies: undefined,
+    error: null,
+    resolvedUrl: null,
+    cookies: [],
   };
   metrics: Metrics = {
     context: null,
@@ -34,9 +36,17 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   #context?: BrowserContext;
   #browser?: Browser;
 
-  constructor(params: TTaskType, browser: Browser) {
-    this.params = params;
-    this.#browser = browser;
+  constructor(params: TTaskType) {
+    this.id = uuid();
+    // Do not print this or pass it to reporting, it contains secrets
+    this.params = {
+      ...params,
+      waitTime: {
+        ...WAIT_TIME,
+        ...params.waitTime,
+      },
+    };
+    this.createdAt = new Date();
   }
 
   get isProcessed(): boolean {
@@ -52,20 +62,19 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     await this.page?.close();
     await this.#context?.close();
 
-    this.metrics.total = Date.now() - this.results.startAt;
+    this.metrics.total = Date.now() - this.startedAt!.getTime();
 
-    this.#browser = undefined;
     this.#context = undefined;
   }
 
   /**
    * Create the incognito context and the page so each task has a fresh start.
    */
-  async createContext(): Promise<void> {
+  async createContext(browser: Browser): Promise<void> {
     this.#processed = true;
-    this.results.startAt = Date.now();
+    this.startedAt = new Date();
 
-    const context = await this.#browser!.getNewContext({
+    const context = await browser.getNewContext({
       userAgent: this.params.userAgent,
     });
     context.setDefaultTimeout(WAIT_TIME.max);
@@ -85,7 +94,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
 
     page.page!.on('response', page.getOnResponseHandler(this.params));
 
-    this.metrics.context = Date.now() - this.results.startAt;
+    this.metrics.context = Date.now() - this.startedAt.getTime();
   }
 
   /**
@@ -102,7 +111,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   async minWait(): Promise<void> {
     const start = Date.now();
     const minWait = this.params.waitTime!.min;
-    const currentDuration = Date.now() - this.results.startAt;
+    const currentDuration = Date.now() - this.startedAt!.getTime();
 
     if (minWait && minWait > currentDuration) {
       console.log(`Waiting ${minWait - currentDuration} extra ms...`);

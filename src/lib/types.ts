@@ -1,12 +1,13 @@
 import type { Cookie } from 'playwright';
 
+import type { Task } from './tasks/Task';
+
 export type TaskFromAPI = Omit<TaskBaseParams, 'type' | 'url' | 'userAgent'> & {
   url: string;
   ua: string;
 };
 
 export interface TaskBaseParams {
-  type: 'login' | 'render';
   url: URL;
   userAgent: string;
   adblock?: boolean;
@@ -19,12 +20,9 @@ export interface TaskBaseParams {
   };
 }
 
-export interface RenderTaskParams extends TaskBaseParams {
-  type: 'render';
-}
+export type RenderTaskParams = TaskBaseParams;
 
 export interface LoginTaskParams extends TaskBaseParams {
-  type: 'login';
   login: {
     username: string;
     password: string;
@@ -36,17 +34,16 @@ export type TaskParams = LoginTaskParams | RenderTaskParams;
 
 export interface TaskFinal extends TaskResult {
   metrics: Metrics;
+  timeout: boolean;
 }
 
 export interface TaskResult {
-  startAt: number;
-  statusCode?: number;
-  body?: string;
-  headers?: Record<string, string>;
-  timeout?: boolean;
-  error?: string;
-  resolvedUrl?: string;
-  cookies?: Cookie[];
+  statusCode: number | null;
+  body: string | null;
+  error: string | null;
+  headers: Record<string, string>;
+  resolvedUrl: string | null;
+  cookies: Cookie[];
 }
 
 export interface Metrics {
@@ -79,8 +76,6 @@ export interface PageMetrics {
 }
 
 export interface TaskObject {
-  id: string;
-  url: string;
-  taskPromise?: Promise<void>;
-  createdAt: Date;
+  ref: Task;
+  promise: Promise<TaskFinal>;
 }

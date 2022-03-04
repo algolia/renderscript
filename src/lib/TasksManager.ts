@@ -1,20 +1,15 @@
-import { v4 as uuid } from 'uuid';
-
 import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
 
 import { Browser } from './browser/Browser';
-import { UNHEALTHY_TASK_TTL, WAIT_TIME } from './constants';
-import { LoginTask } from './tasks/Login';
-import { RenderTask } from './tasks/Render';
+import { UNHEALTHY_TASK_TTL } from './constants';
 import type { Task } from './tasks/Task';
-import type { TaskObject, TaskParams, TaskFinal } from './types';
+import type { TaskObject, TaskFinal } from './types';
 
 export class TasksManager {
   #browser: Browser | null = null;
   #stopping: boolean = true;
-  #tasks: Map<string, TaskObject & { execPromise: Promise<TaskFinal> }> =
-    new Map();
+  #tasks: Map<string, TaskObject> = new Map();
   #totalRun: number = 0;
 
   get healthy(): boolean {
@@ -25,8 +20,8 @@ export class TasksManager {
     // Tasks lifecycle
     const lostTask: string[][] = [];
     this.#tasks.forEach((task) => {
-      if (Date.now() - task.createdAt.getTime() > UNHEALTHY_TASK_TTL) {
-        lostTask.push([task.id, task.url]);
+      if (Date.now() - task.ref.createdAt!.getTime() > UNHEALTHY_TASK_TTL) {
+        lostTask.push([task.ref.id, task.ref.params.url.href]);
       }
     });
     if (lostTask.length > 0) {
@@ -64,18 +59,16 @@ export class TasksManager {
   /**
    * Register and execute a task.
    */
-  async task(job: TaskParams): Promise<TaskFinal> {
-    const id = uuid();
-
-    const task = this.#exec(id, job);
+  async task(task: Task): Promise<TaskFinal> {
+    const promise = this.#exec(task);
     this.#totalRun += 1;
-    this.#tasks.set(id, {
-      id,
-      url: job.url.href,
-      createdAt: new Date(),
-      execPromise: task,
+    this.#tasks.set(task.id, {
+      ref: task,
+      promise,
     });
-    return await task;
+    return await promise.finally(() => {
+      this.#tasks.delete(task.id);
+    });
   }
 
   /**
@@ -83,7 +76,7 @@ export class TasksManager {
    * It will create a browser, a page, launch the task (render, login), close everything.
    * Any unexpected error will be thrown.
    */
-  async #exec(id: string, job: TaskParams): Promise<TaskFinal> {
+  async #exec(task: Task): Promise<TaskFinal> {
     if (this.#stopping) {
       throw new Error('Task can not be executed: stopping');
     }
@@ -91,28 +84,15 @@ export class TasksManager {
       throw new Error('Task can not be executed: no_browser');
     }
 
-    const url = job.url.href;
-    console.log('Processing:', url, `(${job.type})(${id})`);
+    const id = task.id;
+    const url = task.params.url.href;
+    const type = task.constructor.name;
+    console.log('Processing:', url, `(${type})(${id})`);
 
     const start = Date.now();
 
-    // Do not print this or pass it to reporting, it contains secrets
-    const jobParam: TaskParams = {
-      ...job,
-      waitTime: {
-        ...WAIT_TIME,
-        ...job.waitTime,
-      },
-    };
-
-    let task: Task | undefined;
-    if (jobParam.type === 'login') {
-      task = new LoginTask(jobParam, this.#browser);
-    } else {
-      task = new RenderTask(jobParam, this.#browser);
-    }
-
     try {
+      await task.createContext(this.#browser);
       await task.process();
 
       // Required to get metrics
@@ -134,7 +114,7 @@ export class TasksManager {
 
     // ---- Reporting
     stats.timing('renderscript.task', Date.now() - start, undefined, {
-      type: job.type,
+      type,
     });
     const metrics = task.metrics;
 
@@ -153,8 +133,8 @@ export class TasksManager {
 
     console.log('Done', url, `(${id})`);
 
-    const res = task.results!;
-    return { ...res, metrics };
+    const res = task.results;
+    return { ...res, timeout: task.page!.hasTimeout, metrics };
   }
 
   /**
@@ -167,7 +147,7 @@ export class TasksManager {
     // We wait for all tasks to finish before closing
     const promises: Array<Promise<void>> = [];
     this.#tasks.forEach((task) => {
-      promises.push(this.#removeTask(task.id));
+      promises.push(this.#removeTask(task.ref.id));
     });
     await Promise.all(promises);
 
@@ -186,9 +166,7 @@ export class TasksManager {
     }
 
     try {
-      if (task.execPromise) {
-        await task.execPromise;
-      }
+      await task.promise;
     } catch (err) {
       //
     }

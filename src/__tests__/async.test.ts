@@ -41,7 +41,7 @@ describe('async', () => {
     expect(json.body).not.toMatch('4. setTimeout 1000');
   });
 
-  it('should wait 6000ms', async () => {
+  it('should wait at least 6000ms', async () => {
     const { res, body } = await request('http://localhost:3000/render', {
       method: 'POST',
       headers: {
@@ -63,7 +63,7 @@ describe('async', () => {
     expect(json.body).toMatch('5. setTimeout 5000');
   });
 
-  it('should wait 5000ms', async () => {
+  it('should wait at most 5000ms', async () => {
     const { res, body } = await request('http://localhost:3000/render', {
       method: 'POST',
       headers: {
@@ -107,7 +107,7 @@ describe('redirects', () => {
         }),
       });
 
-      expect(res.statusCode).toBe(307);
+      expect(res.statusCode).toBe(200);
       expect(res.headers.location).toBe(
         'http://localhost:3000/test-website/basic.html'
       );
