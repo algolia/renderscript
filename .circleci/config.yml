@@ -6,6 +6,7 @@ defaults: &defaults
   environment:
     NODE_ENV: 'test'
     MAX_WAIT_FOR_NEW_PAGE: 40000
+    PLAYWRIGHT_BROWSERS_PATH: ~/app/pw-browsers
 
 version: 2.1
 
