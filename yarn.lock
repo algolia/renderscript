@@ -58,7 +58,6 @@ __metadata:
     playwright: 1.19.2
     prettier: 2.5.1
     semantic-release: 19.0.2
-    stream-to-string: 1.2.0
     ts-jest: 27.1.3
     ttypescript: 1.5.13
     typescript: 4.5.5
@@ -7835,13 +7834,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"promise-polyfill@npm:^1.1.6":
-  version: 1.1.6
-  resolution: "promise-polyfill@npm:1.1.6"
-  checksum: 84a07ab5a34395ca7dbf104f9e4d89b8dc2853e9e441a3c997a246c1af1e634d49cddc8be4d201440911a2a4912f8f60e1d9331da0d64ac16edb8787f15bb62e
-  languageName: node
-  linkType: hard
-
 "promise-retry@npm:^2.0.1":
   version: 2.0.1
   resolution: "promise-retry@npm:2.0.1"
@@ -8759,15 +8751,6 @@ __metadata:
   version: 1.0.1
   resolution: "stream-shift@npm:1.0.1"
   checksum: 59b82b44b29ec3699b5519a49b3cedcc6db58c72fb40c04e005525dfdcab1c75c4e0c180b923c380f204bed78211b9bad8faecc7b93dece4d004c3f6ec75737b
-  languageName: node
-  linkType: hard
-
-"stream-to-string@npm:1.2.0":
-  version: 1.2.0
-  resolution: "stream-to-string@npm:1.2.0"
-  dependencies:
-    promise-polyfill: ^1.1.6
-  checksum: d7a5c7575e4c1f61de440e788a46019d92e3558e011848a5cd0d25ad5e6044ec73e35034c3cc8a9be651289c08bb101b65293e77ba678457448ee486744f3639
   languageName: node
   linkType: hard
 
