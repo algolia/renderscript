@@ -1,4 +1,4 @@
-import type { PostRenderSuccess } from 'api/responses';
+import type { PostRenderSuccess } from 'api/@types/postRender';
 
 import { request } from './helpers';
 

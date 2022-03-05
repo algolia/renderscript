@@ -1,7 +1,7 @@
 {
   "name": "@algolia/renderscript",
   "version": "1.12.12",
-  "description": "A custom JavaScript rendering engine based on puppeteer",
+  "description": "A custom JavaScript rendering engine based on Playwright",
   "main": "dist/index.js",
   "scripts": {
     "build": "yarn clean && ttsc",

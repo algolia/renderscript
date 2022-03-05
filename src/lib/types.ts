@@ -2,11 +2,6 @@ import type { Cookie } from 'playwright';
 
 import type { Task } from './tasks/Task';
 
-export type TaskFromAPI = Omit<TaskBaseParams, 'type' | 'url' | 'userAgent'> & {
-  url: string;
-  ua: string;
-};
-
 export interface TaskBaseParams {
   url: URL;
   userAgent: string;

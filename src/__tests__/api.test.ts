@@ -1,3 +1,5 @@
+import type { PostRenderSuccess } from 'api/@types/postRender';
+
 import { request } from './helpers';
 
 /**
@@ -17,7 +19,7 @@ describe('POST /render', () => {
     });
     expect(res.statusCode).toBe(200);
 
-    const json = JSON.parse(body);
+    const json: PostRenderSuccess = JSON.parse(body);
     expect(json).toStrictEqual({
       body: expect.any(String),
       headers: {

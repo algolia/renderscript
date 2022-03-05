@@ -1,15 +1,18 @@
 import type express from 'express';
 
+import type {
+  PostRenderParams,
+  PostRenderResponse,
+} from 'api/@types/postRender';
+import type { Res500 } from 'api/@types/responses';
 import { CSP_HEADERS } from 'api/constants';
 import { getDefaultParams, alt } from 'api/helpers/alt';
 import { revertUrl } from 'api/helpers/buildUrl';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
-import type { PostRender, Res500 } from 'api/responses';
 import { report } from 'helpers/errorReporting';
 import { tasksManager } from 'lib/singletons';
 import { RenderTask } from 'lib/tasks/Render';
-import type { TaskFromAPI } from 'lib/types';
 
 export async function validate(
   req: express.Request<any, any, any, any>,
@@ -29,7 +32,7 @@ export async function validate(
 }
 
 export async function render(
-  req: express.Request<any, any, any, TaskFromAPI>,
+  req: express.Request<any, any, any, PostRenderParams>,
   res: express.Response<Res500 | string | null>
 ): Promise<void> {
   const { url: rawUrl, ua, waitTime, adblock } = req.query;
@@ -72,8 +75,8 @@ export async function render(
 }
 
 export async function renderJSON(
-  req: express.Request<any, any, TaskFromAPI>,
-  res: express.Response<PostRender>
+  req: express.Request<any, any, PostRenderParams>,
+  res: express.Response<PostRenderResponse>
 ): Promise<void> {
   const { url: rawUrl, ua, waitTime, adblock } = req.body;
   const headersToForward = getForwardedHeadersFromRequest(req);
