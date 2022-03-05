@@ -69,6 +69,7 @@
     "eslint-plugin-promise": "6.0.0",
     "jest": "27.5.1",
     "nodemon": "2.0.15",
+    "pino-pretty": "7.5.3",
     "prettier": "2.5.1",
     "semantic-release": "19.0.2",
     "ts-jest": "27.1.3",
@@ -85,8 +86,8 @@
     "csurf": "1.11.0",
     "express": "4.17.3",
     "hot-shots": "9.0.0",
+    "pino": "^7.8.0",
     "playwright": "1.19.2",
-    "stream-to-string": "1.2.0",
     "undici": "4.14.1",
     "uuid": "8.3.2"
   },

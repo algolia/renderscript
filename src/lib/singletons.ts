@@ -1,4 +1,5 @@
 import { report } from 'helpers/errorReporting';
+import { log } from 'helpers/logger';
 
 import { TasksManager } from './TasksManager';
 import { Adblocker } from './browser/Adblocker';
@@ -13,7 +14,7 @@ export async function init(): Promise<void> {
   } catch (err: any) {
     report(new Error('Error during launch'), { err });
 
-    console.log('Exit');
+    log.info('Exit');
     setTimeout(() => {
       // eslint-disable-next-line no-process-exit
       process.exit(1);

@@ -13,6 +13,7 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     /* Setup */
     const { url, login } = this.params;
+    const log = this.log;
     const page = this.page.page!;
     let response: Response;
 
@@ -36,8 +37,8 @@ export class LoginTask extends Task<LoginTaskParams> {
       return;
     }
 
-    console.log(`Current URL: ${page!.url()}`);
-    console.log('Entering username...');
+    log.debug('Current URL', { pageUrl: page.url() });
+    log.debug('Entering username...', { userName: login.username });
     await textInput.type(login.username, {
       timeout: this.timeBudget.get(),
     });
@@ -52,7 +53,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     }
 
     // Type the password
-    console.log('Entering password and logging in...');
+    log.info('Entering password and logging in...');
     await passwordInput.type(login.password);
 
     // Submit
@@ -77,6 +78,7 @@ export class LoginTask extends Task<LoginTaskParams> {
   async #getPasswordInput(
     textInput: ElementHandle<HTMLElement | SVGElement>
   ): Promise<ElementHandle<HTMLElement | SVGElement> | null | void> {
+    const log = this.log;
     const page = this.page!.page!;
     const inputSel = 'input[type=password]:not([aria-hidden="true"])';
 
@@ -86,7 +88,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     }
 
     // it can be that we are in a "two step form"
-    console.log('No password input found: validating username...');
+    log.debug('No password input found: validating username...');
     try {
       // We submit the form
       await textInput!.press('Enter', {
@@ -101,14 +103,14 @@ export class LoginTask extends Task<LoginTaskParams> {
       });
       this.timeBudget.consume();
 
-      console.log(`Current URL: ${page.url()}`);
+      log.debug('Current URL', { pageUrl: page.url() });
 
       return await page.$(inputSel);
     } catch (err: any) {
-      console.log(
-        'Found no password input on the page',
-        JSON.stringify({ err: err.message, pageUrl: page.url() })
-      );
+      log.info('No password input on the page', {
+        err: err.message,
+        pageUrl: page.url(),
+      });
 
       this.results.error = err.message;
     }
@@ -120,6 +122,7 @@ export class LoginTask extends Task<LoginTaskParams> {
   async #submitForm(
     passwordInput: ElementHandle<HTMLElement | SVGElement>
   ): Promise<void> {
+    const log = this.log;
     const { url } = this.params;
     const page = this.page!.page!;
     let res: Response | null;
@@ -155,10 +158,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       }
 
       // Can happen if navigation was done through History API
-      console.log(
-        'Got no login response, but redirected',
-        JSON.stringify({ url: page.url() })
-      );
+      log.debug('No login response, but redirected', { pageUrl: page.url() });
       return;
     }
 
@@ -173,10 +173,6 @@ export class LoginTask extends Task<LoginTaskParams> {
       }
       chain.push(prev.url());
     }
-
-    console.log(
-      `Followed ${chain.length} redirections`,
-      JSON.stringify({ url: page.url(), chain })
-    );
+    log.debug('Login after redirections', { pageUrl: page.url(), chain });
   }
 }

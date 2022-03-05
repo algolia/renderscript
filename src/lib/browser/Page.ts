@@ -2,6 +2,7 @@ import { validateURL } from '@algolia/dns-filter';
 import type { BrowserContext, Page, Route, Response } from 'playwright';
 
 import { report } from 'helpers/errorReporting';
+import { log } from 'helpers/logger';
 import { stats } from 'helpers/stats';
 import { adblocker } from 'lib/singletons';
 import type { PageMetrics, TaskBaseParams } from 'lib/types';
@@ -77,13 +78,13 @@ export class BrowserPage {
       report(new Error('Popup created'), { pageUrl: page.url() });
     });
     page.on('request', (req) => {
-      console.debug('  ->', req.url());
+      log.debug('request_start', { url: req.url() });
     });
     page.on('requestfailed', (req) => {
-      console.debug('    ❌ ', req.url());
+      log.debug('request_failed', { url: req.url() });
     });
     page.on('requestfinished', (req) => {
-      console.debug('    ☑️ ', req.url());
+      log.debug('request_finished', { url: req.url() });
     });
   }
 
@@ -239,6 +240,10 @@ export class BrowserPage {
   setDisableNavigation(originalUrl: string): void {
     this.#page!.on('framenavigated', (frame) => {
       if (originalUrl === frame.url()) {
+        return;
+      }
+      if (frame.parentFrame()) {
+        // Sub Frame we don't care
         return;
       }
 
@@ -418,7 +423,7 @@ export class BrowserPage {
       const matchedURL = match[1].replace(/'/g, '');
       const redirectURL = new URL(matchedURL, url);
 
-      console.log(`Meta refresh found. Redirecting to ${redirectURL.href}...`);
+      log.debug('Meta refresh found', { redir: redirectURL.href });
 
       return redirectURL;
     } catch (err) {

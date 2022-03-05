@@ -1,5 +1,6 @@
 import type { Response } from 'playwright';
 
+import { log } from 'helpers/logger';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { RenderTaskParams } from 'lib/types';
 
@@ -64,11 +65,15 @@ export class RenderTask extends Task<RenderTaskParams> {
 
     await this.minWait();
 
-    if (page.url() !== url.href) {
+    const newUrl = page.url();
+    if (newUrl !== url.href) {
       // Redirection was not caught this should not happen
-      console.error('ERROR redirection not caught');
+      log.error('ERROR redirection not caught', {
+        from: url.href,
+        to: newUrl,
+      });
       this.results.error = 'wrong_redirection';
-      this.results.resolvedUrl = page.url();
+      this.results.resolvedUrl = newUrl;
 
       return;
     }

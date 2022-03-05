@@ -1,6 +1,8 @@
+import type { Logger } from 'pino';
 import type { BrowserContext, Response } from 'playwright';
 import { v4 as uuid } from 'uuid';
 
+import { log } from 'helpers/logger';
 import { stats } from 'helpers/stats';
 import type { Browser } from 'lib/browser/Browser';
 import { BrowserPage } from 'lib/browser/Page';
@@ -22,6 +24,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     resolvedUrl: null,
     cookies: [],
   };
+  log: Logger;
   #metrics: Metrics = {
     timings: {
       context: null,
@@ -45,7 +48,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   #processed: boolean = false;
   #context?: BrowserContext;
 
-  constructor(params: TTaskType) {
+  constructor(params: TTaskType, logger?: Logger) {
     this.id = uuid();
     // Do not print this or pass it to reporting, it contains secrets
     this.params = {
@@ -58,6 +61,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     this.createdAt = new Date();
     this.timeBudget = new TimeBudget(this.params.waitTime.max);
     this.#metrics.renderingBudget.max = this.timeBudget.max;
+    this.log = logger ?? log.child({ svc: 'task', ctx: { id: this.id } });
   }
 
   get isProcessed(): boolean {
@@ -132,7 +136,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
       return;
     }
 
-    console.log(`Waiting ${todo} extra ms...`);
+    log.info(`Waiting ${todo} extra ms...`);
     await this.page!.page!.waitForTimeout(todo);
     this.setMetric('minWait');
   }

@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 
 import { DELETE_COOKIE, SESSION_COOKIE } from 'api/constants';
+import { log } from 'api/helpers/logger';
 
 export function getLogin(req: Request, res: Response): void {
   res.render('login', {
@@ -23,7 +24,7 @@ export function getTest(req: Request, res: Response): void {
   const cookie = req.get('Cookie') || '';
   const cookies = cookie.split(';').map((c) => c.trim());
   const granted = cookies.includes(SESSION_COOKIE);
-  console.log(`[/secure/test] granted: ${granted}, received cookie: ${cookie}`);
+  log.debug(`[/secure/test] granted: ${granted}, received cookie: ${cookie}`);
   res
     .contentType('text/html')
     .status(granted ? 200 : 401)
@@ -74,9 +75,11 @@ function renderLogin({
   const setCookie = `${
     granted ? SESSION_COOKIE : DELETE_COOKIE
   }; SameSite=Strict`;
-  console.log(
-    `[renderLoginResult] username: ${username}, password: ${password} => set-cookie: ${setCookie}`
-  );
+  log.debug('renderLogin', {
+    username,
+    password,
+    setCookie,
+  });
 
   res
     .contentType('text/html')

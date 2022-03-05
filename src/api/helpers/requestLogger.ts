@@ -1,5 +1,7 @@
 import type express from 'express';
 
+import { log } from './logger';
+
 export function requestLogger(
   req: express.Request,
   res: express.Response,
@@ -10,6 +12,6 @@ export function requestLogger(
     return;
   }
 
-  console.info(`[${req.method}] ${req.url}`);
+  log.info('New request', { method: req.method, path: req.url });
   next();
 }

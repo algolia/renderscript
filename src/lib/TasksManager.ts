@@ -1,10 +1,13 @@
 import { report } from 'helpers/errorReporting';
+import { log as mainLog } from 'helpers/logger';
 import { stats } from 'helpers/stats';
 
 import { Browser } from './browser/Browser';
 import { UNHEALTHY_TASK_TTL } from './constants';
 import type { Task } from './tasks/Task';
 import type { TaskObject, TaskFinal } from './types';
+
+export const log = mainLog.child({ svc: 'mng' });
 
 export class TasksManager {
   #browser: Browser | null = null;
@@ -54,6 +57,7 @@ export class TasksManager {
 
     this.#browser = browser;
     this.#stopping = false;
+    log.info('Ready');
   }
 
   /**
@@ -87,7 +91,7 @@ export class TasksManager {
     const id = task.id;
     const url = task.params.url.href;
     const type = task.constructor.name;
-    console.log('Processing:', url, `(${type})(${id})`);
+    log.info('Processing', { id, url, type });
 
     const start = Date.now();
 
@@ -123,7 +127,7 @@ export class TasksManager {
       /* eslint-enable prettier/prettier */
     }
 
-    console.log('Done', url, `(${id})`);
+    log.info('Done', { id, url });
     const res = task.results;
     return { ...res, timeout: task.page!.hasTimeout, metrics: task.metrics };
   }
@@ -133,7 +137,7 @@ export class TasksManager {
    */
   async stop(): Promise<void> {
     this.#stopping = true;
-    console.info(`Tasks Manager stopping...`);
+    log.info('[Manager] stopping...');
 
     // We wait for all tasks to finish before closing
     const promises: Array<Promise<void>> = [];

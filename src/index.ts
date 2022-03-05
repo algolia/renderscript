@@ -1,9 +1,8 @@
 import { Api } from 'api/index';
 import { report } from 'helpers/errorReporting';
 import { gracefulClose } from 'helpers/gracefulClose';
+import { log } from 'helpers/logger';
 import * as singletons from 'lib/singletons';
-
-console.info(`NODE_ENV = ${process.env.NODE_ENV}`);
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
@@ -11,7 +10,7 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 process.on('unhandledRejection', (reason) => {
   report(new Error('unhandled rejection'), { err: reason });
 
-  console.log('Exit');
+  log.info('Hard exit after unhandledRejection');
   // We are not sure if it's stable or not
   setTimeout(() => {
     // eslint-disable-next-line no-process-exit
@@ -22,7 +21,7 @@ process.on('unhandledRejection', (reason) => {
 process.on('uncaughtException', (reason) => {
   report(new Error('uncaught exception'), { err: reason });
 
-  console.log('Exit');
+  log.info('Hard exit after uncaughtException');
   // We are not sure if it's stable or not
   setTimeout(() => {
     // eslint-disable-next-line no-process-exit
@@ -31,6 +30,8 @@ process.on('uncaughtException', (reason) => {
 });
 
 (async (): Promise<void> => {
+  log.info('Starting...', { env: process.env.NODE_ENV });
+
   const api = new Api();
   api.start(PORT);
 

@@ -6,9 +6,12 @@ import type {
 import { chromium } from 'playwright';
 import { v4 as uuid } from 'uuid';
 
+import { log as mainLog } from 'helpers/logger';
 import { stats } from 'helpers/stats';
 
 import { flags, HEIGHT, WIDTH } from '../constants';
+
+const log = mainLog.child({ svc: 'bwr' });
 
 export class Browser {
   #id;
@@ -31,7 +34,7 @@ export class Browser {
    * Create a puppeteer instance.
    */
   async create(): Promise<void> {
-    console.info(`Browser ${this.#id} creating...`);
+    log.info('Creating...', { id: this.#id });
 
     const env: { [s: string]: string } = {};
     if (process.env.DISPLAY) {
@@ -63,7 +66,7 @@ export class Browser {
     await context.close();
 
     this.#ready = true;
-    console.log(`Browser is ready`);
+    log.info('Ready', { id: this.#id });
   }
 
   async stop(): Promise<void> {

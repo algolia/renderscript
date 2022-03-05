@@ -2,6 +2,7 @@ import type { Api } from 'api/index';
 import type { TasksManager } from 'lib/TasksManager';
 
 import * as reporting from './errorReporting';
+import { log } from './logger';
 import * as stats from './stats';
 
 interface Params {
@@ -13,35 +14,36 @@ let gracefullyClosing = false;
 
 async function close({ api, tasksManager }: Params): Promise<void> {
   const webServerPromise = new Promise<void>((resolve) => {
-    console.info('[API] Shutting down');
+    log.info('[API] Stopping...');
     api.stop(() => {
-      console.info('[API] Shut down');
+      log.info('[API] stopped');
       resolve();
     });
   });
 
   await webServerPromise;
-
   await tasksManager.stop();
 
-  console.info('Gracefully stopped everything');
+  log.info('Gracefully stopped everything');
 }
 
 export async function gracefulClose(opts: Params): Promise<void> {
-  console.log('Graceful Exit');
   // If we receive multiple signals, swallow them
   if (gracefullyClosing) {
     return;
   }
 
+  gracefullyClosing = true;
+  log.info('Starting graceful close...');
+
   try {
-    gracefullyClosing = true;
     await close(opts);
     await reporting.drain();
     await stats.close();
   } catch (err) {
-    console.log('Graceful exit failed', err);
+    log.error('Graceful exit failed', err);
   }
+  log.flush();
 
   // eslint-disable-next-line no-process-exit
   process.exit(0);

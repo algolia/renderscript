@@ -13,6 +13,7 @@ import { ready } from 'api/routes/ready';
 import * as routeRender from 'api/routes/render';
 import projectRoot from 'helpers/projectRoot';
 
+import { log } from './helpers/logger';
 import { list } from './routes/list';
 import {
   getLogin,
@@ -44,7 +45,7 @@ export class Api {
     }
 
     this.server.listen(port, () => {
-      console.info(`Server started http://localhost:${port}`);
+      log.info(`Ready http://localhost:${port}`);
     });
   }
 
