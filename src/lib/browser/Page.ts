@@ -76,11 +76,14 @@ export class BrowserPage {
     page.on('popup', () => {
       report(new Error('Popup created'), { pageUrl: page.url() });
     });
-    page.on('framenavigated', (frame) => {
-      report(new Error('unexpected navigation'), {
-        pageUrl: page.url(),
-        to: frame.url(),
-      });
+    page.on('request', (req) => {
+      console.debug('  ->', req.url());
+    });
+    page.on('requestfailed', (req) => {
+      console.debug('    ❌ ', req.url());
+    });
+    page.on('requestfinished', (req) => {
+      console.debug('    ☑️ ', req.url());
     });
   }
 
@@ -107,7 +110,7 @@ export class BrowserPage {
         response = res;
       }
     }
-    this.#page!.on('response', onResponse);
+    this.#page!.once('response', onResponse);
 
     const start = Date.now();
     try {
@@ -115,17 +118,45 @@ export class BrowserPage {
       response = await this.#page!.goto(url, opts);
     } catch (err: any) {
       this.throwIfNotTimeout(err);
+    } finally {
+      // We remove listener, because we don't want more response
+      this.#page!.removeListener('response', onResponse);
     }
 
     stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
       success: response ? 'true' : 'false',
     });
-    // We remove listener, because we don't want more response
-    this.#page!.removeListener('response', onResponse);
 
     if (!response) {
       // Just in case
       throw new Error('goto_no_response');
+    }
+
+    return response;
+  }
+
+  /**
+   * Wait for navigation with timeout handling.
+   */
+  async waitForNavigation(
+    opts: Parameters<Page['waitForNavigation']>[0]
+  ): Promise<Response | null> {
+    let response: Response | null = null;
+    function onResponse(res: Response): void {
+      // We listen to response because "goto" will throw on timeout but we still want to process the doc in that case
+      if (!response) {
+        response = res;
+      }
+    }
+    this.#page!.once('response', onResponse);
+
+    try {
+      response = await this.page!.waitForNavigation(opts);
+    } catch (err: any) {
+      this.throwIfNotTimeout(err);
+    } finally {
+      // We remove listener, because we don't want more response
+      this.#page!.removeListener('response', onResponse);
     }
 
     return response;
@@ -166,7 +197,6 @@ export class BrowserPage {
    * Output body as a string at the moment it is requested.
    */
   async renderBody(): Promise<string> {
-    console.log(`Rendering page...`);
     return await this.#page!.content();
   }
 
@@ -191,7 +221,7 @@ export class BrowserPage {
   /**
    * Disable service workers, this is recommended.
    */
-  async disableServiceWorker(): Promise<void> {
+  async setDisableServiceWorker(): Promise<void> {
     await this.#context!.addInitScript(() => {
       // @ts-expect-error read-only prop
       delete window.navigator.serviceWorker;
@@ -199,6 +229,22 @@ export class BrowserPage {
     this.#page!.on('worker', () => {
       report(new Error('WebWorker disabled but created'), {
         pageUrl: this.#page!.url(),
+      });
+    });
+  }
+
+  /**
+   * Disable service workers, this is recommended.
+   */
+  setDisableNavigation(originalUrl: string): void {
+    this.#page!.on('framenavigated', (frame) => {
+      if (originalUrl === frame.url()) {
+        return;
+      }
+
+      report(new Error('unexpected navigation'), {
+        pageUrl: originalUrl,
+        to: frame.url(),
       });
     });
   }

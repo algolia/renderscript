@@ -1,5 +1,6 @@
 import type { ElementHandle, Response, Request } from 'playwright';
 
+import { report } from 'helpers/errorReporting';
 import type { LoginTaskParams } from 'lib/types';
 
 import { Task } from './Task';
@@ -11,13 +12,13 @@ export class LoginTask extends Task<LoginTaskParams> {
     }
 
     /* Setup */
-    const { url, waitTime, login } = this.params;
+    const { url, login } = this.params;
     const page = this.page.page!;
     let response: Response;
 
     try {
       response = await this.page.goto(url.href, {
-        timeout: waitTime!.max,
+        timeout: this.timeBudget.get(),
         waitUntil: 'networkidle',
       });
     } catch (err: any) {
@@ -25,10 +26,11 @@ export class LoginTask extends Task<LoginTaskParams> {
       return;
     }
 
+    this.setMetric('goto');
     await this.saveStatus(response);
 
     // We first check if there is form
-    const textInput = await page!.$('input[type=text], input[type=email]');
+    const textInput = await page.$('input[type=text], input[type=email]');
     if (!textInput) {
       this.results.error = `field_not_found: input[type=text], input[type=email]`;
       return;
@@ -36,7 +38,10 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     console.log(`Current URL: ${page!.url()}`);
     console.log('Entering username...');
-    await textInput.type(login!.username);
+    await textInput.type(login.username, {
+      timeout: this.timeBudget.get(),
+    });
+    this.timeBudget.consume();
 
     // Get the password input
     const passwordInput = await this.#getPasswordInput(textInput);
@@ -48,20 +53,22 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     // Type the password
     console.log('Entering password and logging in...');
-    await passwordInput!.type(login!.password);
+    await passwordInput.type(login.password);
 
     // Submit
     await this.#submitForm(passwordInput);
 
     await this.saveStatus(response);
+    if (this.results.error) {
+      return;
+    }
 
     await this.minWait();
 
-    const cookies = await page.context().cookies();
-
+    this.results.cookies = await page.context().cookies();
     await this.saveStatus(response);
 
-    this.results.cookies = cookies;
+    this.timeBudget.consume();
   }
 
   /**
@@ -71,8 +78,8 @@ export class LoginTask extends Task<LoginTaskParams> {
     textInput: ElementHandle<HTMLElement | SVGElement>
   ): Promise<ElementHandle<HTMLElement | SVGElement> | null | void> {
     const page = this.page!.page!;
-
     const inputSel = 'input[type=password]:not([aria-hidden="true"])';
+
     const passwordInput = await page!.$(inputSel);
     if (passwordInput) {
       return passwordInput;
@@ -82,13 +89,17 @@ export class LoginTask extends Task<LoginTaskParams> {
     console.log('No password input found: validating username...');
     try {
       // We submit the form
-      await textInput!.press('Enter');
+      await textInput!.press('Enter', {
+        timeout: this.timeBudget.limit(1000),
+      });
+      this.timeBudget.consume();
 
       // And wait for a new input to be there maybe
       // page!.waitForNavigation() doesn't work with Okta for example, it's JS based
       await page.waitForSelector(inputSel, {
-        timeout: this.params.waitTime!.min,
+        timeout: this.timeBudget.limit(1000),
       });
+      this.timeBudget.consume();
 
       console.log(`Current URL: ${page.url()}`);
 
@@ -96,10 +107,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     } catch (err: any) {
       console.log(
         'Found no password input on the page',
-        JSON.stringify({
-          err: err.message,
-          pageUrl: page.url(),
-        })
+        JSON.stringify({ err: err.message, pageUrl: page.url() })
       );
 
       this.results.error = err.message;
@@ -114,46 +122,43 @@ export class LoginTask extends Task<LoginTaskParams> {
   ): Promise<void> {
     const { url } = this.params;
     const page = this.page!.page!;
-    let res;
+    let res: Response | null;
 
     try {
-      // We don't submit form because sometimes there are no form
-      await passwordInput.press('Enter');
-
-      res = await page.waitForNavigation({
-        timeout: this.params.waitTime!.min,
-        waitUntil: 'networkidle',
-      });
+      // We don't submit form directly because sometimes there are no form
+      // We wait both at the same time because navigation happens quickly
+      [res] = await Promise.all([
+        this.page!.waitForNavigation({
+          timeout: this.timeBudget.limit(5000),
+          waitUntil: 'domcontentloaded',
+        }),
+        passwordInput.press('Enter', {
+          timeout: this.timeBudget.limit(1000),
+        }),
+      ]);
     } catch (err: any) {
-      console.log(
-        'Error while logging in',
-        JSON.stringify({
-          err: err.message,
-          pageUrl: page.url(),
-        })
-      );
-
+      report(new Error('Error while submit'), {
+        err: err.message,
+        pageUrl: page.url(),
+      });
       this.results.error = err.message;
       return;
+    } finally {
+      this.timeBudget.consume();
     }
 
     if (!res) {
-      if (page.url() !== url.href) {
-        // Can happen if navigation was done through History API
-        console.log(
-          `Got no login response, but we were redirected on ${page!.url()}, continuing...`
-        );
+      if (page.url() === url.href) {
+        // Return an error if we got no login response and are still on the same URL
+        this.results.error = 'no_response';
+        return;
       }
 
-      // Return an error if we got no login response and are still on the same URL
+      // Can happen if navigation was done through History API
       console.log(
-        'Got no login response',
-        JSON.stringify({
-          url: page.url(),
-        })
+        'Got no login response, but redirected',
+        JSON.stringify({ url: page.url() })
       );
-
-      this.results.error = 'no_response';
       return;
     }
 
@@ -171,10 +176,7 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     console.log(
       `Followed ${chain.length} redirections`,
-      JSON.stringify({
-        url: page.url(),
-        chain,
-      })
+      JSON.stringify({ url: page.url(), chain })
     );
   }
 }

@@ -47,13 +47,20 @@ export interface TaskResult {
 }
 
 export interface Metrics {
-  context: number | null;
-  goto: number | null;
-  equiv: number | null;
-  ready: number | null;
-  minWait: number | null;
-  serialize: number | null;
-  total: number | null;
+  timings: {
+    context: number | null;
+    goto: number | null;
+    equiv: number | null;
+    ready: number | null;
+    minWait: number | null;
+    serialize: number | null;
+    close: number | null;
+    total: number | null;
+  };
+  renderingBudget: {
+    max: number;
+    consumed: number;
+  };
   page: PageMetrics | null;
 }
 

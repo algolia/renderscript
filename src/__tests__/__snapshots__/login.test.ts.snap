@@ -7,13 +7,8 @@ Object {
   "httpOnly": false,
   "name": "sessionToken",
   "path": "/secure",
-  "sameParty": false,
   "sameSite": "Strict",
   "secure": false,
-  "session": true,
-  "size": 26,
-  "sourcePort": 3000,
-  "sourceScheme": "NonSecure",
   "value": "53cu23_535510n",
 }
 `;
@@ -25,13 +20,8 @@ Object {
   "httpOnly": false,
   "name": "sessionToken",
   "path": "/secure",
-  "sameParty": false,
   "sameSite": "Strict",
   "secure": false,
-  "session": true,
-  "size": 26,
-  "sourcePort": 3000,
-  "sourceScheme": "NonSecure",
   "value": "53cu23_535510n",
 }
 `;
@@ -43,13 +33,8 @@ Object {
   "httpOnly": false,
   "name": "sessionToken",
   "path": "/secure",
-  "sameParty": false,
   "sameSite": "Strict",
   "secure": false,
-  "session": true,
-  "size": 26,
-  "sourcePort": 3000,
-  "sourceScheme": "NonSecure",
   "value": "53cu23_535510n",
 }
 `;

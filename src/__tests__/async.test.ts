@@ -39,7 +39,7 @@ describe('async', () => {
 
     const json: PostRenderSuccess = JSON.parse(body);
     expect(res.statusCode).toBe(200);
-    expect(json.metrics.total).toBeLessThanOrEqual(2000);
+    expect(json.metrics.timings.total).toBeLessThanOrEqual(2000);
     expect(json.body).not.toMatch('4. setTimeout 1000');
   });
 
@@ -61,9 +61,9 @@ describe('async', () => {
     const json: PostRenderSuccess = JSON.parse(body);
     expect(res.statusCode).toBe(200);
 
-    expect(json.metrics.minWait).toBeGreaterThanOrEqual(5000);
-    expect(json.metrics.total).toBeGreaterThanOrEqual(6000);
-    expect(json.metrics.total).toBeLessThanOrEqual(7000);
+    expect(json.metrics.timings.minWait).toBeGreaterThanOrEqual(5000);
+    expect(json.metrics.timings.total).toBeGreaterThanOrEqual(6000);
+    expect(json.metrics.timings.total).toBeLessThanOrEqual(7000);
     expect(json.body).toMatch('5. setTimeout 5000');
   });
 
@@ -85,14 +85,14 @@ describe('async', () => {
 
     const json: PostRenderSuccess = JSON.parse(body);
     expect(res.statusCode).toBe(200);
-    expect(json.metrics.goto).toBeLessThanOrEqual(20);
+    expect(json.metrics.timings.goto).toBeLessThanOrEqual(20);
 
     // In that case the page is slow so min is not used
-    expect(json.metrics.minWait).toBe(0);
+    expect(json.metrics.timings.minWait).toBeNull();
 
-    expect(json.metrics.ready).toBeLessThanOrEqual(5020);
-    expect(json.metrics.total).toBeGreaterThanOrEqual(4000);
-    expect(json.metrics.total).toBeLessThanOrEqual(5120);
+    expect(json.metrics.timings.ready).toBeLessThanOrEqual(5020);
+    expect(json.metrics.timings.total).toBeGreaterThanOrEqual(4000);
+    expect(json.metrics.timings.total).toBeLessThanOrEqual(5120);
 
     // We count the dot because there is no way to have precise execution
     // There should be around 25 dots (one fetch every 200ms during 5s = 25 dots)

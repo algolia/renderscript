@@ -1,8 +1,10 @@
 import type { BrowserContext, Response } from 'playwright';
 import { v4 as uuid } from 'uuid';
 
+import { stats } from 'helpers/stats';
 import type { Browser } from 'lib/browser/Browser';
 import { BrowserPage } from 'lib/browser/Page';
+import { TimeBudget } from 'lib/browser/TimeBudget';
 import { WAIT_TIME } from 'lib/constants';
 import type { Metrics, TaskBaseParams, TaskResult } from 'lib/types';
 
@@ -20,21 +22,28 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     resolvedUrl: null,
     cookies: [],
   };
-  metrics: Metrics = {
-    context: null,
-    goto: null,
-    equiv: null,
-    ready: null,
-    minWait: null,
-    serialize: null,
-    total: null,
+  #metrics: Metrics = {
+    timings: {
+      context: null,
+      goto: null,
+      equiv: null,
+      ready: null,
+      minWait: null,
+      serialize: null,
+      close: null,
+      total: null,
+    },
+    renderingBudget: {
+      max: 0,
+      consumed: 0,
+    },
     page: null,
   };
+  timeBudget: TimeBudget;
 
   #closed: boolean = false;
   #processed: boolean = false;
   #context?: BrowserContext;
-  #browser?: Browser;
 
   constructor(params: TTaskType) {
     this.id = uuid();
@@ -47,10 +56,16 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
       },
     };
     this.createdAt = new Date();
+    this.timeBudget = new TimeBudget(this.params.waitTime.max);
+    this.#metrics.renderingBudget.max = this.timeBudget.max;
   }
 
   get isProcessed(): boolean {
-    return typeof this.results !== 'undefined';
+    return this.#processed;
+  }
+
+  get metrics(): Metrics {
+    return this.#metrics;
   }
 
   async close(): Promise<void> {
@@ -61,9 +76,9 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     this.#closed = true;
     await this.page?.close();
     await this.#context?.close();
+    this.setMetric('close');
 
-    this.metrics.total = Date.now() - this.startedAt!.getTime();
-
+    this.metrics.timings.total = Date.now() - this.startedAt!.getTime();
     this.#context = undefined;
   }
 
@@ -72,12 +87,14 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
    */
   async createContext(browser: Browser): Promise<void> {
     this.#processed = true;
+    this.timeBudget.lastConsumption = Date.now();
     this.startedAt = new Date();
 
     const context = await browser.getNewContext({
       userAgent: this.params.userAgent,
     });
-    context.setDefaultTimeout(WAIT_TIME.max);
+    context.setDefaultTimeout(WAIT_TIME.min);
+    context.setDefaultNavigationTimeout(WAIT_TIME.max);
 
     const page = new BrowserPage(context);
     this.page = page;
@@ -86,15 +103,15 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     await page.create();
 
     if (this.params.headersToForward.cookies) {
-      page.setCookies(this.params);
+      await page.setCookies(this.params);
     }
 
     await context.route('**/*', page.getOnRequestHandler(this.params));
-    await page.disableServiceWorker();
+    await page.setDisableServiceWorker();
 
     page.page!.on('response', page.getOnResponseHandler(this.params));
 
-    this.metrics.context = Date.now() - this.startedAt.getTime();
+    this.setMetric('context');
   }
 
   /**
@@ -109,16 +126,23 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
    * Wait for browser to execute more stuff before we kill the page.
    */
   async minWait(): Promise<void> {
-    const start = Date.now();
     const minWait = this.params.waitTime!.min;
-    const currentDuration = Date.now() - this.startedAt!.getTime();
-
-    if (minWait && minWait > currentDuration) {
-      console.log(`Waiting ${minWait - currentDuration} extra ms...`);
-      await this.page!.page!.waitForTimeout(minWait - currentDuration);
+    const todo = minWait - this.timeBudget.consumed;
+    if (todo <= 0) {
+      return;
     }
 
-    this.metrics.minWait = Date.now() - start;
+    console.log(`Waiting ${todo} extra ms...`);
+    await this.page!.page!.waitForTimeout(todo);
+    this.setMetric('minWait');
+  }
+
+  /**
+   * Log metric and reduce time budget.
+   */
+  setMetric(name: keyof Metrics['timings']): void {
+    this.#metrics.timings[name] = this.timeBudget.consume();
+    stats.timing(`renderscript.page.${name}`, this.#metrics.timings[name]!);
   }
 
   /**
@@ -126,7 +150,8 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
    */
   async saveMetrics(): Promise<void> {
     try {
-      this.metrics.page = await this.page!.saveMetrics();
+      this.#metrics.page = await this.page!.saveMetrics();
+      this.#metrics.renderingBudget.consumed = this.timeBudget.consumed;
     } catch (err) {
       // Can happen if target is already closed or redirection
     }

@@ -2,6 +2,8 @@ import type { Cookie } from 'playwright';
 
 import { sendLoginRequest } from './helpers';
 
+jest.setTimeout(25000);
+
 describe('login', () => {
   it('should error when no username', async () => {
     const { res, body } = await sendLoginRequest({

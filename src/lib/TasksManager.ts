@@ -94,8 +94,6 @@ export class TasksManager {
     try {
       await task.createContext(this.#browser);
       await task.process();
-
-      // Required to get metrics
       await task.saveMetrics();
     } catch (err: any) {
       // Task itself should never break the whole execution
@@ -104,37 +102,30 @@ export class TasksManager {
 
     // No matter what happen we want to kill everything gracefully
     try {
-      if (task) {
-        await task.close();
-      }
+      await task.close();
       this.#tasks.delete(id);
     } catch (err) {
       report(new Error('Error during close'), { err, url });
     }
 
     // ---- Reporting
-    stats.timing('renderscript.task', Date.now() - start, undefined, {
-      type,
-    });
-    const metrics = task.metrics;
+    const total = Date.now() - start;
+    stats.timing('renderscript.task', total, undefined, { type });
 
-    if (metrics.page) {
-      Object.entries(metrics.page).forEach(([key, value]) => {
-        if (key.endsWith('Duration')) {
-          stats.timing(`renderscript.task.${key}`, value);
-          return;
-        }
-
-        stats.histogram(`renderscript.task.${key}`, value);
-        stats.increment(`renderscript.task.${key}.amount`, value);
-      });
+    if (task.metrics.page) {
+      const mp = task.metrics.page;
+      /* eslint-disable prettier/prettier */
+      stats.timing(`renderscript.task.download`, mp.timings.download!);
+      stats.histogram(`renderscript.task.requests`, mp.requests.total);
+      stats.increment(`renderscript.task.requests.amount`, mp.requests.total);
+      stats.histogram(`renderscript.task.blockedRequests`, mp.requests.blocked);
+      stats.increment(`renderscript.task.blockedRequests.amount`, mp.requests.blocked);
+      /* eslint-enable prettier/prettier */
     }
-    // --- /reporting
 
     console.log('Done', url, `(${id})`);
-
     const res = task.results;
-    return { ...res, timeout: task.page!.hasTimeout, metrics };
+    return { ...res, timeout: task.page!.hasTimeout, metrics: task.metrics };
   }
 
   /**

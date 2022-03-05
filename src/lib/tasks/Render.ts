@@ -1,6 +1,5 @@
 import type { Response } from 'playwright';
 
-import { stats } from 'helpers/stats';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { RenderTaskParams } from 'lib/types';
 
@@ -13,15 +12,16 @@ export class RenderTask extends Task<RenderTaskParams> {
     }
 
     /* Setup */
-    const { url, waitTime } = this.params;
+    const { url } = this.params;
     const baseHref = url.origin;
     const page = this.page.page!;
-    let start = Date.now();
     let response: Response;
 
     try {
+      this.page.setDisableNavigation(url.href);
+
       response = await this.page.goto(url.href, {
-        timeout: waitTime!.max,
+        timeout: this.timeBudget.get(),
         waitUntil: 'domcontentloaded',
       });
     } catch (err: any) {
@@ -31,13 +31,13 @@ export class RenderTask extends Task<RenderTaskParams> {
     }
 
     // --- At this point we have just the DOM, but we want to do some checks
-    this.metrics.goto = Date.now() - start;
+    this.setMetric('goto');
+
     await this.saveStatus(response);
 
     // Check for html refresh
-    start = Date.now();
     const redirect = await this.page.checkForHttpEquivRefresh();
-    this.metrics.equiv = Date.now() - start;
+    this.setMetric('equiv');
     if (redirect) {
       this.results.resolvedUrl = redirect.href;
 
@@ -52,17 +52,15 @@ export class RenderTask extends Task<RenderTaskParams> {
     }
 
     // --- Basic checks passed we wait a bit more to page to render
-    start = Date.now();
     try {
       // Computing maxWait minus what we already consumed
-      const maxWait = Math.max(0, waitTime!.max - this.metrics.goto);
       await page.waitForLoadState('networkidle', {
-        timeout: maxWait,
+        timeout: this.timeBudget.get(),
       });
     } catch (err: any) {
       this.page.throwIfNotTimeout(err);
     }
-    this.metrics.ready = Date.now() - start;
+    this.setMetric('ready');
 
     await this.minWait();
 
@@ -76,14 +74,9 @@ export class RenderTask extends Task<RenderTaskParams> {
     }
 
     /* Transforming */
-    start = Date.now();
     await page.evaluate(injectBaseHref, baseHref);
-
     const body = await page.content();
-
-    this.metrics.serialize = Date.now() - start;
-    stats.timing('renderscript.page.serialize', this.metrics.serialize);
-
     this.results.body = body;
+    this.setMetric('serialize');
   }
 }
