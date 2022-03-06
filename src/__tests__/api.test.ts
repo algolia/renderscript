@@ -30,7 +30,7 @@ describe('POST /render', () => {
         'content-length': expect.any(String),
         'content-type': 'text/html; charset=UTF-8',
         date: expect.any(String),
-        etag: 'W/"2fb-17e9234f5f2"',
+        etag: expect.any(String),
         'keep-alive': 'timeout=5',
         'last-modified': expect.any(String),
       },
