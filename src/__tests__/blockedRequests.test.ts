@@ -21,8 +21,8 @@ describe('native', () => {
 
     expect(res.statusCode).toBe(200);
     expect(json.metrics.page!.requests).toStrictEqual({
-      total: 10,
-      blocked: 5,
+      total: 11,
+      blocked: 6,
     });
   });
 });
@@ -45,8 +45,8 @@ describe('adblocker', () => {
 
     expect(res.statusCode).toBe(200);
     expect(json.metrics.page!.requests).toStrictEqual({
-      total: 10,
-      blocked: 8,
+      total: 11,
+      blocked: 9,
     });
   });
 });

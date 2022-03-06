@@ -292,6 +292,30 @@ export class BrowserPage {
         return;
       }
 
+      // Iframe block
+      if (req.frame().parentFrame()) {
+        this.#metrics.requests.blocked += 1;
+
+        await route.abort('blockedbyclient');
+        return;
+      }
+
+      // Ignore some type of resources
+      if (IGNORED_RESOURCES.includes(req.resourceType())) {
+        this.#metrics.requests.blocked += 1;
+
+        await route.abort('blockedbyclient');
+        return;
+      }
+
+      // Adblocking
+      if (adblock && adblocker.match(new URL(reqUrl))) {
+        this.#metrics.requests.blocked += 1;
+
+        await route.abort('blockedbyclient');
+        return;
+      }
+
       // Check for ssrf attempts = page that redirects to localhost for example
       try {
         await validateURL({
@@ -311,22 +335,6 @@ export class BrowserPage {
       }
 
       try {
-        // Ignore some type of resources
-        if (IGNORED_RESOURCES.includes(req.resourceType())) {
-          this.#metrics.requests.blocked += 1;
-
-          await route.abort('blockedbyclient');
-          return;
-        }
-
-        // Adblocking
-        if (adblock && adblocker.match(new URL(reqUrl))) {
-          this.#metrics.requests.blocked += 1;
-
-          await route.abort('blockedbyclient');
-          return;
-        }
-
         if (req.isNavigationRequest()) {
           const headers = await req.allHeaders();
           await route.continue({

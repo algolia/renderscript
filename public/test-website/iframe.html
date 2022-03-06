@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head></head>
+
+<body>
+  A basic page
+  <div id="preloaded"><iframe src="/301"></iframe></div>
+  <div id="js"></div>
+
+  <!-- <iframe src="/test-website/basic.html"></iframe> -->
+
+  <script>
+    // Create an iframe in JS
+    const iframe = document.createElement('iframe');
+    iframe.src = '/test-website/basic.html';
+    document.getElementById('js').appendChild(iframe);
+  </script>
+</body>
+
+</html>
