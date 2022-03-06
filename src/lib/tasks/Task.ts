@@ -136,7 +136,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
       return;
     }
 
-    log.info(`Waiting ${todo} extra ms...`);
+    this.log.debug(`Waiting ${todo} extra ms...`);
     await this.page!.page!.waitForTimeout(todo);
     this.setMetric('minWait');
   }

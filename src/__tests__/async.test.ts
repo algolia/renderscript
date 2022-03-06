@@ -85,7 +85,7 @@ describe('async', () => {
 
     const json: PostRenderSuccess = JSON.parse(body);
     expect(res.statusCode).toBe(200);
-    expect(json.metrics.timings.goto).toBeLessThanOrEqual(20);
+    expect(json.metrics.timings.goto).toBeLessThanOrEqual(50);
 
     // In that case the page is slow so min is not used
     expect(json.metrics.timings.minWait).toBeNull();

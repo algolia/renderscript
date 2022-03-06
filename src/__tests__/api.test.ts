@@ -22,6 +22,7 @@ describe('POST /render', () => {
     const json: PostRenderSuccess = JSON.parse(body);
     expect(json).toStrictEqual({
       body: expect.any(String),
+      error: null,
       headers: {
         'accept-ranges': 'bytes',
         'cache-control': 'public, max-age=0',
@@ -34,14 +35,23 @@ describe('POST /render', () => {
         'last-modified': expect.any(String),
       },
       statusCode: 200,
+      resolvedUrl: null,
+      timeout: false,
       metrics: {
-        context: expect.any(Number),
-        equiv: expect.any(Number),
-        goto: expect.any(Number),
-        minWait: 0,
-        ready: expect.any(Number),
-        serialize: expect.any(Number),
-        total: expect.any(Number),
+        renderingBudget: {
+          consumed: expect.any(Number),
+          max: 20000,
+        },
+        timings: {
+          context: expect.any(Number),
+          equiv: expect.any(Number),
+          goto: expect.any(Number),
+          minWait: null,
+          ready: expect.any(Number),
+          serialize: expect.any(Number),
+          close: expect.any(Number),
+          total: expect.any(Number),
+        },
         page: {
           contentLength: {
             main: 763,

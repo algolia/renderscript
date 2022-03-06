@@ -7,8 +7,10 @@ jest.setTimeout(25000);
 describe('list', () => {
   it('should list nothing', async () => {
     const { res, body } = await request('http://localhost:3000/list');
+
     expect(res.statusCode).toBe(200);
-    expect(JSON.parse(body)).toEqual({ open: [] });
+    const parsed = JSON.parse(body);
+    expect(parsed).toEqual({ open: [] });
   });
 
   it('should list current page', async () => {
@@ -31,7 +33,8 @@ describe('list', () => {
 
     // Currently processing
     const res1 = await request('http://localhost:3000/list');
-    expect(JSON.parse(res1.body)).toEqual({
+    const parsed1 = JSON.parse(res1.body);
+    expect(parsed1).toEqual({
       open: ['http://localhost:3000/test-website/slow.html'],
     });
 
@@ -39,7 +42,8 @@ describe('list', () => {
 
     // Cleared
     const res2 = await request('http://localhost:3000/list');
-    expect(JSON.parse(res2.body)).toEqual({
+    const parsed2 = JSON.parse(res2.body);
+    expect(parsed2).toEqual({
       open: [],
     });
   });

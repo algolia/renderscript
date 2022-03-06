@@ -53,7 +53,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     }
 
     // Type the password
-    log.info('Entering password and logging in...');
+    log.debug('Entering password and logging in...');
     await passwordInput.type(login.password);
 
     // Submit

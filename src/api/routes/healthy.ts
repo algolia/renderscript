@@ -2,12 +2,16 @@ import os from 'os';
 
 import type express from 'express';
 
+import type { GetHealthySuccess } from 'api/@types/getHealthy';
 import { stats } from 'helpers/stats';
 import { tasksManager } from 'lib/singletons';
 
 const hostname = os.hostname();
 
-export function healthy(req: express.Request, res: express.Response): void {
+export function healthy(
+  req: express.Request,
+  res: express.Response<GetHealthySuccess>
+): void {
   const isHealthy = tasksManager.healthy;
   const tasksRunning = tasksManager.currentConcurrency;
   const pagesOpen = tasksManager.currentBrowser?.getCurrentConcurrency() || 0;

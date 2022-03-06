@@ -1,3 +1,5 @@
+import type { GetHealthySuccess } from 'api/@types/getHealthy';
+
 import { request } from './helpers';
 
 describe('manager', () => {
@@ -6,11 +8,12 @@ describe('manager', () => {
     const { res, body } = await request('http://localhost:3000/healthy');
     expect(res.statusCode).toBe(200);
 
-    expect(JSON.parse(body)).toEqual({
+    const before: GetHealthySuccess = JSON.parse(body);
+    expect(before).toEqual({
       ready: true,
       tasksRunning: 0,
       pagesOpen: 0,
-      totalRun: 0,
+      totalRun: expect.any(Number),
     });
 
     // Process something
@@ -32,11 +35,16 @@ describe('manager', () => {
     );
     expect(resAfter.statusCode).toBe(200);
 
-    expect(JSON.parse(bodyAfter)).toEqual({
+    const after: GetHealthySuccess = JSON.parse(bodyAfter);
+    expect(after).toEqual({
       ready: true,
       tasksRunning: 0,
       pagesOpen: 0,
-      totalRun: 1,
+      totalRun: expect.any(Number),
     });
+
+    // Compare because we can't know how much due to of other that could have been run before
+    expect(after.totalRun).toBeGreaterThan(0);
+    expect(before.totalRun).toBeLessThan(after.totalRun);
   });
 });
