@@ -1,19 +1,15 @@
-import { validateURL } from '@algolia/dns-filter';
 import type { BrowserContext, Page, Route, Response } from 'playwright';
 
 import { report } from 'helpers/errorReporting';
 import { log } from 'helpers/logger';
 import { stats } from 'helpers/stats';
+import { isURLAllowed } from 'lib/helpers/validateURL';
 import { adblocker } from 'lib/singletons';
 import type { PageMetrics, TaskBaseParams } from 'lib/types';
 
-import { DATA_REGEXP, IGNORED_RESOURCES, RESTRICTED_IPS } from '../constants';
+import { DATA_REGEXP, IGNORED_RESOURCES } from '../constants';
 
-import {
-  REQUEST_IGNORED_ERRORS,
-  RESPONSE_IGNORED_ERRORS,
-  VALIDATE_URL_IGNORED_ERRORS,
-} from './constants';
+import { REQUEST_IGNORED_ERRORS, RESPONSE_IGNORED_ERRORS } from './constants';
 
 /**
  * Abstract some logics around playwright pages.
@@ -38,6 +34,7 @@ export class BrowserPage {
       jsHeapTotalSize: null,
     },
   };
+  #redirection?: string;
   #hasTimeout: boolean = false;
 
   get page(): Page | undefined {
@@ -54,6 +51,10 @@ export class BrowserPage {
 
   get hasTimeout(): boolean {
     return this.#hasTimeout;
+  }
+
+  get redirection(): string | undefined {
+    return this.#redirection;
   }
 
   constructor(context: BrowserContext) {
@@ -76,9 +77,6 @@ export class BrowserPage {
     });
     page.on('popup', () => {
       report(new Error('Popup created'), { pageUrl: page.url() });
-    });
-    page.on('request', (req) => {
-      log.debug('request_start', { url: req.url() });
     });
     page.on('requestfailed', (req) => {
       log.debug('request_failed', { url: req.url() });
@@ -118,7 +116,9 @@ export class BrowserPage {
       // Response can be assigned here or on('response')
       response = await this.#page!.goto(url, opts);
     } catch (err: any) {
-      this.throwIfNotTimeout(err);
+      if (this.redirection && err.name === 'E_ABORTED') {
+        this.throwIfNotTimeout(err);
+      }
     } finally {
       // We remove listener, because we don't want more response
       this.#page!.removeListener('response', onResponse);
@@ -235,9 +235,12 @@ export class BrowserPage {
   }
 
   /**
-   * Disable service workers, this is recommended.
+   * Disable navigation. Only opt-in because Login requires navigation.
    */
-  setDisableNavigation(originalUrl: string): void {
+  setDisableNavigation(
+    originalUrl: string,
+    onNavigation: (url: string) => void
+  ): void {
     this.#page!.on('framenavigated', (frame) => {
       if (originalUrl === frame.url()) {
         return;
@@ -246,14 +249,31 @@ export class BrowserPage {
         // Sub Frame we don't care
         return;
       }
-
+      const url = frame.url();
+      onNavigation(url);
       report(new Error('unexpected navigation'), {
         pageUrl: originalUrl,
-        to: frame.url(),
+        to: url,
       });
+    });
+
+    this.page!.on('request', (req) => {
+      // Playwright does not route redirection to route() so we need to manually catch them
+      log.debug('request_start', { url: req.url() });
+      const main = req.frame().parentFrame() === null;
+      const redir = req.redirectedFrom()?.url();
+      if (!redir || (redir && !main)) {
+        return;
+      }
+
+      this.#redirection = redir;
+      onNavigation(redir);
     });
   }
 
+  /**
+   * Helper to throw if an error is not timeout so we can reuse the response easily.
+   */
   throwIfNotTimeout(err: any): Error {
     if (!(err instanceof Error) || err.name !== 'TimeoutError') {
       throw err;
@@ -317,18 +337,7 @@ export class BrowserPage {
       }
 
       // Check for ssrf attempts = page that redirects to localhost for example
-      try {
-        await validateURL({
-          url: reqUrl,
-          ipPrefixes: RESTRICTED_IPS,
-        });
-      } catch (err: any) {
-        if (
-          !VALIDATE_URL_IGNORED_ERRORS.some((msg) => err.message.includes(msg))
-        ) {
-          report(new Error('Blocked url'), { err, url: reqUrl });
-        }
-
+      if (!(await isURLAllowed(reqUrl))) {
         this.#metrics.requests.blocked += 1;
         await route.abort('blockedbyclient');
         return;

@@ -1,6 +1,5 @@
 import type { Response } from 'playwright';
 
-import { log } from 'helpers/logger';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { RenderTaskParams } from 'lib/types';
 
@@ -18,9 +17,14 @@ export class RenderTask extends Task<RenderTaskParams> {
     const page = this.page.page!;
     let response: Response;
 
-    try {
-      this.page.setDisableNavigation(url.href);
+    // Important to catch any redirect
+    this.page.setDisableNavigation(url.href, (newUrl) => {
+      this.results.error = 'redirection';
+      this.results.resolvedUrl = newUrl;
+      this.close();
+    });
 
+    try {
       response = await this.page.goto(url.href, {
         timeout: this.timeBudget.get(),
         waitUntil: 'domcontentloaded',
@@ -35,6 +39,9 @@ export class RenderTask extends Task<RenderTaskParams> {
     this.setMetric('goto');
 
     await this.saveStatus(response);
+    if (this.page.redirection) {
+      return;
+    }
 
     // Check for html refresh
     const redirect = await this.page.checkForHttpEquivRefresh();
@@ -68,13 +75,8 @@ export class RenderTask extends Task<RenderTaskParams> {
     const newUrl = page.url();
     if (newUrl !== url.href) {
       // Redirection was not caught this should not happen
-      log.error('ERROR redirection not caught', {
-        from: url.href,
-        to: newUrl,
-      });
       this.results.error = 'wrong_redirection';
       this.results.resolvedUrl = newUrl;
-
       return;
     }
 
