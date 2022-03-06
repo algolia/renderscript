@@ -13,10 +13,15 @@ export const log = pino({
   hooks: {
     // By default pino does Sprintf instead we merge objects.
     logMethod(args, method) {
-      const final = { msg: '', data: {} };
+      const final: Record<string, any> = { msg: '', data: {} };
       args.forEach((m) => {
-        if (typeof m === 'string') final.msg += m;
-        else final.data = { ...final.data, ...m };
+        if (typeof m === 'string') {
+          final.msg += m;
+        } else if (typeof m === 'object' && m instanceof Error) {
+          final.err = m;
+        } else {
+          final.data = { ...final.data, ...m };
+        }
       });
       method.apply(this, [final as unknown as string]);
     },

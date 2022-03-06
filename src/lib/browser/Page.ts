@@ -9,7 +9,11 @@ import type { PageMetrics, TaskBaseParams } from 'lib/types';
 
 import { DATA_REGEXP, IGNORED_RESOURCES } from '../constants';
 
-import { REQUEST_IGNORED_ERRORS, RESPONSE_IGNORED_ERRORS } from './constants';
+import {
+  METRICS_IGNORED_ERRORS,
+  REQUEST_IGNORED_ERRORS,
+  RESPONSE_IGNORED_ERRORS,
+} from './constants';
 
 /**
  * Abstract some logics around playwright pages.
@@ -91,7 +95,7 @@ export class BrowserPage {
    */
   async close(): Promise<void> {
     await this.#page?.close();
-    await this.#context?.close();
+    this.#page = undefined;
   }
 
   /**
@@ -116,7 +120,7 @@ export class BrowserPage {
       // Response can be assigned here or on('response')
       response = await this.#page!.goto(url, opts);
     } catch (err: any) {
-      if (this.redirection && err.name === 'E_ABORTED') {
+      if (!this.redirection && !err.message.includes('ERR_ABORTED')) {
         this.throwIfNotTimeout(err);
       }
     } finally {
@@ -165,32 +169,41 @@ export class BrowserPage {
 
   /**
    * Get performance metrics from the page.
+   * This function can fail silently because it's non-critical resource.
+   * If that happen it will return previous metrics.
    */
   async saveMetrics(): Promise<PageMetrics> {
-    const perf: {
-      curr: PerformanceNavigationTiming;
-      all: PerformanceEntryList;
-      mem: {
-        jsHeapSizeLimit?: number;
-        totalJSHeapSize?: number;
-        usedJSHeapSize?: number;
-      };
-    } = JSON.parse(
-      await this.#page!.evaluate(() => {
-        return JSON.stringify({
-          curr: performance.getEntriesByType('navigation')[0],
-          all: performance.getEntries(),
-          // @ts-expect-error only exists in chromium
-          mem: performance.memory || {},
-        });
-      })
-    );
+    try {
+      const perf: {
+        curr: PerformanceNavigationTiming;
+        all: PerformanceEntryList;
+        mem: {
+          jsHeapSizeLimit?: number;
+          totalJSHeapSize?: number;
+          usedJSHeapSize?: number;
+        };
+      } = JSON.parse(
+        await this.#page!.evaluate(() => {
+          return JSON.stringify({
+            curr: performance.getEntriesByType('navigation')[0],
+            all: performance.getEntries(),
+            // @ts-expect-error only exists in chromium
+            mem: performance.memory || {},
+          });
+        })
+      );
 
-    this.#metrics.timings.download = Math.round(perf.curr.duration || 0);
-    this.#metrics.mem = {
-      jsHeapUsedSize: perf.mem.usedJSHeapSize || 0,
-      jsHeapTotalSize: perf.mem.totalJSHeapSize || 0,
-    };
+      this.#metrics.timings.download = Math.round(perf.curr.duration || 0);
+      this.#metrics.mem = {
+        jsHeapUsedSize: perf.mem.usedJSHeapSize || 0,
+        jsHeapTotalSize: perf.mem.totalJSHeapSize || 0,
+      };
+    } catch (err: any) {
+      if (!METRICS_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+        log.error(err);
+        report(new Error('Error saving metrics'), { err });
+      }
+    }
     return this.#metrics;
   }
 
@@ -249,6 +262,7 @@ export class BrowserPage {
         // Sub Frame we don't care
         return;
       }
+
       const url = frame.url();
       onNavigation(url);
       report(new Error('unexpected navigation'), {
@@ -258,16 +272,19 @@ export class BrowserPage {
     });
 
     this.page!.on('request', (req) => {
+      const url = req.url();
+
       // Playwright does not route redirection to route() so we need to manually catch them
-      log.debug('request_start', { url: req.url() });
+      log.debug('request_start', { pageUrl: originalUrl, url });
       const main = req.frame().parentFrame() === null;
-      const redir = req.redirectedFrom()?.url();
-      if (!redir || (redir && !main)) {
+      const redir = req.isNavigationRequest();
+
+      if (!redir || (redir && !main) || originalUrl === url) {
         return;
       }
 
-      this.#redirection = redir;
-      onNavigation(redir);
+      this.#redirection = url;
+      onNavigation(url);
     });
   }
 
@@ -385,6 +402,9 @@ export class BrowserPage {
 
       // Redirections do not have a body
       if (status > 300 && status < 400) {
+        if (!res.request().frame().parentFrame()) {
+          this.#redirection = new URL(headers.location, url).href;
+        }
         return;
       }
 

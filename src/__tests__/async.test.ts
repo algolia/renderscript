@@ -120,13 +120,24 @@ describe('redirects', () => {
       const json: PostRenderSuccess = JSON.parse(body);
       expect(res.statusCode).toBe(200);
 
+      expect(json.body).toBeNull();
+      expect(json.headers).toMatchObject({
+        location: '/test-website/basic.html',
+      });
+      expect(json.statusCode).toBe(301);
+      expect(json.timeout).toBe(false);
       expect(json.resolvedUrl).toBe(
         'http://localhost:3000/test-website/basic.html'
       );
+
+      // Make sure execution was interrupted gracefully
+      expect(json.metrics.timings.total).toBeGreaterThan(0);
+      expect(json.metrics.timings.serialize).toBeNull();
+      expect(json.metrics.timings.close).toBeGreaterThan(0);
     });
   });
 
-  describe('client redirect', () => {
+  describe('meta refresh', () => {
     it('should return the redirection', async () => {
       const { res, body } = await request('http://localhost:3000/render', {
         method: 'POST',
@@ -142,10 +153,17 @@ describe('redirects', () => {
       const json: PostRenderSuccess = JSON.parse(body);
       expect(res.statusCode).toBe(200);
 
+      expect(json.statusCode).toBe(200);
+      expect(json.body).toBeNull();
       expect(json.resolvedUrl).toBe(
         'http://localhost:3000/test-website/basic.html'
       );
-      expect(json.error).toBeNull(); // Make sure we blocked navigation
+      expect(json.error).toBe('redirection');
+
+      // Make sure execution was interrupted gracefully
+      expect(json.metrics.timings.total).toBeGreaterThan(0);
+      expect(json.metrics.timings.serialize).toBeNull();
+      expect(json.metrics.timings.close).toBeGreaterThan(0);
     });
 
     it('should return the redirection even if not executed yet', async () => {
@@ -155,7 +173,7 @@ describe('redirects', () => {
           'content-type': 'application/json',
         },
         body: JSON.stringify({
-          // The client redirection happens after 5 seconds
+          // The client redirection happens after 5sec but we only wait 2sec
           url: 'http://localhost:3000/test-website/meta-refresh-5.html',
           ua: 'Algolia Crawler',
           waitTime: {
@@ -167,9 +185,17 @@ describe('redirects', () => {
       const json: PostRenderSuccess = JSON.parse(body);
       expect(res.statusCode).toBe(200);
 
+      expect(json.statusCode).toBe(200);
+      expect(json.body).toBeNull();
       expect(json.resolvedUrl).toBe(
         'http://localhost:3000/test-website/basic.html'
       );
+      expect(json.error).toBe('redirection');
+
+      // Make sure execution was interrupted gracefully
+      expect(json.metrics.timings.total).toBeGreaterThan(0);
+      expect(json.metrics.timings.serialize).toBeNull();
+      expect(json.metrics.timings.close).toBeGreaterThan(0);
     });
   });
 });

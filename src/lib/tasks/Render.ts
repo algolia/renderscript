@@ -18,10 +18,12 @@ export class RenderTask extends Task<RenderTaskParams> {
     let response: Response;
 
     // Important to catch any redirect
-    this.page.setDisableNavigation(url.href, (newUrl) => {
+    this.page.setDisableNavigation(url.href, async (newUrl) => {
+      await this.page?.saveMetrics();
+      this.page?.page?.close();
+
       this.results.error = 'redirection';
       this.results.resolvedUrl = newUrl;
-      this.close();
     });
 
     try {
@@ -36,6 +38,7 @@ export class RenderTask extends Task<RenderTaskParams> {
     }
 
     // --- At this point we have just the DOM, but we want to do some checks
+    await this.saveMetrics();
     this.setMetric('goto');
 
     await this.saveStatus(response);
@@ -47,6 +50,7 @@ export class RenderTask extends Task<RenderTaskParams> {
     const redirect = await this.page.checkForHttpEquivRefresh();
     this.setMetric('equiv');
     if (redirect) {
+      this.results.error = 'redirection';
       this.results.resolvedUrl = redirect.href;
 
       return;
@@ -68,8 +72,8 @@ export class RenderTask extends Task<RenderTaskParams> {
     } catch (err: any) {
       this.page.throwIfNotTimeout(err);
     }
-    this.setMetric('ready');
 
+    this.setMetric('ready');
     await this.minWait();
 
     const newUrl = page.url();
