@@ -1,15 +1,10 @@
 import { pino } from 'pino';
 
+const isProd = process.env.NODE_ENV === 'production';
 export const log = pino({
   level: process.env.LOG_LEVEL || 'info',
-  timestamp: false,
+  timestamp: true,
   base: {},
-  // nestedKey: 'data',
-  // formatters: {
-  //   bindings({ pid, hostname, ...rest }) {
-  //     return rest;
-  //   },
-  // },
   formatters: {
     level(label) {
       return { level: label };
@@ -26,13 +21,17 @@ export const log = pino({
       method.apply(this, [final as unknown as string]);
     },
   },
-  prettifier: process.env.NODE_ENV !== 'production',
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      singleLine: true,
-      messageFormat: '{svc} \x1B[37m{msg}',
-    },
-  },
+  prettifier: !isProd,
+  transport: !isProd
+    ? {
+        target: 'pino-pretty',
+        options: {
+          colorize: true,
+          singleLine: true,
+          messageFormat: '{svc} \x1B[37m{msg}',
+          translateTime: 'HH:MM',
+          ignore: 'svc',
+        },
+      }
+    : undefined,
 });

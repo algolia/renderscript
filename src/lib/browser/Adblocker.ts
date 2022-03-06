@@ -6,7 +6,7 @@ import { log as mainLog } from 'helpers/logger';
 const list =
   'https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/domains.txt';
 
-const log = mainLog.child({ svc: 'adb' });
+const log = mainLog.child({ svc: 'adbk' });
 
 /**
  * Dead simple adblocking by exact hostname.

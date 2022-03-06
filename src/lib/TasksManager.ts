@@ -7,7 +7,7 @@ import { UNHEALTHY_TASK_TTL } from './constants';
 import type { Task } from './tasks/Task';
 import type { TaskObject, TaskFinal } from './types';
 
-export const log = mainLog.child({ svc: 'mng' });
+export const log = mainLog.child({ svc: 'mngr' });
 
 export class TasksManager {
   #browser: Browser | null = null;

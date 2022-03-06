@@ -11,7 +11,7 @@ import { stats } from 'helpers/stats';
 
 import { flags, HEIGHT, WIDTH } from '../constants';
 
-const log = mainLog.child({ svc: 'bwr' });
+const log = mainLog.child({ svc: 'brws' });
 
 export class Browser {
   #id;
