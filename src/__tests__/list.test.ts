@@ -29,7 +29,7 @@ describe('list', () => {
       }),
     });
 
-    await wait(100);
+    await wait(1000);
 
     // Currently processing
     const res1 = await request('http://localhost:3000/list');
