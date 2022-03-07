@@ -1,1 +1,8 @@
 dist/
+pw-browsers/
+dist/
+coverage/
+node_modules/
+
+.yarnrc.yml
+.yarn/
