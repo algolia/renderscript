@@ -1,5 +1,7 @@
 import type { Cookie } from 'playwright';
 
+import type { PostLoginSuccess } from 'api/@types/postLogin';
+
 import { sendLoginRequest } from './helpers';
 
 jest.setTimeout(25000);
@@ -124,15 +126,16 @@ describe('JavaScript redirect', () => {
       url: 'http://localhost:3000/secure/login?redirect=true',
       username: 'admin',
       password: 'password',
-      renderHTML: 'true',
+      renderHTML: true,
+      waitTime: {
+        min: 1000,
+      },
     });
 
-    // Page rending crashes because of the JS redirection (c.f. _renderLoginResult()), with the following error:
-    // Error: Execution context was destroyed, most likely because of a navigation.
-    expect(res.statusCode).toBe(500);
-
-    const jsonBody = JSON.parse(body);
-    expect(jsonBody.error).toBe('Invalid status code: undefined');
+    expect(res.statusCode).toBe(200);
+    expect(body).toBe(
+      '<!DOCTYPE html><html lang="en"><head></head><body>OK(/test)</body></html>'
+    );
   });
 
   it('should not try to render the body if renderHTML was not requested', async () => {
@@ -140,12 +143,24 @@ describe('JavaScript redirect', () => {
       url: 'http://localhost:3000/secure/login?redirect=true',
       username: 'admin',
       password: 'password',
+      waitTime: {
+        min: 1000,
+      },
     });
 
     // Since we didn't try to render, it returns the current cookies, even if there is an ongoing JS redirection
     expect(res.statusCode).toBe(200);
 
-    const jsonBody = JSON.parse(body);
-    expect(jsonBody.body).toBeUndefined();
+    const parsed: PostLoginSuccess = JSON.parse(body);
+    expect(parsed.body).toBe(
+      '<!DOCTYPE html><html lang="en"><head></head><body>OK(/test)</body></html>'
+    );
+    expect(parsed.timeout).toBe(false);
+    expect(parsed.statusCode).toBe(200);
+    expect(parsed.metrics.timings.total).toBeGreaterThan(1000);
+    expect(parsed.resolvedUrl).toBe('http://localhost:3000/secure/test');
+    expect(
+      parsed.cookies.find((cookie) => cookie.name === 'sessionToken')
+    ).toMatchSnapshot();
   });
 });

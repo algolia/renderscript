@@ -1,6 +1,8 @@
 import { request as req } from 'undici';
 import type { ResponseData } from 'undici/types/dispatcher';
 
+import type { PostLoginParams } from 'api/@types/postLogin';
+
 export async function request(
   url: string,
   params?: Parameters<typeof req>[1]
@@ -20,20 +22,21 @@ export async function sendLoginRequest({
   username,
   password,
   renderHTML,
-}: {
-  url: string;
-  username: string;
-  password: string;
-  renderHTML?: string;
-}): Promise<{ res: ResponseData; body: string }> {
+  waitTime,
+}: Partial<PostLoginParams>): Promise<{ res: ResponseData; body: string }> {
   return await request('http://localhost:3000/login', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'content-type': 'application/json',
     },
-    body: `url=${url}&username=${username}&password=${password}&ua=Algolia Crawler&renderHTML=${Boolean(
-      renderHTML
-    )}`,
+    body: JSON.stringify({
+      url,
+      username,
+      password,
+      renderHTML,
+      ua: 'Algolia Crawler',
+      waitTime,
+    }),
   });
 }
 

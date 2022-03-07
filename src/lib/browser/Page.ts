@@ -218,7 +218,7 @@ export class BrowserPage {
    * Add cookies to the context.
    */
   async setCookies({ url, headersToForward }: TaskBaseParams): Promise<void> {
-    const cookies = headersToForward.cookie.split('; ').map((cookie) => {
+    const cookies = headersToForward!.cookie.split('; ').map((cookie) => {
       const [key, ...v] = cookie.split('=');
       // url attribute is required because it is not possible set cookies on a blank page
       // so page.setCookie would crash if no url is provided, since we start with a blank page
@@ -249,6 +249,8 @@ export class BrowserPage {
 
   /**
    * Disable navigation. Only opt-in because Login requires navigation.
+   * Because playwright has some limitation we can't cancel redirection directly, so it's not bulletproof.
+   * Request will most likely be interrupted but due do code lag and event we can still have time to reach the backend.
    */
   setDisableNavigation(
     originalUrl: string,
@@ -265,6 +267,8 @@ export class BrowserPage {
 
       const url = frame.url();
       onNavigation(url);
+
+      // We still report just in case.
       report(new Error('unexpected navigation'), {
         pageUrl: originalUrl,
         to: url,

@@ -10,7 +10,7 @@ export function getLogin(req: Request, res: Response): void {
   });
 }
 
-export function postLogin(req: Request, res: Response): void {
+export function postLogin(req: Request<any, any, any>, res: Response): void {
   const { username, password, redirect } = req.body;
   renderLogin({
     username,
@@ -31,7 +31,7 @@ export function getTest(req: Request, res: Response): void {
     .send(
       `<!DOCTYPE html><html lang="en"><body>${
         granted ? 'OK' : 'NOK'
-      }</body></html>`
+      }(/test)</body></html>`
     );
 }
 
@@ -92,9 +92,9 @@ function renderLogin({
 // Redirect after 500ms to reproduce https://github.com/algolia/renderscript/pull/394
 setTimeout(() => {
 window.location = new URL('/secure/test', window.location);
-}, 500);
+}, 200);
 </script>`
           : ''
-      }<body>${granted ? 'OK' : 'NOK'}</body></html>`
+      }<body>${granted ? 'OK' : 'NOK'}(/login)</body></html>`
     );
 }

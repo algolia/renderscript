@@ -50,14 +50,14 @@ export async function render(
       })
     );
 
-    if (error) {
-      res.status(400).json({ error });
-      return;
-    }
-
     if (resolvedUrl && resolvedUrl !== url.href) {
       const location = revertUrl(resolvedUrl).href;
       res.status(307).header('Location', location).send();
+      return;
+    }
+
+    if (error) {
+      res.status(400).json({ error });
       return;
     }
 

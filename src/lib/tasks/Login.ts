@@ -66,10 +66,14 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     await this.minWait();
 
-    this.results.cookies = await page.context().cookies();
     await this.saveStatus(response);
 
-    this.timeBudget.consume();
+    /* Transforming */
+    this.results.resolvedUrl = page.url();
+    this.results.cookies = await page.context().cookies();
+    const body = await page.content();
+    this.results.body = body;
+    this.setMetric('serialize');
   }
 
   /**

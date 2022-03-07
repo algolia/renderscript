@@ -10,7 +10,7 @@ export interface TaskBaseParams {
     min?: number;
     max?: number;
   };
-  headersToForward: {
+  headersToForward?: {
     [s: string]: string;
   };
 }

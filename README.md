@@ -68,7 +68,7 @@ Main endpoint. Renders the page and dumps a JSON with all the page information.
   /**
    * Headers to Forward on navigation
    */
-  headersToForward: {
+  headersToForward?: {
     [s: string]: string;
   };
 }

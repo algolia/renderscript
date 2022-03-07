@@ -85,23 +85,4 @@ describe('main', () => {
       `<!DOCTYPE html><html><head><base href="http://localhost:3000"></head><body>A basic page</body></html>`
     );
   });
-
-  it('should catch redirection', async () => {
-    const { res, body } = await request(
-      `http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fjs-redirect.html?to=${encodeURIComponent(
-        '/test-website/basic.html'
-      )}&ua=Algolia+Crawler`
-    );
-
-    expect(res.statusCode).toBe(307);
-    expect(res.headers).toEqual({
-      connection: 'keep-alive',
-      'content-length': '0',
-      date: expect.any(String),
-      'keep-alive': 'timeout=5',
-      location: 'http://localhost:3000/test-website/basic.html',
-    });
-
-    expect(cleanString(body)).toBe('');
-  });
 });
