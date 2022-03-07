@@ -254,9 +254,9 @@ export class BrowserPage {
    */
   setDisableNavigation(
     originalUrl: string,
-    onNavigation: (url: string) => void
+    onNavigation: (url: string) => Promise<void>
   ): void {
-    this.#page!.on('framenavigated', (frame) => {
+    this.#page!.on('framenavigated', async (frame) => {
       if (originalUrl === frame.url()) {
         return;
       }
@@ -266,7 +266,7 @@ export class BrowserPage {
       }
 
       const url = frame.url();
-      onNavigation(url);
+      await onNavigation(url);
 
       // We still report just in case.
       report(new Error('unexpected navigation'), {
@@ -275,7 +275,7 @@ export class BrowserPage {
       });
     });
 
-    this.page!.on('request', (req) => {
+    this.page!.on('request', async (req) => {
       const url = req.url();
 
       // Playwright does not route redirection to route() so we need to manually catch them
@@ -286,9 +286,10 @@ export class BrowserPage {
       if (!redir || (redir && !main) || originalUrl === url) {
         return;
       }
+      log.info('Will navigate', { url });
 
       this.#redirection = url;
-      onNavigation(url);
+      await onNavigation(url);
     });
   }
 
