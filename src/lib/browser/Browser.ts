@@ -31,7 +31,7 @@ export class Browser {
   }
 
   /**
-   * Create a puppeteer instance.
+   * Create a Playwright instance.
    */
   async create(): Promise<void> {
     log.info('Creating...', { id: this.#id });

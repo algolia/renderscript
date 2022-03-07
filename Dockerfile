@@ -1,14 +1,32 @@
 # Base image
-FROM node:16.14.0 AS base
+FROM ubuntu:focal
 
-# Install git
-# Others are dependencies of our gyp dependencies
+# For tzdata
+ARG DEBIAN_FRONTEND=noninteractive
+ARG TZ=America/Los_Angeles
+
+# Autolink repository https://docs.github.com/en/packages/learn-github-packages/connecting-a-repository-to-a-package
+LABEL org.opencontainers.image.source=https://github.com/algolia/renderscript
+LABEL org.opencontainers.image.revision=$VERSION
+
+# === INSTALL Node.js ===
 RUN apt-get update && \
-  apt-get install -y --no-install-recommends \
-  g++ \
-  git \
-  make \
-  python
+  # Install node16
+  apt-get install -y curl wget && \
+  curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
+  apt-get install -y nodejs && \
+  # Feature-parity with node.js base images.
+  apt-get install -y --no-install-recommends git openssh-client && \
+  npm install -g yarn && \
+  # Install Python 3.8
+  apt-get install -y python3.8 python3-pip && \
+  update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1 && \
+  update-alternatives --install /usr/bin/python python /usr/bin/python3 1 && \
+  update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1 && \
+  # clean apt cache
+  rm -rf /var/lib/apt/lists/* && \
+  # Create the pwuser
+  adduser pwuser
 
 # Setup the app WORKDIR
 WORKDIR /app/tmp
@@ -18,12 +36,16 @@ WORKDIR /app/tmp
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn .yarn
 RUN ls -lah /app/tmp
+ENV PLAYWRIGHT_BROWSERS_PATH="/app/tmp/pw-browsers"
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD="true"
 
 # Install dev dependencies
 RUN true \
   # Use local version instead of letting yarn auto upgrade itself
   && yarn set version $(ls -d $PWD/.yarn/releases/*) \
-  && yarn install
+  && yarn install \
+  && npx playwright install chromium \
+  && npx playwright install-deps chromium
 
 # This step will invalidates cache
 COPY . /app/tmp
@@ -31,64 +53,13 @@ RUN ls -lah /app/tmp
 
 ARG VERSION
 ENV VERSION ${VERSION:-dev}
+ENV NODE_ENV production
+ENV IN_DOCKER true
 
 # Builds the UI, install chrome and remove dev dependencies
 RUN true \
   && yarn build \
-  && yarn install-chromium \
   && yarn workspaces focus --all --production \
   && rm -rf .yarn/
-
-# Resulting image
-# New, minimal image
-# This image must have the minimum amount of layers
-FROM node:16.14.0-slim
-
-ARG VERSION
-ENV VERSION ${VERSION:-dev}
-
-# Autolink repository https://docs.github.com/en/packages/learn-github-packages/connecting-a-repository-to-a-package
-LABEL org.opencontainers.image.source=https://github.com/algolia/renderscript
-LABEL org.opencontainers.image.revision=$VERSION
-
-ENV NODE_ENV production
-ENV IN_DOCKER true
-
-# Install:
-# - Chromium (so that we get its dependencies)
-# - Extra needed dependencies
-# - A few fonts
-# Then remove Chromium to use puppeteer's bundled Chromium
-# Also install xfvb to run Chromium in Headful mode (necessary for extensions)
-RUN true \
-  && apt-get update \
-  && apt-get install -y --no-install-recommends \
-  curl \
-  chromium \
-  libatk-bridge2.0-0 \
-  libgtk-3-0 \
-  fonts-ipafont-gothic \
-  fonts-wqy-zenhei \
-  fonts-thai-tlwg \
-  fonts-kacst \
-  fonts-freefont-ttf \
-  xvfb \
-  && apt-get remove -y chromium \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* \
-  && true
-
-WORKDIR /app/renderscript
-
-COPY --from=base /app/tmp /app/renderscript
-
-RUN true \
-  && groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
-  && mkdir -p /home/pptruser/ \
-  && chown -R pptruser:pptruser /home/pptruser \
-  && chown -R pptruser:pptruser /app/renderscript \
-  && true
-
-USER pptruser
 
 CMD [ "node", "dist/index.js" ]

@@ -126,13 +126,11 @@ Used for debug purposes. Dumps directly the HTML for easy inspection in your bro
 
 #### Query parameters:
 
-- `url`: URL to render (for hash and query params support, use `encodeURIComponent` on it)
-- `ua`: User-Agent
-- `waitTime[min]&waitTime[max]`: minimum and maximum execution time
+> see `Post /login` parameters
 
 #### Response `text/html`.
 
-(CSP headers are set to prevent script execution on the rendered page)
+CSP headers are set to prevent script execution on the rendered page.
 
 ---
 
@@ -143,25 +141,98 @@ It allows retrieving programmatically a session-cookie from websites with [CSRF]
 
 #### Body parameters
 
-- `url`: URL of the login page
-- `username`: Username to enter on the login form. Renderscript expects to find an `input[type=text]` or `input[type=email]` on the login page.
-- `password`: Password to enter on the login form. Renderscript expects to find an `input[type=password]` on the login page.
-- `ua`: User-Agent
-- `renderHTML`: Boolean (optional). If set to true, Renderscript will return the rendered HTML after the login request. Useful to debug visually.
+```ts
+{
+  /**
+   * URL to render (for hash and query params support, use `encodeURIComponent` on it)
+   */
+  url: string;
+
+  /**
+   * User-Agent to use.
+   */
+  ua: string;
+
+  /**
+   * Username to enter on the login form. Renderscript expects to find an `input[type=text]` or `input[type=email]` on the login page.
+   */
+  username: string;
+
+  /**
+   * Password to enter on the login form. Renderscript expects to find an `input[type=password]` on the login page.
+   */
+  password: string;
+
+  /**
+   * Define the range of time.
+   * Minimum and maximum execution time.
+   */
+  waitTime?: {
+    min?: number;
+    max?: number;
+  };
+
+  /**
+   * Boolean (optional).
+   * If set to true, Renderscript will return the rendered HTML after the login request. Useful to debug visually.
+   */
+  renderHTML?: boolean;
+}
+```
 
 #### Response `application/json`
 
-```json
+```ts
+{
+  /**
+   * HTTP Code of the rendered page.
+   */
+  statusCode: number | null;
 
+  /**
+   * HTTP Headers of the rendered page.
+   */
+  headers: Record<string, string>;
+
+  /**
+   * Metrics from different taks during the rendering.
+   */
+  metrics: Metrics;
+
+  /**
+   * Has the page reached timeout?
+   * When timeout has been reached we continue the rendering as usual
+   * but reduce other timeout to a minimum.
+   */
+  timeout: boolean;
+
+  /**
+   * Any error encountered along the way.
+   * If this field is filled that means the rest of the payload is partial.
+   */
+  error: string | null;
+
+  /**
+   * Cookie generated from a succesful login.
+   */
+  cookies: Cookie[];
+
+  /**
+   * The URL at the end of a succesful login.
+   */
+  resolvedUrl: string | null;
+
+  /**
+   * Body at the end of a succesful login.
+   */
+  body: string | null;
+}
 ```
 
-- `statusCode <number>`: HTTP Status Code.
-- `headers <{ [key: string]: string }>`: Response headers received on the login request.
-- `cookies` <[https://chromedevtools.github.io/devtools-protocol/tot/Network/#type-Cookie](Cookie)[]>: Browser cookies after the login request.
-- `timeout <boolean>`: Present only if the login operation took too long.
+#### Response `text/html`
 
 If `renderHTML: true`, returns `text/html`.
-(CSP headers are set to prevent script execution on the rendered page)
+CSP headers are set to prevent script execution on the rendered page.
 
 ---
 

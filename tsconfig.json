@@ -23,9 +23,6 @@
       ],
       "helpers/*": [
         "src/helpers/*"
-      ],
-      "puppeteer-core": [
-        "node_modules/puppeteer-core/lib/esm/puppeteer/node"
       ]
     },
     "plugins": [

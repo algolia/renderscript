@@ -1,3 +1,5 @@
+import pw from 'playwright';
+
 import { report } from 'helpers/errorReporting';
 import { log } from 'helpers/logger';
 

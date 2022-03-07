@@ -19,9 +19,8 @@ export const log = pino({
           final.msg += m;
         } else if (typeof m === 'object' && m instanceof Error) {
           final.err = m;
-        } else {
-          final.data = { ...final.data, ...m };
-        }
+        } else if (m.err || m.error) final.err = m.err || m.error;
+        else final.data = { ...final.data, ...m };
       });
       method.apply(this, [final as unknown as string]);
     },
