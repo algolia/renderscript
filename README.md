@@ -2,7 +2,7 @@
 
 > An API to render a page inside a real Chromium (with JavaScript enabled) and send back the raw HTML.
 
-This project is directly written and consumed by [Algolia Crawler](https://www.algolia.com/products/search-and-discovery/crawler/).
+This project is directly written for and consumed by [Algolia Crawler](https://www.algolia.com/products/search-and-discovery/crawler/).
 
 🔐  **Secure**
 Leverages `Context` to isolate each page, prevent cookie sharing, control redirection, etc...
@@ -15,13 +15,23 @@ Renderscript have everything abstracted to render a page and login to website wi
 
 ## Usage
 
+### Local
+
 ```sh
-docker run -it algolia/renderscript
-# or
 yarn dev
 ```
 
 **Goto**: <http://localhost:3000>
+
+### Docker
+
+```sh
+docker run -p 3000:3000 -it algolia/renderscript
+
+curl -X POST http://localhost:3000/render \
+  -H 'Content-Type: application/json' \
+  -d '{"url": "https://www.algolia.com/", "ua": "local_renderscript"}'
+```
 
 ## API
 
@@ -126,7 +136,7 @@ Used for debug purposes. Dumps directly the HTML for easy inspection in your bro
 
 #### Query parameters:
 
-> see `Post /login` parameters
+> see `POST /login` parameters
 
 #### Response `text/html`.
 

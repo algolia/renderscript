@@ -38,7 +38,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     }
 
     log.debug('Current URL', { pageUrl: page.url() });
-    log.debug('Entering username...', { userName: login.username });
+    log.info('Entering username...', { userName: login.username });
     await textInput.type(login.username, {
       timeout: this.timeBudget.get(),
     });
@@ -92,7 +92,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     }
 
     // it can be that we are in a "two step form"
-    log.debug('No password input found: validating username...');
+    log.info('No password input found: validating username...');
     try {
       // We submit the form
       await textInput!.press('Enter', {
