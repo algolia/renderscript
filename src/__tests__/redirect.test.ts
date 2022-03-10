@@ -4,6 +4,9 @@ import { cleanString, request } from './helpers';
 
 describe('server redirect', () => {
   it('should return the redirection', async () => {
+    // !---
+    // Server Redirect are flaky since Playwright do not catch 301
+    // You might want to relaunch the test if it failed.
     const { res, body } = await request('http://localhost:3000/render', {
       method: 'POST',
       headers: {
