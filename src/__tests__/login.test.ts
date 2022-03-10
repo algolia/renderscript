@@ -60,12 +60,15 @@ describe('login', () => {
 
     expect(res.statusCode).toBe(200);
 
-    const cookies: Cookie[] = JSON.parse(body).cookies;
+    const parsed: PostLoginSuccess = JSON.parse(body);
+    console.log(parsed);
     expect(
-      cookies.find((cookie) => cookie.name === 'sessionToken')
+      parsed.cookies.find((cookie) => cookie.name === 'sessionToken')
     ).toMatchSnapshot();
     // Check that we actually went through the form
-    expect(cookies.find((cookie) => cookie.name === '_csrf')).toBeDefined();
+    expect(
+      parsed.cookies.find((cookie) => cookie.name === '_csrf')
+    ).toBeDefined();
   });
 
   it('should works even with a 2-steps login', async () => {

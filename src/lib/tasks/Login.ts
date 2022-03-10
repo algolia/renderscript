@@ -136,7 +136,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       // We wait both at the same time because navigation happens quickly
       [res] = await Promise.all([
         this.page!.waitForNavigation({
-          timeout: this.timeBudget.limit(5000),
+          timeout: this.timeBudget.limit(3000),
           waitUntil: 'domcontentloaded',
         }),
         passwordInput.press('Enter', {
@@ -157,10 +157,16 @@ export class LoginTask extends Task<LoginTaskParams> {
     try {
       // After it is submit there can quite a lof ot redirections so we wait a bit more
       // we could do it before but it's easier to split domcontentloaded and networkidle for debug
-      res = await this.page!.waitForNavigation({
+      const resAfterNetwork = await this.page!.waitForNavigation({
         timeout: this.timeBudget.limit(5000),
         waitUntil: 'networkidle',
       });
+
+      if (resAfterNetwork) {
+        // if no navigation happened resAfterNetwork is nul
+        // but we don't want to erase res because it is most of the time normal if we already reached the final page
+        res = resAfterNetwork;
+      }
     } catch (err: any) {
       this.results.error = err.message;
       return;

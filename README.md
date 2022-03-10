@@ -136,7 +136,7 @@ Used for debug purposes. Dumps directly the HTML for easy inspection in your bro
 
 #### Query parameters:
 
-> see `POST /login` parameters
+> see `POST /render` parameters
 
 #### Response `text/html`.
 

@@ -1,7 +1,8 @@
+import type { Cookie } from 'playwright-chromium';
 import { request as req } from 'undici';
 import type { ResponseData } from 'undici/types/dispatcher';
 
-import type { PostLoginParams } from 'api/@types/postLogin';
+import type { PostLoginParams, PostLoginSuccess } from 'api/@types/postLogin';
 
 export async function request(
   url: string,
@@ -42,4 +43,16 @@ export async function sendLoginRequest({
 
 export function cleanString(body: string): string {
   return body.replace(/\n|\r/g, '').replace(/\s\s+/g, '');
+}
+
+export function cleanCookies(
+  cookies: PostLoginSuccess['cookies']
+): Array<
+  Omit<Cookie, 'expires' | 'httpOnly' | 'sameSite' | 'secure' | 'value'>
+> {
+  return cookies.map(
+    ({ value, expires, httpOnly, secure, sameSite, ...rest }) => {
+      return rest;
+    }
+  );
 }
