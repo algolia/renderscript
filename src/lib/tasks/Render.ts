@@ -22,7 +22,11 @@ export class RenderTask extends Task<RenderTaskParams> {
       this.results.error = 'redirection';
       this.results.resolvedUrl = newUrl;
 
+      // We save the status of the page before the navigation (hopefully)
+      await this.saveStatus(response);
       await this.page?.saveMetrics();
+
+      // Hard close of the page to avoid reaching the backend
       await this.page?.page?.close();
     });
 
@@ -41,10 +45,11 @@ export class RenderTask extends Task<RenderTaskParams> {
     await this.saveMetrics();
     this.setMetric('goto');
 
-    await this.saveStatus(response);
     if (this.page.redirection) {
       return;
     }
+
+    await this.saveStatus(response);
 
     // Check for html refresh
     const redirect = await this.page.checkForHttpEquivRefresh();
