@@ -154,6 +154,20 @@ export class LoginTask extends Task<LoginTaskParams> {
       this.timeBudget.consume();
     }
 
+    try {
+      // After it is submit there can quite a lof ot redirections so we wait a bit more
+      // we could do it before but it's easier to split domcontentloaded and networkidle for debug
+      res = await this.page!.waitForNavigation({
+        timeout: this.timeBudget.limit(5000),
+        waitUntil: 'networkidle',
+      });
+    } catch (err: any) {
+      this.results.error = err.message;
+      return;
+    } finally {
+      this.timeBudget.consume();
+    }
+
     if (!res) {
       if (page.url() === url.href) {
         // Return an error if we got no login response and are still on the same URL
