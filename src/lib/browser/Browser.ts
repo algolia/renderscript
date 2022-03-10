@@ -2,8 +2,8 @@ import type {
   Browser as BrowserInterface,
   BrowserContext,
   BrowserContextOptions,
-} from 'playwright';
-import { chromium } from 'playwright';
+} from 'playwright-chromium';
+import { chromium } from 'playwright-chromium';
 import { v4 as uuid } from 'uuid';
 
 import { log as mainLog } from 'helpers/logger';
@@ -100,7 +100,7 @@ export class Browser {
       extraHTTPHeaders: {
         'Accept-Encoding': 'gzip, deflate',
         Accept:
-          'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
       },
       ...opts,
     });

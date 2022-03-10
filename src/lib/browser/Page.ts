@@ -1,4 +1,9 @@
-import type { BrowserContext, Page, Route, Response } from 'playwright';
+import type {
+  BrowserContext,
+  Page,
+  Route,
+  Response,
+} from 'playwright-chromium';
 
 import { report } from 'helpers/errorReporting';
 import { log } from 'helpers/logger';

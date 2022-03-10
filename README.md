@@ -11,7 +11,7 @@ Leverages `Context` to isolate each page, prevent cookie sharing, control redire
 Ignores unnecessary resources for rendering HTML (e.g. `images`, `video`, `font`, etc...) and bundle an AdBlocker by default.
 
 🤖 **Automated**:
-Renderscript have everything abstracted to render a page and login to website with minimal configuration required.
+Renderscript has everything abstracted to render a page and login to website with minimal configuration required.
 
 ## Usage
 

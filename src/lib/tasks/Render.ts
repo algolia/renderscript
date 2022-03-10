@@ -1,4 +1,4 @@
-import type { Response } from 'playwright';
+import type { Response } from 'playwright-chromium';
 
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { RenderTaskParams } from 'lib/types';
@@ -19,11 +19,11 @@ export class RenderTask extends Task<RenderTaskParams> {
 
     // Important to catch any redirect
     this.page.setDisableNavigation(url.href, async (newUrl) => {
-      await this.page?.saveMetrics();
-      this.page?.page?.close();
-
       this.results.error = 'redirection';
       this.results.resolvedUrl = newUrl;
+
+      await this.page?.saveMetrics();
+      await this.page?.page?.close();
     });
 
     try {

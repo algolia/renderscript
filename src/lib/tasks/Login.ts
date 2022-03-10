@@ -1,4 +1,4 @@
-import type { ElementHandle, Response, Request } from 'playwright';
+import type { ElementHandle, Response, Request } from 'playwright-chromium';
 
 import { report } from 'helpers/errorReporting';
 import type { LoginTaskParams } from 'lib/types';
