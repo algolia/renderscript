@@ -1,8 +1,11 @@
+import type { IncomingHttpHeaders } from 'http';
+
 import type { Cookie } from 'playwright-chromium';
 import { request as req } from 'undici';
 import type { ResponseData } from 'undici/types/dispatcher';
 
 import type { PostLoginParams, PostLoginSuccess } from 'api/@types/postLogin';
+import type { PostRenderParams } from 'api/@types/postRender';
 
 export async function request(
   url: string,
@@ -18,25 +21,34 @@ export async function request(
   return { res, body };
 }
 
-export async function sendLoginRequest({
-  url,
-  username,
-  password,
-  renderHTML,
-  waitTime,
-}: Partial<PostLoginParams>): Promise<{ res: ResponseData; body: string }> {
+export async function postRender(
+  opts: Partial<PostRenderParams>,
+  headers?: IncomingHttpHeaders
+): Promise<{ res: ResponseData; body: string }> {
+  return await request('http://localhost:3000/render', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      ...headers,
+    },
+    body: JSON.stringify({
+      ua: 'Algolia Crawler',
+      ...opts,
+    }),
+  });
+}
+
+export async function sendLoginRequest(
+  opts: Partial<PostLoginParams>
+): Promise<{ res: ResponseData; body: string }> {
   return await request('http://localhost:3000/login', {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
     },
     body: JSON.stringify({
-      url,
-      username,
-      password,
-      renderHTML,
       ua: 'Algolia Crawler',
-      waitTime,
+      ...opts,
     }),
   });
 }
@@ -55,4 +67,11 @@ export function cleanCookies(
       return rest;
     }
   );
+}
+
+export function cookiesToString(cookies: PostLoginSuccess['cookies']): string {
+  if (!cookies) {
+    return '';
+  }
+  return cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ');
 }

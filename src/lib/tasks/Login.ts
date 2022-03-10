@@ -70,7 +70,9 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     /* Transforming */
     this.results.resolvedUrl = page.url();
-    this.results.cookies = await page.context().cookies();
+    // we get the cookie for the requested domain
+    // this is not ideal for some SSO, returning valid cookies but missing some of them
+    this.results.cookies = await page.context().cookies([url.href]);
     const body = await page.content();
     this.results.body = body;
     this.setMetric('serialize');
@@ -157,18 +159,34 @@ export class LoginTask extends Task<LoginTaskParams> {
     try {
       // After it is submit there can quite a lof ot redirections so we wait a bit more
       // we could do it before but it's easier to split domcontentloaded and networkidle for debug
-      const resAfterNetwork = await this.page!.waitForNavigation({
-        timeout: this.timeBudget.limit(5000),
-        waitUntil: 'networkidle',
-      });
-
+      const [resAfterNetwork] = await Promise.all([
+        this.page!.waitForNavigation({
+          timeout: this.timeBudget.limit(5000),
+          waitUntil: 'networkidle',
+        }),
+      ]);
       if (resAfterNetwork) {
         // if no navigation happened resAfterNetwork is nul
         // but we don't want to erase res because it is most of the time normal if we already reached the final page
         res = resAfterNetwork;
       }
+
+      const [resAfterSpec] = await Promise.all([
+        this.page!.waitForNavigation({
+          timeout: this.timeBudget.limit(5000),
+          waitUntil: 'networkidle',
+        }),
+        this.#handleSpecForm(),
+      ]);
+      if (resAfterSpec) {
+        res = resAfterSpec;
+      }
     } catch (err: any) {
       this.results.error = err.message;
+      report(new Error('Error while spec'), {
+        err: err.message,
+        pageUrl: page.url(),
+      });
       return;
     } finally {
       this.timeBudget.consume();
@@ -198,5 +216,34 @@ export class LoginTask extends Task<LoginTaskParams> {
       chain.push(prev.url());
     }
     log.debug('Login after redirections', { pageUrl: page.url(), chain });
+  }
+
+  async #handleSpecForm(): Promise<void> {
+    const { log } = this;
+    const page = this.page!.page!;
+    const currentUrl = page.url();
+
+    // Spec for Microsoft SSO
+    if (currentUrl.startsWith('https://login.live.com')) {
+      log.debug('MSFT: Entering specs');
+
+      // There is a "Keep me sign in?" checkbox now
+      const confirm = page.locator('#KmsiCheckboxField');
+      const submit = page.locator('input[type=submit]');
+
+      if ((await confirm.count()) === 1 && (await submit.count()) === 1) {
+        log.debug('MSFT: found confirm and submit');
+
+        await confirm.click({
+          timeout: this.timeBudget.limit(100),
+          noWaitAfter: true, // Otherwise wait for navigation
+        });
+
+        await submit.click({
+          timeout: this.timeBudget.limit(100),
+          noWaitAfter: true, // Otherwise wait for navigation
+        });
+      }
+    }
   }
 }
