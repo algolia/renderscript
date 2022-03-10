@@ -31,21 +31,22 @@ export class LoginTask extends Task<LoginTaskParams> {
     await this.saveStatus(response);
 
     // We first check if there is form
-    const textInput = await page.$('input[type=text], input[type=email]');
-    if (!textInput) {
+    const textInputLoc = page.locator('input[type=text], input[type=email]');
+    if ((await textInputLoc.count()) <= 0) {
       this.results.error = `field_not_found: input[type=text], input[type=email]`;
       return;
     }
 
     log.debug('Current URL', { pageUrl: page.url() });
     log.info('Entering username...', { userName: login.username });
-    await textInput.type(login.username, {
+    const elTextInput = (await textInputLoc.elementHandle())!;
+    await elTextInput.type(login.username, {
       timeout: this.timeBudget.get(),
     });
     this.timeBudget.consume();
 
     // Get the password input
-    const passwordInput = await this.#getPasswordInput(textInput);
+    const passwordInput = await this.#getPasswordInput(elTextInput);
     if (!passwordInput) {
       await this.saveStatus(response);
 
@@ -88,9 +89,9 @@ export class LoginTask extends Task<LoginTaskParams> {
     const page = this.page!.page!;
     const inputSel = 'input[type=password]:not([aria-hidden="true"])';
 
-    const passwordInput = await page!.$(inputSel);
-    if (passwordInput) {
-      return passwordInput;
+    const passwordInputLoc = page.locator(inputSel);
+    if ((await passwordInputLoc.count()) > 0) {
+      return await passwordInputLoc.elementHandle();
     }
 
     // it can be that we are in a "two step form"
@@ -111,7 +112,10 @@ export class LoginTask extends Task<LoginTaskParams> {
 
       log.debug('Current URL', { pageUrl: page.url() });
 
-      return await page.$(inputSel);
+      const loc = page.locator(inputSel);
+      if ((await loc.count()) > 0) {
+        return await loc.elementHandle();
+      }
     } catch (err: any) {
       log.info('No password input on the page', {
         err: err.message,
@@ -120,6 +124,8 @@ export class LoginTask extends Task<LoginTaskParams> {
 
       this.results.error = err.message;
     }
+
+    return null;
   }
 
   /**

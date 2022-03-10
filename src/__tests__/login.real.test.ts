@@ -116,7 +116,6 @@ describe.skip('Real Login', () => {
 
       expect(res.statusCode).toBe(200);
       const parsed: PostRenderSuccess = JSON.parse(body);
-      console.log(parsed);
       expect(parsed.statusCode).toBe(200);
     });
   });

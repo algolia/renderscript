@@ -61,7 +61,6 @@ describe('login', () => {
     expect(res.statusCode).toBe(200);
 
     const parsed: PostLoginSuccess = JSON.parse(body);
-    console.log(parsed);
     expect(
       parsed.cookies.find((cookie) => cookie.name === 'sessionToken')
     ).toMatchSnapshot();
@@ -158,7 +157,7 @@ describe('JavaScript redirect', () => {
     expect(parsed.body).toBe(
       '<!DOCTYPE html><html lang="en"><head></head><body>OK(/test)</body></html>'
     );
-    expect(parsed.timeout).toBe(false);
+    expect(parsed.timeout).toBe(true); // timeout since we don't do any network call
     expect(parsed.statusCode).toBe(200);
     expect(parsed.metrics.timings.total).toBeGreaterThan(1000);
     expect(parsed.resolvedUrl).toBe('http://localhost:3000/secure/test');

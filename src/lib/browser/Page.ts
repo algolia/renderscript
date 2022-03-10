@@ -447,17 +447,16 @@ export class BrowserPage {
    */
   async checkForHttpEquivRefresh(): Promise<URL | void> {
     try {
-      const metaRefreshElement = await this.page!.$(
+      const metaRefreshElement = this.page!.locator(
         'meta[http-equiv="refresh"]'
       );
 
-      if (!metaRefreshElement) {
+      if ((await metaRefreshElement.count()) <= 0) {
         return;
       }
 
-      const metaRefreshContent = await metaRefreshElement.getProperty(
-        'content'
-      );
+      const el = (await metaRefreshElement.elementHandle())!;
+      const metaRefreshContent = await el.getProperty('content');
       const refreshContent = await metaRefreshContent?.jsonValue();
       const match = refreshContent?.match(/\d+;\s(?:url|URL)=(.*)/);
       if (!match) {
