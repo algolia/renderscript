@@ -1,21 +1,15 @@
 import type { PostRenderSuccess } from 'api/@types/postRender';
 
-import { request } from './helpers';
+import { postRender } from './helpers';
 
 /**
  * Test the schema only on this file.
  */
 describe('POST /render', () => {
   it('should validate 200', async () => {
-    const { res, body } = await request('http://localhost:3000/render', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: 'http://localhost:3000/test-website/async.html',
-        ua: 'Algolia Crawler',
-      }),
+    const { res, body } = await postRender({
+      url: 'http://localhost:3000/test-website/async.html',
+      ua: 'Algolia Crawler',
     });
     expect(res.statusCode).toBe(200);
 

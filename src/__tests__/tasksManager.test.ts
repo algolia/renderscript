@@ -1,6 +1,6 @@
 import type { GetHealthySuccess } from 'api/@types/getHealthy';
 
-import { request } from './helpers';
+import { postRender, request } from './helpers';
 
 describe('manager', () => {
   it('should properly close page after done', async () => {
@@ -17,15 +17,9 @@ describe('manager', () => {
     });
 
     // Process something
-    const { res: resRender } = await request('http://localhost:3000/render', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: 'http://localhost:3000/test-website/async.html',
-        ua: 'Algolia Crawler',
-      }),
+    const { res: resRender } = await postRender({
+      url: 'http://localhost:3000/test-website/async.html',
+      ua: 'Algolia Crawler',
     });
     expect(resRender.statusCode).toBe(200);
 

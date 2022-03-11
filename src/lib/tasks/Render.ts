@@ -1,5 +1,6 @@
 import type { Response } from 'playwright-chromium';
 
+import { wait } from 'helpers/wait';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { RenderTaskParams } from 'lib/types';
 
@@ -44,7 +45,8 @@ export class RenderTask extends Task<RenderTaskParams> {
     await this.saveMetrics();
     this.setMetric('goto');
 
-    await this.saveStatus(response);
+    // In case of redirection, initialResponse is prefered since response is probably now incorrect
+    await this.saveStatus(this.page.initialResponse || response);
 
     if (this.page.redirection) {
       return;

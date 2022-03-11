@@ -15,7 +15,7 @@
     "release": "yarn docker:build && yarn docker:release",
     "start": "UV_THREADPOOL_SIZE=100 node dist/index.js",
     "semantic-release": "semantic-release",
-    "test": "jest --runInBand src/"
+    "test": "jest src/"
   },
   "repository": {
     "type": "git",

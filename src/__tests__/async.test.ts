@@ -1,6 +1,6 @@
 import type { PostRenderSuccess } from 'api/@types/postRender';
 
-import { cleanString, request } from './helpers';
+import { cleanString, postRender, request } from './helpers';
 
 jest.setTimeout(10000);
 
@@ -26,15 +26,9 @@ describe('async', () => {
   });
 
   it('should wait by default for 0ms', async () => {
-    const { res, body } = await request('http://localhost:3000/render', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: 'http://localhost:3000/test-website/async.html',
-        ua: 'Algolia Crawler',
-      }),
+    const { res, body } = await postRender({
+      url: 'http://localhost:3000/test-website/async.html',
+      ua: 'Algolia Crawler',
     });
 
     const json: PostRenderSuccess = JSON.parse(body);
@@ -44,18 +38,12 @@ describe('async', () => {
   });
 
   it('should wait at least 6000ms', async () => {
-    const { res, body } = await request('http://localhost:3000/render', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
+    const { res, body } = await postRender({
+      url: 'http://localhost:3000/test-website/async.html',
+      ua: 'Algolia Crawler',
+      waitTime: {
+        min: 6000,
       },
-      body: JSON.stringify({
-        url: 'http://localhost:3000/test-website/async.html',
-        ua: 'Algolia Crawler',
-        waitTime: {
-          min: 6000,
-        },
-      }),
     });
 
     const json: PostRenderSuccess = JSON.parse(body);
@@ -68,19 +56,13 @@ describe('async', () => {
   });
 
   it('should wait at most 5000ms', async () => {
-    const { res, body } = await request('http://localhost:3000/render', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
+    const { res, body } = await postRender({
+      url: 'http://localhost:3000/test-website/slow.html',
+      ua: 'Algolia Crawler',
+      waitTime: {
+        min: 4000,
+        max: 5000,
       },
-      body: JSON.stringify({
-        url: 'http://localhost:3000/test-website/slow.html',
-        ua: 'Algolia Crawler',
-        waitTime: {
-          min: 4000,
-          max: 5000,
-        },
-      }),
     });
 
     const json: PostRenderSuccess = JSON.parse(body);
