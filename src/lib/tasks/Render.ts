@@ -1,6 +1,5 @@
 import type { Response } from 'playwright-chromium';
 
-import { wait } from 'helpers/wait';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { RenderTaskParams } from 'lib/types';
 
