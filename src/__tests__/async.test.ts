@@ -1,3 +1,5 @@
+import type { PostRenderSuccess } from 'api/@types/postRender';
+
 import { cleanString, request } from './helpers';
 
 jest.setTimeout(10000);
@@ -35,13 +37,13 @@ describe('async', () => {
       }),
     });
 
-    const json = JSON.parse(body);
+    const json: PostRenderSuccess = JSON.parse(body);
     expect(res.statusCode).toBe(200);
-    expect(json.metrics.total).toBeLessThanOrEqual(2000);
+    expect(json.metrics.timings.total).toBeLessThanOrEqual(2000);
     expect(json.body).not.toMatch('4. setTimeout 1000');
   });
 
-  it('should wait 6000ms', async () => {
+  it('should wait at least 6000ms', async () => {
     const { res, body } = await request('http://localhost:3000/render', {
       method: 'POST',
       headers: {
@@ -56,14 +58,16 @@ describe('async', () => {
       }),
     });
 
-    const json = JSON.parse(body);
+    const json: PostRenderSuccess = JSON.parse(body);
     expect(res.statusCode).toBe(200);
-    expect(json.metrics.total).toBeGreaterThanOrEqual(6000);
-    expect(json.metrics.total).toBeLessThanOrEqual(7000);
+
+    expect(json.metrics.timings.minWait).toBeGreaterThanOrEqual(5000);
+    expect(json.metrics.timings.total).toBeGreaterThanOrEqual(6000);
+    expect(json.metrics.timings.total).toBeLessThanOrEqual(7000);
     expect(json.body).toMatch('5. setTimeout 5000');
   });
 
-  it('should wait 5000ms', async () => {
+  it('should wait at most 5000ms', async () => {
     const { res, body } = await request('http://localhost:3000/render', {
       method: 'POST',
       headers: {
@@ -79,10 +83,16 @@ describe('async', () => {
       }),
     });
 
-    const json = JSON.parse(body);
+    const json: PostRenderSuccess = JSON.parse(body);
     expect(res.statusCode).toBe(200);
-    expect(json.metrics.goto).toBeLessThanOrEqual(5010);
-    expect(json.metrics.goto).toBeGreaterThanOrEqual(5000);
+    expect(json.metrics.timings.goto).toBeLessThanOrEqual(50);
+
+    // In that case the page is slow so min is not used
+    expect(json.metrics.timings.minWait).toBeNull();
+
+    expect(json.metrics.timings.ready).toBeLessThanOrEqual(5020);
+    expect(json.metrics.timings.total).toBeGreaterThanOrEqual(4000);
+    expect(json.metrics.timings.total).toBeLessThanOrEqual(5120);
 
     // We count the dot because there is no way to have precise execution
     // There should be around 25 dots (one fetch every 200ms during 5s = 25 dots)
@@ -90,66 +100,5 @@ describe('async', () => {
     // And no more than 30 to check that it was not executed more than 5s
     expect(json.body).toMatch('.'.repeat(20));
     expect(json.body).not.toMatch('.'.repeat(30));
-  });
-});
-
-describe('redirects', () => {
-  describe('server redirect', () => {
-    it('should return the redirection', async () => {
-      const { res } = await request('http://localhost:3000/render', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          url: 'http://localhost:3000/301',
-          ua: 'Algolia Crawler',
-        }),
-      });
-
-      expect(res.statusCode).toBe(307);
-      expect(res.headers.location).toBe(
-        'http://localhost:3000/test-website/basic.html'
-      );
-    });
-  });
-
-  describe('client redirect', () => {
-    it('should return the redirection', async () => {
-      const { res } = await request('http://localhost:3000/render', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          url: 'http://localhost:3000/test-website/meta-refresh.html',
-          ua: 'Algolia Crawler',
-        }),
-      });
-
-      expect(res.statusCode).toBe(307);
-      expect(res.headers.location).toBe(
-        'http://localhost:3000/test-website/basic.html'
-      );
-    });
-
-    it('should return the redirection even if not executed yet', async () => {
-      const { res } = await request('http://localhost:3000/render', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          // The client redirection happens after 5 seconds
-          url: 'http://localhost:3000/test-website/meta-refresh-5.html',
-          ua: 'Algolia Crawler',
-        }),
-      });
-
-      expect(res.statusCode).toBe(307);
-      expect(res.headers.location).toBe(
-        'http://localhost:3000/test-website/basic.html'
-      );
-    });
   });
 });

@@ -1,16 +1,8 @@
-import type {
-  Page,
-  BrowserContext,
-  Protocol,
-} from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
+import type { Cookie } from 'playwright-chromium';
 
-export type TaskFromAPI = Omit<TaskBaseParams, 'type' | 'url' | 'userAgent'> & {
-  url: string;
-  ua: string;
-};
+import type { Task } from './tasks/Task';
 
 export interface TaskBaseParams {
-  type: 'login' | 'render';
   url: URL;
   userAgent: string;
   adblock?: boolean;
@@ -18,17 +10,14 @@ export interface TaskBaseParams {
     min?: number;
     max?: number;
   };
-  headersToForward: {
+  headersToForward?: {
     [s: string]: string;
   };
 }
 
-export interface RenderTaskParams extends TaskBaseParams {
-  type: 'render';
-}
+export type RenderTaskParams = TaskBaseParams;
 
 export interface LoginTaskParams extends TaskBaseParams {
-  type: 'login';
   login: {
     username: string;
     password: string;
@@ -40,45 +29,55 @@ export type TaskParams = LoginTaskParams | RenderTaskParams;
 
 export interface TaskFinal extends TaskResult {
   metrics: Metrics;
+  timeout: boolean;
 }
 
 export interface TaskResult {
-  statusCode?: number;
-  body?: string;
-  headers?: Record<string, string>;
-  timeout?: boolean;
-  error?: string;
-  resolvedUrl?: string;
-  cookies?: Protocol.Network.Cookie[];
+  statusCode: number | null;
+  body: string | null;
+  error: string | null;
+  headers: Record<string, string>;
+  resolvedUrl: string | null;
+  cookies: Cookie[];
 }
 
 export interface Metrics {
-  goto: number | null;
-  minWait: number | null;
-  serialize: number | null;
-  total: number | null;
+  timings: {
+    context: number | null;
+    goto: number | null;
+    equiv: number | null;
+    ready: number | null;
+    minWait: number | null;
+    serialize: number | null;
+    close: number | null;
+    total: number | null;
+  };
+  renderingBudget: {
+    max: number;
+    consumed: number;
+  };
   page: PageMetrics | null;
 }
 
 export interface PageMetrics {
-  layoutDuration: number | null;
-  scriptDuration: number | null;
-  taskDuration: number | null;
-  jsHeapUsedSize: number | null; // currently active to render the page
-  jsHeapTotalSize: number | null; // total allocated
-  requests: number;
-  blockedRequests: number;
-  contentLength: number;
-  contentLengthTotal: number;
-}
-
-export interface NewPage {
-  page: Page;
-  context: BrowserContext;
+  timings: {
+    download: number | null;
+  };
+  mem: {
+    jsHeapUsedSize: number | null;
+    jsHeapTotalSize: number | null;
+  };
+  requests: {
+    total: number;
+    blocked: number;
+  };
+  contentLength: {
+    main: number;
+    total: number;
+  };
 }
 
 export interface TaskObject {
-  id: string;
-  taskPromise?: Promise<void>;
-  createdAt: Date;
+  ref: Task;
+  promise: Promise<TaskFinal>;
 }

@@ -1,43 +1,164 @@
-import type { BrowserPage } from 'lib/browser/Page';
+import type { Logger } from 'pino';
+import type { BrowserContext, Response } from 'playwright-chromium';
+import { v4 as uuid } from 'uuid';
+
+import { log } from 'helpers/logger';
+import { stats } from 'helpers/stats';
+import type { Browser } from 'lib/browser/Browser';
+import { BrowserPage } from 'lib/browser/Page';
+import { TimeBudget } from 'lib/browser/TimeBudget';
+import { WAIT_TIME } from 'lib/constants';
 import type { Metrics, TaskBaseParams, TaskResult } from 'lib/types';
 
-export abstract class Task<TTaskType = TaskBaseParams> {
+export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
+  id: string;
   params;
-  page;
-  results: TaskResult | undefined;
-  metrics: Metrics = {
-    goto: null,
-    minWait: null,
-    serialize: null,
-    total: null,
+  page?: BrowserPage;
+  createdAt?: Date;
+  startedAt?: Date;
+  results: TaskResult = {
+    statusCode: null,
+    body: null,
+    headers: {},
+    error: null,
+    resolvedUrl: null,
+    cookies: [],
+  };
+  log: Logger;
+  #metrics: Metrics = {
+    timings: {
+      context: null,
+      goto: null,
+      equiv: null,
+      ready: null,
+      minWait: null,
+      serialize: null,
+      close: null,
+      total: null,
+    },
+    renderingBudget: {
+      max: 0,
+      consumed: 0,
+    },
     page: null,
   };
-  closed: boolean = false;
+  timeBudget: TimeBudget;
 
-  constructor(params: TTaskType, page: BrowserPage) {
-    this.params = params;
-    this.page = page;
+  #closed: boolean = false;
+  #processed: boolean = false;
+  #context?: BrowserContext;
+
+  constructor(params: TTaskType, logger?: Logger) {
+    this.id = uuid();
+    // Do not print this or pass it to reporting, it contains secrets
+    this.params = {
+      ...params,
+      waitTime: {
+        ...WAIT_TIME,
+        ...params.waitTime,
+      },
+    };
+    this.createdAt = new Date();
+    this.timeBudget = new TimeBudget(this.params.waitTime.max);
+    this.#metrics.renderingBudget.max = this.timeBudget.max;
+    this.log = logger ?? log.child({ svc: 'task', ctx: { id: this.id } });
   }
 
   get isProcessed(): boolean {
-    return typeof this.results !== 'undefined';
+    return this.#processed;
   }
 
-  async saveMetrics(): Promise<void> {
-    try {
-      this.metrics.page = await this.page.metrics();
-    } catch (err) {
-      // Can happen if target is already closed or redirection
-    }
+  get metrics(): Metrics {
+    return this.#metrics;
   }
 
   async close(): Promise<void> {
-    if (this.closed) {
+    if (this.#closed) {
       return;
     }
 
-    this.closed = true;
-    await this.page.close();
+    this.#closed = true;
+    await this.page?.close();
+    await this.#context?.close();
+    this.setMetric('close');
+
+    this.metrics.timings.total = Date.now() - this.startedAt!.getTime();
+    this.#context = undefined;
+  }
+
+  /**
+   * Create the incognito context and the page so each task has a fresh start.
+   */
+  async createContext(browser: Browser): Promise<void> {
+    this.#processed = true;
+    this.timeBudget.lastConsumption = Date.now();
+    this.startedAt = new Date();
+
+    const context = await browser.getNewContext({
+      userAgent: this.params.userAgent,
+    });
+    context.setDefaultTimeout(WAIT_TIME.min);
+    context.setDefaultNavigationTimeout(WAIT_TIME.max);
+
+    const page = new BrowserPage(context);
+    this.page = page;
+    this.#context = context;
+
+    await page.create();
+
+    if (this.params.headersToForward?.cookies) {
+      await page.setCookies(this.params);
+    }
+
+    await context.route('**/*', page.getOnRequestHandler(this.params));
+    await page.setDisableServiceWorker();
+
+    page.page!.on('response', page.getOnResponseHandler(this.params));
+
+    this.setMetric('context');
+  }
+
+  /**
+   * Save status in results.
+   */
+  async saveStatus(response: Response): Promise<void> {
+    this.results.statusCode = response.status();
+    this.results.headers = await response.allHeaders();
+  }
+
+  /**
+   * Wait for browser to execute more stuff before we kill the page.
+   */
+  async minWait(): Promise<void> {
+    const minWait = this.params.waitTime!.min;
+    const todo = minWait - this.timeBudget.consumed;
+    if (todo <= 0) {
+      return;
+    }
+
+    this.log.debug(`Waiting ${todo} extra ms...`);
+    await this.page!.page!.waitForTimeout(todo);
+    this.setMetric('minWait');
+  }
+
+  /**
+   * Log metric and reduce time budget.
+   */
+  setMetric(name: keyof Metrics['timings']): void {
+    this.#metrics.timings[name] = this.timeBudget.consume();
+    stats.timing(`renderscript.page.${name}`, this.#metrics.timings[name]!);
+  }
+
+  /**
+   * Save page metrics.
+   */
+  async saveMetrics(): Promise<void> {
+    try {
+      this.#metrics.page = await this.page!.saveMetrics();
+      this.#metrics.renderingBudget.consumed = this.timeBudget.consumed;
+    } catch (err) {
+      // Can happen if target is already closed or redirection
+    }
   }
 
   abstract process(): Promise<void>;

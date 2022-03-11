@@ -2,20 +2,20 @@ import os from 'os';
 
 import type express from 'express';
 
+import type { GetHealthySuccess } from 'api/@types/getHealthy';
 import { stats } from 'helpers/stats';
 import { tasksManager } from 'lib/singletons';
 
 const hostname = os.hostname();
 
-export async function healthy(
+export function healthy(
   req: express.Request,
-  res: express.Response
-): Promise<void> {
+  res: express.Response<GetHealthySuccess>
+): void {
   const isHealthy = tasksManager.healthy;
   const tasksRunning = tasksManager.currentConcurrency;
-  const pagesOpen = tasksManager.currentBrowser
-    ? await tasksManager.currentBrowser.getCurrentConcurrency()
-    : -1;
+  const pagesOpen = tasksManager.currentBrowser?.getCurrentConcurrency() || 0;
+  const totalRun = tasksManager.totalRun;
 
   // Those stats could be computed from .task.count
   // But we want to double check that we don't forgot tasks or tabs
@@ -29,11 +29,7 @@ export async function healthy(
     }
   );
 
-  console.debug(
-    'healthy reported',
-    JSON.stringify({ isHealthy, tasksRunning, pagesOpen })
-  );
   res
     .status(isHealthy ? 200 : 503)
-    .json({ ready: isHealthy, tasksRunning, pagesOpen });
+    .json({ ready: isHealthy, tasksRunning, pagesOpen, totalRun });
 }

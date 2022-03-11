@@ -1,5 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`JavaScript redirect should not try to render the body if renderHTML was not requested 1`] = `
+Object {
+  "domain": "localhost",
+  "expires": -1,
+  "httpOnly": false,
+  "name": "sessionToken",
+  "path": "/secure",
+  "sameSite": "Strict",
+  "secure": false,
+  "value": "53cu23_535510n",
+}
+`;
+
 exports[`login should works even with a 2-steps login 1`] = `
 Object {
   "domain": "localhost",
@@ -7,13 +20,8 @@ Object {
   "httpOnly": false,
   "name": "sessionToken",
   "path": "/secure",
-  "sameParty": false,
   "sameSite": "Strict",
   "secure": false,
-  "session": true,
-  "size": 26,
-  "sourcePort": 3000,
-  "sourceScheme": "NonSecure",
   "value": "53cu23_535510n",
 }
 `;
@@ -25,13 +33,8 @@ Object {
   "httpOnly": false,
   "name": "sessionToken",
   "path": "/secure",
-  "sameParty": false,
   "sameSite": "Strict",
   "secure": false,
-  "session": true,
-  "size": 26,
-  "sourcePort": 3000,
-  "sourceScheme": "NonSecure",
   "value": "53cu23_535510n",
 }
 `;
@@ -43,13 +46,8 @@ Object {
   "httpOnly": false,
   "name": "sessionToken",
   "path": "/secure",
-  "sameParty": false,
   "sameSite": "Strict",
   "secure": false,
-  "session": true,
-  "size": 26,
-  "sourcePort": 3000,
-  "sourceScheme": "NonSecure",
   "value": "53cu23_535510n",
 }
 `;

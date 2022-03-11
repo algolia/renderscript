@@ -1,7 +1,5 @@
-import type { HTTPResponse } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
+import type { Response } from 'playwright-chromium';
 
-import { report } from 'helpers/errorReporting';
-import { stats } from 'helpers/stats';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { RenderTaskParams } from 'lib/types';
 
@@ -9,113 +7,91 @@ import { Task } from './Task';
 
 export class RenderTask extends Task<RenderTaskParams> {
   async process(): Promise<void> {
-    const { url, waitTime } = this.params;
-    const { page } = this.page;
+    if (!this.page) {
+      throw new Error('Calling process before createContext()');
+    }
+
+    /* Setup */
+    const { url } = this.params;
     const baseHref = url.origin;
+    const page = this.page.page!;
+    let response: Response;
 
-    const total = Date.now();
-    const minWait = waitTime!.min;
-    let start = Date.now();
+    // Important to catch any redirect
+    this.page.setDisableNavigation(url.href, async (newUrl) => {
+      this.results.error = 'redirection';
+      this.results.resolvedUrl = newUrl;
 
-    let response: HTTPResponse;
+      // We save the status of the page before the navigation (hopefully)
+      await this.page?.saveMetrics();
+
+      // Hard close of the page to avoid reaching the backend
+      await this.page?.page?.close();
+    });
+
     try {
-      response = await this.page.goto(url);
+      response = await this.page.goto(url.href, {
+        timeout: this.timeBudget.get(),
+        waitUntil: 'domcontentloaded',
+      });
     } catch (err: any) {
-      this.results = {
-        error: err.message,
-        timeout: Boolean(err.timeout),
-      };
+      this.results.error = err.message;
+
       return;
     }
 
-    this.metrics.goto = Date.now() - start;
+    // --- At this point we have just the DOM, but we want to do some checks
+    await this.saveMetrics();
+    this.setMetric('goto');
 
-    const statusCode = response.status();
-    const headers = response.headers();
+    await this.saveStatus(response);
 
-    start = Date.now();
-    if (statusCode === 200 && minWait) {
-      await page!.waitForTimeout(minWait - (Date.now() - total));
-    }
-    this.metrics.minWait = Date.now() - start;
-
-    if (page!.url() !== url.href) {
-      this.results = {
-        statusCode,
-        headers,
-        resolvedUrl: page!.url(),
-      };
+    if (this.page.redirection) {
       return;
     }
 
+    // Check for html refresh
+    const redirect = await this.page.checkForHttpEquivRefresh();
+    this.setMetric('equiv');
+    if (redirect) {
+      this.results.error = 'redirection';
+      this.results.resolvedUrl = redirect.href;
+
+      return;
+    }
+
+    if (this.results.statusCode !== 200) {
+      // Everything is different than OK is not worth processing
+      this.results.body = await this.page.renderBody();
+
+      return;
+    }
+
+    // --- Basic checks passed we wait a bit more to page to render
     try {
-      const metaRefreshElement = await page!.$('meta[http-equiv="refresh"]');
-      if (metaRefreshElement) {
-        const metaRefreshContent = await metaRefreshElement.getProperty(
-          'content'
-        );
-        const refreshContent = await metaRefreshContent?.jsonValue<string>();
-        const match = refreshContent?.match(/\d+;\s(?:url|URL)=(.*)/);
-        if (match) {
-          const matchedURL = match[1].replace(/'/g, ''); // Sometimes URLs are surrounded by quotes
-          const redirectURL = matchedURL.startsWith('/')
-            ? `${baseHref}${matchedURL}`
-            : match[1];
-          console.log(`Meta refresh found. Redirecting to ${redirectURL}...`);
-          this.results = {
-            statusCode,
-            headers,
-            resolvedUrl: redirectURL,
-          };
-          return;
-        }
-      }
-    } catch (err) {
-      report(
-        new Error(
-          'Error while trying to check for meta[http-equive="refresh"]'
-        ),
-        { err }
-      );
+      // Computing maxWait minus what we already consumed
+      await page.waitForLoadState('networkidle', {
+        timeout: this.timeBudget.get(),
+      });
+    } catch (err: any) {
+      this.page.throwIfNotTimeout(err);
+    }
+
+    this.setMetric('ready');
+    await this.minWait();
+
+    const newUrl = page.url();
+    if (newUrl !== url.href) {
+      // Redirection was not caught this should not happen
+      this.results.error = 'wrong_redirection';
+      this.results.resolvedUrl = newUrl;
+      return;
     }
 
     /* Transforming */
-    await page!.evaluate(injectBaseHref, baseHref);
-
-    start = Date.now();
-    /**
-     * Serialize
-     * We put a debugger to stop processing JS.
-     **/
-    await page!.evaluate(() => {
-      // eslint-disable-next-line no-debugger
-      debugger;
-    });
-    const preSerializationUrl = await page!.evaluate('window.location.href');
-    const body = (await page!.evaluate(
-      'document.firstElementChild.outerHTML'
-    )) as string;
-    const resolvedUrl = (await page!.evaluate(
-      'window.location.href'
-    )) as string;
-
-    this.metrics.serialize = Date.now() - start;
-    stats.timing('renderscript.page.serialize', Date.now() - start);
-
-    if (preSerializationUrl !== resolvedUrl) {
-      // something super shady happened where the page url changed during evaluation
-      this.results = {
-        error: 'unsafe_redirect',
-      };
-      return;
-    }
-
-    this.metrics.total = Date.now() - total;
-    this.results = {
-      statusCode,
-      headers,
-      body,
-      resolvedUrl,
-    };
+    await page.evaluate(injectBaseHref, baseHref);
+    const body = await page.content();
+    this.results.body = body;
+    this.setMetric('serialize');
   }
 }

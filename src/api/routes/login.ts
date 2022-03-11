@@ -1,14 +1,16 @@
 import type express from 'express';
 
+import type { PostLoginParams, PostLoginResponse } from 'api/@types/postLogin';
 import { CSP_HEADERS } from 'api/constants';
 import { getDefaultParams, alt } from 'api/helpers/alt';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
 import { report } from 'helpers/errorReporting';
 import { tasksManager } from 'lib/singletons';
+import { LoginTask } from 'lib/tasks/Login';
 
 export async function validate(
-  req: express.Request,
+  req: express.Request<any, any, PostLoginParams>,
   res: express.Response,
   next: express.NextFunction
 ): Promise<void> {
@@ -30,31 +32,15 @@ export async function validate(
 }
 
 export async function processLogin(
-  req: express.Request<
-    any,
-    any,
-    {
-      url: string;
-      ua: string;
-      username: string;
-      password: string;
-      renderHTML?: string;
-      waitTime?: {
-        min?: number;
-        max?: number;
-      };
-    }
-  >,
-  res: express.Response
+  req: express.Request<any, any, PostLoginParams>,
+  res: express.Response<PostLoginResponse | string | null>
 ): Promise<void> {
   const { url, ua, username, password, renderHTML, waitTime } = req.body;
-  const renderHTMLInBoolean = renderHTML === 'true';
   const headersToForward = getForwardedHeadersFromRequest(req);
 
   try {
-    const { error, statusCode, headers, body, cookies, timeout } =
-      await tasksManager.task({
-        type: 'login',
+    const task = await tasksManager.task(
+      new LoginTask({
         url: new URL(url),
         headersToForward,
         userAgent: ua,
@@ -62,36 +48,29 @@ export async function processLogin(
           username,
           password,
         },
-        renderHTML: renderHTMLInBoolean,
+        renderHTML,
         waitTime,
-      });
+      })
+    );
 
-    if (error) {
-      if (renderHTMLInBoolean) {
-        res
-          .status(200)
-          .header('Content-Type', 'text/html')
-          .header('Content-Security-Policy', CSP_HEADERS)
-          .send(body);
-        return;
-      }
-      res.status(400).json({ error });
-      return;
-    }
-
-    if (renderHTMLInBoolean) {
+    if (renderHTML) {
       res
-        .status(statusCode!)
+        .status(200)
         .header('Content-Type', 'text/html')
         .header('Content-Security-Policy', CSP_HEADERS)
-        .send(body);
+        .send(task.body);
       return;
     }
+
     res.status(200).json({
-      statusCode,
-      headers,
-      cookies,
-      timeout,
+      headers: task.headers,
+      metrics: task.metrics,
+      statusCode: task.statusCode,
+      timeout: task.timeout,
+      error: task.error,
+      cookies: task.cookies,
+      resolvedUrl: task.resolvedUrl,
+      body: task.body,
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

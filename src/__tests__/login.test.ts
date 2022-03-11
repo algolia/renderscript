@@ -1,6 +1,10 @@
-import type { Protocol } from 'puppeteer-core/lib/esm/puppeteer/api-docs-entry';
+import type { Cookie } from 'playwright-chromium';
+
+import type { PostLoginSuccess } from 'api/@types/postLogin';
 
 import { sendLoginRequest } from './helpers';
+
+jest.setTimeout(25000);
 
 describe('login', () => {
   it('should error when no username', async () => {
@@ -56,15 +60,13 @@ describe('login', () => {
 
     expect(res.statusCode).toBe(200);
 
-    const cookies = JSON.parse(body).cookies;
+    const parsed: PostLoginSuccess = JSON.parse(body);
     expect(
-      cookies.find(
-        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
-      )
+      parsed.cookies.find((cookie) => cookie.name === 'sessionToken')
     ).toMatchSnapshot();
     // Check that we actually went through the form
     expect(
-      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
+      parsed.cookies.find((cookie) => cookie.name === '_csrf')
     ).toBeDefined();
   });
 
@@ -77,16 +79,12 @@ describe('login', () => {
 
     expect(res.statusCode).toBe(200);
 
-    const cookies = JSON.parse(body).cookies;
+    const cookies: Cookie[] = JSON.parse(body).cookies;
     expect(
-      cookies.find(
-        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
-      )
+      cookies.find((cookie) => cookie.name === 'sessionToken')
     ).toMatchSnapshot();
     // Check that we actually went through the form
-    expect(
-      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
-    ).toBeDefined();
+    expect(cookies.find((cookie) => cookie.name === '_csrf')).toBeDefined();
   });
 
   it('should works with a 2-steps JS login', async () => {
@@ -98,16 +96,12 @@ describe('login', () => {
 
     expect(res.statusCode).toBe(200);
 
-    const cookies = JSON.parse(body).cookies;
+    const cookies: Cookie[] = JSON.parse(body).cookies;
     expect(
-      cookies.find(
-        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
-      )
+      cookies.find((cookie) => cookie.name === 'sessionToken')
     ).toMatchSnapshot();
     // Check that we actually went through the form
-    expect(
-      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
-    ).toBeDefined();
+    expect(cookies.find((cookie) => cookie.name === '_csrf')).toBeDefined();
   });
 
   it('should works but not get a session token with bad credentials', async () => {
@@ -119,16 +113,12 @@ describe('login', () => {
 
     expect(res.statusCode).toBe(200);
 
-    const cookies = JSON.parse(body).cookies;
+    const cookies: Cookie[] = JSON.parse(body).cookies;
     expect(
-      cookies.find(
-        (cookie: Protocol.Network.Cookie) => cookie.name === 'sessionToken'
-      )
+      cookies.find((cookie) => cookie.name === 'sessionToken')
     ).toBeUndefined();
     // Check that we actually went through the form
-    expect(
-      cookies.find((cookie: Protocol.Network.Cookie) => cookie.name === '_csrf')
-    ).toBeDefined();
+    expect(cookies.find((cookie) => cookie.name === '_csrf')).toBeDefined();
   });
 });
 
@@ -138,15 +128,16 @@ describe('JavaScript redirect', () => {
       url: 'http://localhost:3000/secure/login?redirect=true',
       username: 'admin',
       password: 'password',
-      renderHTML: 'true',
+      renderHTML: true,
+      waitTime: {
+        min: 1000,
+      },
     });
 
-    // Page rending crashes because of the JS redirection (c.f. _renderLoginResult()), with the following error:
-    // Error: Execution context was destroyed, most likely because of a navigation.
-    expect(res.statusCode).toBe(500);
-
-    const jsonBody = JSON.parse(body);
-    expect(jsonBody.error).toBe('Invalid status code: undefined');
+    expect(res.statusCode).toBe(200);
+    expect(body).toBe(
+      '<!DOCTYPE html><html lang="en"><head></head><body>OK(/test)</body></html>'
+    );
   });
 
   it('should not try to render the body if renderHTML was not requested', async () => {
@@ -154,12 +145,24 @@ describe('JavaScript redirect', () => {
       url: 'http://localhost:3000/secure/login?redirect=true',
       username: 'admin',
       password: 'password',
+      waitTime: {
+        min: 1000,
+      },
     });
 
     // Since we didn't try to render, it returns the current cookies, even if there is an ongoing JS redirection
     expect(res.statusCode).toBe(200);
 
-    const jsonBody = JSON.parse(body);
-    expect(jsonBody.body).toBeUndefined();
+    const parsed: PostLoginSuccess = JSON.parse(body);
+    expect(parsed.body).toBe(
+      '<!DOCTYPE html><html lang="en"><head></head><body>OK(/test)</body></html>'
+    );
+    expect(parsed.timeout).toBe(true); // timeout since we don't do any network call
+    expect(parsed.statusCode).toBe(200);
+    expect(parsed.metrics.timings.total).toBeGreaterThan(1000);
+    expect(parsed.resolvedUrl).toBe('http://localhost:3000/secure/test');
+    expect(
+      parsed.cookies.find((cookie) => cookie.name === 'sessionToken')
+    ).toMatchSnapshot();
   });
 });

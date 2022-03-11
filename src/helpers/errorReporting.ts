@@ -1,5 +1,7 @@
 import * as Sentry from '@sentry/node';
 
+import { log } from './logger';
+
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   release: process.env.npm_package_version,
@@ -11,11 +13,11 @@ Sentry.init({
 
 export function report(err: Error, extra: any = {}): void {
   if (!process.env.SENTRY_DSN) {
-    console.error(err, extra);
+    log.error(err.message, err.stack, extra);
     return;
   }
 
-  console.error(err.message);
+  log.error(err.message);
   Sentry.withScope((scope) => {
     scope.setExtras(extra);
     Sentry.captureException(err);

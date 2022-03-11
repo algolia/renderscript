@@ -1,5 +1,10 @@
 import type express from 'express';
 
+import type {
+  PostRenderParams,
+  PostRenderResponse,
+} from 'api/@types/postRender';
+import type { Res500 } from 'api/@types/responses';
 import { CSP_HEADERS } from 'api/constants';
 import { getDefaultParams, alt } from 'api/helpers/alt';
 import { revertUrl } from 'api/helpers/buildUrl';
@@ -7,7 +12,7 @@ import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
 import { report } from 'helpers/errorReporting';
 import { tasksManager } from 'lib/singletons';
-import type { TaskFromAPI } from 'lib/types';
+import { RenderTask } from 'lib/tasks/Render';
 
 export async function validate(
   req: express.Request<any, any, any, any>,
@@ -27,31 +32,35 @@ export async function validate(
 }
 
 export async function render(
-  req: express.Request<any, any, any, TaskFromAPI>,
-  res: express.Response
+  req: express.Request<any, any, any, PostRenderParams>,
+  res: express.Response<Res500 | string | null>
 ): Promise<void> {
   const { url: rawUrl, ua, waitTime, adblock } = req.query;
   const headersToForward = getForwardedHeadersFromRequest(req);
   const url = new URL(rawUrl);
 
   try {
-    const { error, statusCode, body, resolvedUrl } = await tasksManager.task({
-      type: 'render',
-      url,
-      headersToForward,
-      userAgent: ua,
-      waitTime,
-      adblock,
-    });
-    if (error) {
-      res.status(400).json({ error });
-      return;
-    }
+    const { error, statusCode, body, resolvedUrl } = await tasksManager.task(
+      new RenderTask({
+        url,
+        headersToForward,
+        userAgent: ua,
+        waitTime,
+        adblock,
+      })
+    );
+
     if (resolvedUrl && resolvedUrl !== url.href) {
       const location = revertUrl(resolvedUrl).href;
       res.status(307).header('Location', location).send();
       return;
     }
+
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+
     res
       .status(statusCode!)
       .header('Content-Type', 'text/html')
@@ -66,41 +75,32 @@ export async function render(
 }
 
 export async function renderJSON(
-  req: express.Request<any, any, TaskFromAPI>,
-  res: express.Response
+  req: express.Request<any, any, PostRenderParams>,
+  res: express.Response<PostRenderResponse>
 ): Promise<void> {
   const { url: rawUrl, ua, waitTime, adblock } = req.body;
   const headersToForward = getForwardedHeadersFromRequest(req);
   const url = new URL(rawUrl);
 
   try {
-    const { error, statusCode, headers, body, timeout, resolvedUrl, metrics } =
-      await tasksManager.task({
-        type: 'render',
+    const task = await tasksManager.task(
+      new RenderTask({
         url,
         headersToForward,
         userAgent: ua,
         waitTime,
         adblock,
-      });
-
-    if (error) {
-      res.status(400).json({ error });
-      return;
-    }
-
-    if (resolvedUrl && resolvedUrl !== url.href) {
-      const location = revertUrl(resolvedUrl).href;
-      res.status(307).header('Location', location).send();
-      return;
-    }
+      })
+    );
 
     res.status(200).json({
-      statusCode,
-      metrics,
-      headers,
-      body,
-      timeout,
+      body: task.body,
+      headers: task.headers,
+      metrics: task.metrics,
+      resolvedUrl: task.resolvedUrl,
+      statusCode: task.statusCode,
+      timeout: task.timeout,
+      error: task.error,
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

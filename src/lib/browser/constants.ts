@@ -12,4 +12,12 @@ export const RESPONSE_IGNORED_ERRORS = [
 
 export const REQUEST_IGNORED_ERRORS = ['Request is already handled'];
 
+export const GOTO_IGNORED_ERRORS = ['Navigation timeout'];
+
 export const VALIDATE_URL_IGNORED_ERRORS = ['ENOTFOUND', 'EAI_AGAIN'];
+
+export const METRICS_IGNORED_ERRORS = [
+  // Navigation or page closed, okay for metrics
+  'Target closed',
+  'Execution context was destroyed',
+];

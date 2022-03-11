@@ -5,4 +5,5 @@ module.exports = {
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   testMatch: ['<rootDir>/src/**/*.test.[jt]s'],
   globalSetup: '<rootDir>/jest.setup.ts',
+  setupFiles: ['dotenv/config'],
 };

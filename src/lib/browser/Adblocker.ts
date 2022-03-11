@@ -1,7 +1,12 @@
 import { request } from 'undici';
 
+import { log as mainLog } from 'helpers/logger';
+
+// TO DO: copy this at compile time.
 const list =
   'https://raw.githubusercontent.com/badmojr/1Hosts/master/Lite/domains.txt';
+
+const log = mainLog.child({ svc: 'adbk' });
 
 /**
  * Dead simple adblocking by exact hostname.
@@ -25,7 +30,11 @@ export class Adblocker {
         this.#hostnames.add(line);
       }
     }
-    console.log('Adblocker ready,', this.#hostnames.size, 'entries');
+
+    log.info('Ready', {
+      entries: this.#hostnames.size,
+      lastMod: res.headers['last-modified'],
+    });
   }
 
   match(url: URL): boolean {
