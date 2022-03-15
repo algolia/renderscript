@@ -1,21 +1,17 @@
 import type { PostRenderSuccess } from 'api/@types/postRender';
 
-import { cleanString, request } from './helpers';
+import { cleanString, postRender, request } from './helpers';
 
 describe('server redirect', () => {
   it('should return the redirection', async () => {
     // !---
     // Server Redirect are flaky since Playwright do not catch 301
     // You might want to relaunch the test if it failed.
-    const { res, body } = await request('http://localhost:3000/render', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
+    const { res, body } = await postRender({
+      url: 'http://localhost:3000/301',
+      waitTime: {
+        min: 5000, // wait long to be sure we end up being redirected
       },
-      body: JSON.stringify({
-        url: 'http://localhost:3000/301',
-        ua: 'Algolia Crawler',
-      }),
     });
 
     const json: PostRenderSuccess = JSON.parse(body);
@@ -40,15 +36,9 @@ describe('server redirect', () => {
 
 describe('meta refresh', () => {
   it('should return the redirection', async () => {
-    const { res, body } = await request('http://localhost:3000/render', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        url: 'http://localhost:3000/test-website/meta-refresh.html',
-        ua: 'Algolia Crawler',
-      }),
+    const { res, body } = await postRender({
+      url: 'http://localhost:3000/test-website/meta-refresh.html',
+      ua: 'Algolia Crawler',
     });
 
     const json: PostRenderSuccess = JSON.parse(body);
@@ -68,19 +58,13 @@ describe('meta refresh', () => {
   });
 
   it('should return the redirection even if not executed yet', async () => {
-    const { res, body } = await request('http://localhost:3000/render', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
+    const { res, body } = await postRender({
+      // The client redirection happens after 5sec but we only wait 2sec
+      url: 'http://localhost:3000/test-website/meta-refresh-5.html',
+      ua: 'Algolia Crawler',
+      waitTime: {
+        max: 2000,
       },
-      body: JSON.stringify({
-        // The client redirection happens after 5sec but we only wait 2sec
-        url: 'http://localhost:3000/test-website/meta-refresh-5.html',
-        ua: 'Algolia Crawler',
-        waitTime: {
-          max: 2000,
-        },
-      }),
     });
 
     const json: PostRenderSuccess = JSON.parse(body);
@@ -102,18 +86,12 @@ describe('meta refresh', () => {
 
 describe('js redirects', () => {
   it('should catch redirection', async () => {
-    const { res, body } = await request('http://localhost:3000/render', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
+    const { res, body } = await postRender({
+      url: 'http://localhost:3000/test-website/js-redirect.html?to=/test-website/basic.html',
+      ua: 'Algolia Crawler',
+      waitTime: {
+        max: 2000,
       },
-      body: JSON.stringify({
-        url: 'http://localhost:3000/test-website/js-redirect.html?to=/test-website/basic.html',
-        ua: 'Algolia Crawler',
-        waitTime: {
-          max: 2000,
-        },
-      }),
     });
 
     const json: PostRenderSuccess = JSON.parse(body);

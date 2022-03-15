@@ -44,7 +44,8 @@ export class RenderTask extends Task<RenderTaskParams> {
     await this.saveMetrics();
     this.setMetric('goto');
 
-    await this.saveStatus(response);
+    // In case of redirection, initialResponse is prefered since response is probably now incorrect
+    await this.saveStatus(this.page.initialResponse || response);
 
     if (this.page.redirection) {
       return;

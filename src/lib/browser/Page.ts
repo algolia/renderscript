@@ -45,6 +45,7 @@ export class BrowserPage {
   };
   #redirection?: string;
   #hasTimeout: boolean = false;
+  #initialResponse?: Response;
 
   get page(): Page | undefined {
     return this.#page;
@@ -64,6 +65,10 @@ export class BrowserPage {
 
   get redirection(): string | undefined {
     return this.#redirection;
+  }
+
+  get initialResponse(): Response | undefined {
+    return this.#initialResponse;
   }
 
   constructor(context: BrowserContext) {
@@ -179,6 +184,11 @@ export class BrowserPage {
    */
   async saveMetrics(): Promise<PageMetrics> {
     try {
+      if (!this.#page) {
+        // page has been closed or not yet open
+        return this.#metrics;
+      }
+
       const perf: {
         curr: PerformanceNavigationTiming;
         all: PerformanceEntryList;
@@ -403,6 +413,11 @@ export class BrowserPage {
       const reqUrl = res.url();
       const headers = await res.allHeaders();
       let length = 0;
+
+      // Store initial response in case of navigation
+      if (!this.#initialResponse) {
+        this.#initialResponse = res;
+      }
 
       if (headers['content-length']) {
         length = parseInt(headers['content-length'], 10);
