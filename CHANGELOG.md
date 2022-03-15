@@ -1,3 +1,16 @@
+# [1.13.0](https://github.com/algolia/renderscript/compare/v1.12.12...v1.13.0) (2022-03-15)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @sentry/node to v6.18.1 ([#573](https://github.com/algolia/renderscript/issues/573)) ([1fd8b7c](https://github.com/algolia/renderscript/commit/1fd8b7c129451dd6491b4247c8815afa9dd222b4))
+* simple solution for redirection ([#579](https://github.com/algolia/renderscript/issues/579)) ([6b99b8d](https://github.com/algolia/renderscript/commit/6b99b8d90fe15354cab6b700fa0da6fe704e35e9))
+
+
+### Features
+
+* use playwright ([#572](https://github.com/algolia/renderscript/issues/572)) ([89022e0](https://github.com/algolia/renderscript/commit/89022e0d9881ea83589263e32304b918add0307d))
+
 ## [1.12.12](https://github.com/algolia/renderscript/compare/v1.12.11...v1.12.12) (2022-02-27)
 
 
