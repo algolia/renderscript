@@ -1,3 +1,10 @@
+## [1.13.2](https://github.com/algolia/renderscript/compare/v1.13.1...v1.13.2) (2022-03-16)
+
+
+### Bug Fixes
+
+* **test:** adapt test image to new log ([#584](https://github.com/algolia/renderscript/issues/584)) ([91d6160](https://github.com/algolia/renderscript/commit/91d6160af2ff0347f282718607130942bf01eb05))
+
 ## [1.13.1](https://github.com/algolia/renderscript/compare/v1.13.0...v1.13.1) (2022-03-16)
 
 
