@@ -3,7 +3,7 @@
 set -ex
 
 hash=$(git rev-parse HEAD) # the last commit change because of semantic-release
-docker run -d --name renderscript_test -p 3000:3000 docker.io/algolia/renderscript:$hash
+docker run -d --name renderscript_test -p 3000:3000 algolia/renderscript:$hash
 
 echo "waiting for docker"
 sleepSec=10
