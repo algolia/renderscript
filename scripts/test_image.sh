@@ -3,14 +3,15 @@
 set -ex
 
 hash=$(git rev-parse HEAD) # the last commit change because of semantic-release
-docker run -d --platform linux/amd64 --name renderscript_test -p 3000:3000 algolia/renderscript:$hash
+docker run -d --name renderscript_test -p 3000:3000 algolia/renderscript:$hash
 
 echo "waiting for docker"
-sleep 20
+sleepSec=10
+sleep $sleepSec
 
-echo "slept for 20s"
+echo "slept for ${sleepSec}s"
 
-launched=$(docker logs renderscript_test 2>&1 | grep "Browser is ready")
+launched=$(docker logs renderscript_test 2>&1 | grep '"svc":"brws","msg":"Ready"')
 
 if [ -z "$launched" ]; then
   echo "Not ready"
