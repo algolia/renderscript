@@ -1,3 +1,21 @@
+# [2.0.0](https://github.com/algolia/renderscript/compare/v1.14.0...v2.0.0) (2022-03-16)
+
+
+### Features
+
+* v2 ([1294a61](https://github.com/algolia/renderscript/commit/1294a61180949cb4b4d031caddc54b104bc86db2))
+
+
+### BREAKING CHANGES
+
+* Replace Puppeteer by [Playwright](https://playwright.dev/).
+* API responses has changed, please read [README.md](https://github.com/algolia/renderscript/README.md).
+* Logging now output JSON.
+* iframe are now blocked by default.
+* `body` output now contains Doctype.
+* `waitTime` now defines Budget per process not per request.
+* Switch to Ubuntu image.
+
 # [1.14.0](https://github.com/algolia/renderscript/compare/v1.13.2...v1.14.0) (2022-03-16)
 
 
