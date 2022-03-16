@@ -9,7 +9,7 @@ echo "waiting for docker"
 sleepSec=10
 sleep $sleepSec
 
-echo "slept for $sleepSecs"
+echo "slept for ${sleepSec}s"
 
 launched=$(docker logs renderscript_test 2>&1 | grep '"svc":"brws","msg":"Ready"')
 
