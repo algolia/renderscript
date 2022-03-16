@@ -13,8 +13,9 @@ export async function isURLAllowed(url: string): Promise<boolean> {
   } catch (err: any) {
     if (!VALIDATE_URL_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
       report(new Error('Blocked url'), { err, url });
+      return false;
     }
-    return false;
+    return true;
   }
 
   return true;
