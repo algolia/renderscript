@@ -1,3 +1,10 @@
+## [1.13.1](https://github.com/algolia/renderscript/compare/v1.13.0...v1.13.1) (2022-03-16)
+
+
+### Bug Fixes
+
+* **deps:** pin dependency pino to v ([#583](https://github.com/algolia/renderscript/issues/583)) ([89b2d9d](https://github.com/algolia/renderscript/commit/89b2d9db6a060fe3c84fd5b8e060b8cc69b52ae6))
+
 # [1.13.0](https://github.com/algolia/renderscript/compare/v1.12.12...v1.13.0) (2022-03-15)
 
 
