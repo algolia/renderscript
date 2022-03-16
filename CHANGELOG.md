@@ -1,3 +1,11 @@
+# [1.14.0](https://github.com/algolia/renderscript/compare/v1.13.2...v1.14.0) (2022-03-16)
+
+
+### Features
+
+* major upgrade ([e91c3b3](https://github.com/algolia/renderscript/commit/e91c3b390325fedce83fb485bc19d9e9bd45805e))
+* major upgrade ([e554705](https://github.com/algolia/renderscript/commit/e55470544d9ae553dc41e506b1789670d1984509))
+
 ## [1.13.2](https://github.com/algolia/renderscript/compare/v1.13.1...v1.13.2) (2022-03-16)
 
 
