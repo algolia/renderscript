@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/algolia/renderscript/compare/v2.0.0...v2.0.1) (2022-03-19)
+
+
+### Bug Fixes
+
+* **deps:** update dependency playwright-chromium to v1.20.0 ([#587](https://github.com/algolia/renderscript/issues/587)) ([e7bd156](https://github.com/algolia/renderscript/commit/e7bd1568cbac027bc77cce500228a163011d5489))
+
 # [2.0.0](https://github.com/algolia/renderscript/compare/v1.14.0...v2.0.0) (2022-03-16)
 
 
