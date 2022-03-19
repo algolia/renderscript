@@ -86,7 +86,7 @@
     "express": "4.17.3",
     "hot-shots": "9.0.0",
     "pino": "7.8.0",
-    "playwright-chromium": "1.19.2",
+    "playwright-chromium": "1.20.0",
     "undici": "4.14.1",
     "uuid": "8.3.2"
   },
