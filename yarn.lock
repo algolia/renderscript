@@ -54,7 +54,7 @@ __metadata:
     jest: 27.5.1
     nodemon: 2.0.15
     pino: 7.8.0
-    pino-pretty: 7.5.3
+    pino-pretty: 7.5.4
     playwright-chromium: 1.20.0
     prettier: 2.5.1
     semantic-release: 19.0.2
@@ -7670,15 +7670,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino-pretty@npm:7.5.3":
-  version: 7.5.3
-  resolution: "pino-pretty@npm:7.5.3"
+"pino-pretty@npm:7.5.4":
+  version: 7.5.4
+  resolution: "pino-pretty@npm:7.5.4"
   dependencies:
     args: ^5.0.1
     colorette: ^2.0.7
     dateformat: ^4.6.3
     fast-safe-stringify: ^2.0.7
     joycon: ^3.1.1
+    on-exit-leak-free: ^0.2.0
     pino-abstract-transport: ^0.5.0
     pump: ^3.0.0
     readable-stream: ^3.6.0
@@ -7688,7 +7689,7 @@ __metadata:
     strip-json-comments: ^3.1.1
   bin:
     pino-pretty: bin.js
-  checksum: bb9f0d4b35754cf5205227e7ee66abbd787760bd3150ba9eb147a0b8858f1b55460ef577606a1388098199f9000af6586f45b6dfe27770afecad1390fef0b4bc
+  checksum: 73f1f0c751dfc77029826b252c11ad61cf4b3164bf9fb48297a772e5319ff8d8cdc9b9218e93e6e40418cbb80d7c74eb5d80c044b1aca46562fae33288fb416e
   languageName: node
   linkType: hard
 
