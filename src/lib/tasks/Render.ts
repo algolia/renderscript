@@ -1,5 +1,6 @@
 import type { Response } from 'playwright-chromium';
 
+import { cleanErrorMessage } from 'lib/helpers/errors';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { RenderTaskParams } from 'lib/types';
 
@@ -35,7 +36,7 @@ export class RenderTask extends Task<RenderTaskParams> {
         waitUntil: 'domcontentloaded',
       });
     } catch (err: any) {
-      this.results.error = err.message;
+      this.results.error = cleanErrorMessage(err);
 
       return;
     }

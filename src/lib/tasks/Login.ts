@@ -1,6 +1,7 @@
 import type { ElementHandle, Response, Request } from 'playwright-chromium';
 
 import { report } from 'helpers/errorReporting';
+import { cleanErrorMessage } from 'lib/helpers/errors';
 import type { LoginTaskParams } from 'lib/types';
 
 import { Task } from './Task';
@@ -122,7 +123,7 @@ export class LoginTask extends Task<LoginTaskParams> {
         pageUrl: page.url(),
       });
 
-      this.results.error = err.message;
+      this.results.error = cleanErrorMessage(err);
     }
 
     return null;
@@ -156,7 +157,7 @@ export class LoginTask extends Task<LoginTaskParams> {
         err: err.message,
         pageUrl: page.url(),
       });
-      this.results.error = err.message;
+      this.results.error = cleanErrorMessage(err);
       return;
     } finally {
       this.timeBudget.consume();
@@ -188,7 +189,7 @@ export class LoginTask extends Task<LoginTaskParams> {
         res = resAfterSpec;
       }
     } catch (err: any) {
-      this.results.error = err.message;
+      this.results.error = cleanErrorMessage(err);
       report(new Error('Error while spec'), {
         err: err.message,
         pageUrl: page.url(),
