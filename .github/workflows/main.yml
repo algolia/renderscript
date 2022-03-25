@@ -109,11 +109,11 @@ jobs:
           push: false
           tags: |
             algolia/renderscript-pw-chromium:latest
-            algolia/renderscript-pw-chromium:${{ env.RENDERSCRIPT_VERSION }}
+            algolia/renderscript-pw-chromium:${{ steps.env_var.outputs.RENDERSCRIPT_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            VERSION=${{ env.RENDERSCRIPT_VERSION }}
+            VERSION=${{ steps.env_var.outputs.RENDERSCRIPT_VERSION }}
 
       - name: Build Main Image
         uses: docker/build-push-action@v2.7.0
@@ -125,11 +125,11 @@ jobs:
           load: true
           tags: |
             algolia/renderscript:latest
-            algolia/renderscript:${{ env.RENDERSCRIPT_VERSION }}
+            algolia/renderscript:${{ steps.env_var.outputs.RENDERSCRIPT_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            VERSION=${{ env.RENDERSCRIPT_VERSION }}
+            VERSION=${{ steps.env_var.outputs.RENDERSCRIPT_VERSION }}
 
       - name: Test Image
         run: ./scripts/test_image.sh
@@ -144,8 +144,8 @@ jobs:
       #     push: true
       #     tags: |
       #       algolia/renderscript:latest
-      #       algolia/renderscript:${{ env.RENDERSCRIPT_VERSION }}
+      #       algolia/renderscript:${{ steps.env_var.outputs.RENDERSCRIPT_VERSION }}
       #     cache-from: type=gha
       #     cache-to: type=gha,mode=max
       #     build-args: |
-      #       VERSION=${{ env.RENDERSCRIPT_VERSION }}
+      #       VERSION=${{ steps.env_var.outputs.RENDERSCRIPT_VERSION }}
