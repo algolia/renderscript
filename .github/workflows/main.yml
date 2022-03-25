@@ -90,7 +90,7 @@ jobs:
         id: env_var
         shell: bash
         run: |
-          echo "::set-output name=RENDERSCRIPT_VERSION::$(node -e 'console.log(require(\'./package.json\').version)')"
+          echo "::set-output name=RENDERSCRIPT_VERSION::$(node -e 'console.log(require("./package.json").version)')"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
