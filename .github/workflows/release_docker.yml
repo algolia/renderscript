@@ -6,6 +6,9 @@ on:
   #   types:
   #     - completed
 
+  pull_request:
+    branches: [ master ]
+
   workflow_dispatch:
     inputs:
       is_release:
