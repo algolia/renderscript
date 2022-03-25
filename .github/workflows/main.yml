@@ -13,6 +13,8 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     name: Lint
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "true"
     steps:
       - uses: actions/checkout@v2
 
@@ -52,27 +54,46 @@ jobs:
       - name: Run test
         run: yarn test
 
+  release:
+    runs-on: ubuntu-latest
+    name: Tests
+    needs: tests
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - name: Release
+        run: yarn semantic-release
+
   build-docker:
     runs-on: ubuntu-latest
     name: Build Dockers
-    needs: tests
+    # needs: tests
     # if: github.ref == 'refs/heads/master'
 
     steps:
       - uses: actions/checkout@v2
 
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
       - name: Setting env var
         id: env_var
         shell: bash
         run: |
-          echo "::set-output name=RENDERSCRIPT_VERSION::$(node -e 'console.log(require('./package.json').version)'')"
-
+          echo "::set-output name=RENDERSCRIPT_VERSION::$(node -e 'console.log(require('./package.json').version)')"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-        with:
-          use: linux/amd64,linux/arm/v8
-        # For caching
 
       - uses: docker/login-action@v1
         with:
@@ -84,6 +105,7 @@ jobs:
         with:
           file: Dockerfile.pw
           context: .
+          platforms: linux/amd64,linux/arm64/v8
           push: false
           tags: |
             algolia/renderscript-pw-chromium:latest
@@ -98,7 +120,9 @@ jobs:
         with:
           file: Dockerfile
           context: .
+          platforms: linux/amd64,linux/arm64/v8
           push: false
+          load: true
           tags: |
             algolia/renderscript:latest
             algolia/renderscript:${{ env.RENDERSCRIPT_VERSION }}
@@ -106,3 +130,22 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             VERSION=${{ env.RENDERSCRIPT_VERSION }}
+
+      - name: Test Image
+        run: ./scripts/test_image.sh
+
+      # Cache should be reused from prev execution
+      # - name: Push
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     file: Dockerfile
+      #     context: .
+      #     platforms: linux/amd64,linux/arm64/v8
+      #     push: true
+      #     tags: |
+      #       algolia/renderscript:latest
+      #       algolia/renderscript:${{ env.RENDERSCRIPT_VERSION }}
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
+      #     build-args: |
+      #       VERSION=${{ env.RENDERSCRIPT_VERSION }}
