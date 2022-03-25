@@ -58,7 +58,7 @@ jobs:
         with:
           file: Dockerfile
           context: .
-          platforms: linux/amd64,linux/arm64/v8
+          platforms: linux/amd64 # buildx does not support multi-arch load
           push: false
           load: true
           tags: |
