@@ -111,6 +111,7 @@ jobs:
           tags: |
             algolia/renderscript:latest
             algolia/renderscript:${{ steps.env_var.outputs.RENDERSCRIPT_VERSION }}
+            algolia/renderscript:${{ env.COMMIT_SHA }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
