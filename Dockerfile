@@ -2,7 +2,7 @@ ARG VERSION
 ARG IMAGE_BASE=docker.io/algolia/renderscript-pw-chromium:${VERSION}
 
 # ------------------
-# New final image
+# New base image
 FROM ${IMAGE_BASE} as base
 
 ENV VERSION ${VERSION:-dev}
@@ -36,7 +36,7 @@ RUN true \
   && rm -rf .yarn/
 
 # ------------------
-# New final image
+# New final image that onlys contains built code
 FROM ${IMAGE_BASE} as final
 
 ARG VERSION
