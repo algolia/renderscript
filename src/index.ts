@@ -30,7 +30,10 @@ process.on('uncaughtException', (reason) => {
 });
 
 (async (): Promise<void> => {
-  log.info('Starting...', { env: process.env.NODE_ENV });
+  log.info('Starting...', {
+    env: process.env.NODE_ENV,
+    v: process.env.VERSION,
+  });
 
   const api = new Api();
   api.start(PORT);
