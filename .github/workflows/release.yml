@@ -1,0 +1,29 @@
+name: Release Docker
+on:
+  workflow_run:
+    workflows: ["Renderscript"]
+    branches: [master]
+    types:
+      - completed
+
+env:
+  COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    name: Release
+    needs: tests
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - name: Release
+        run: yarn semantic-release
