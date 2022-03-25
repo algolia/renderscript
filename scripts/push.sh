@@ -8,6 +8,8 @@ current=$(node -e "console.log(require('./package.json').version)")
 echo "Pushing: $current"
 echo ""
 
+docker push "algolia/renderscript-pw-chromium:${current}"
+
 docker push "algolia/renderscript"
 docker push "algolia/renderscript:${current}"
 docker push "algolia/renderscript:${hash}"

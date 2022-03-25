@@ -1,10 +1,10 @@
-ARG IMAGE_BASE=docker.io/algolia/renderscript-pw-chromium
+ARG VERSION
+ARG IMAGE_BASE=docker.io/algolia/renderscript-pw-chromium:${VERSION}
 
 # ------------------
 # New final image
 FROM ${IMAGE_BASE} as base
 
-ARG VERSION
 ENV VERSION ${VERSION:-dev}
 ENV NODE_ENV production
 ENV IN_DOCKER true

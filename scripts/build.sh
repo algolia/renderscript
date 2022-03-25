@@ -11,10 +11,12 @@ echo ""
 
 docker build \
   --progress plain \
-  -t algolia/renderscript-pw-chromium \
+  -t algolia/renderscript-pw-chromium:${current} \
   --build-arg "VERSION=${current}" \
   -f Dockerfile.pw \
   .
+
+# Build renderscript
 
 docker build \
   --progress plain \

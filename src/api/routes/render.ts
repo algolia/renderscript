@@ -97,7 +97,7 @@ export async function renderJSON(
       body: task.body,
       headers: task.headers,
       metrics: task.metrics,
-      resolvedUrl: task.resolvedUrl,
+      resolvedUrl: task.resolvedUrl ? revertUrl(task.resolvedUrl).href : null,
       statusCode: task.statusCode,
       timeout: task.timeout,
       error: task.error,
