@@ -1,3 +1,10 @@
+## [2.1.2](https://github.com/algolia/renderscript/compare/v2.1.1...v2.1.2) (2022-03-25)
+
+
+### Bug Fixes
+
+* chown using pwuser ([1e4f579](https://github.com/algolia/renderscript/commit/1e4f57944941c634d141cd4900d51b08ce23b628))
+
 ## [2.1.1](https://github.com/algolia/renderscript/compare/v2.1.0...v2.1.1) (2022-03-25)
 
 
