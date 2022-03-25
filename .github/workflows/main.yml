@@ -10,10 +10,52 @@ env:
   COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - run: yarn install
+
+      - name: Run Linter
+        run: yarn lint
+
+  tests:
+    runs-on: ubuntu-latest
+    name: Tests
+    needs: lint
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+
+      - run: yarn install
+
+      - name: Build
+        run: yarn build
+
+      - name: Background process
+        run: |
+          yarn ci:start &
+
+      - name: Run test
+        run: yarn test
+
   build-docker:
     runs-on: ubuntu-latest
     name: Build Dockers
-    needs: integrations
+    needs: tests
     # if: github.ref == 'refs/heads/master'
 
     steps:
