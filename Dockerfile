@@ -51,11 +51,11 @@ ENV IN_DOCKER true
 ENV PLAYWRIGHT_BROWSERS_PATH="/ms-playwright"
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD="true"
 
-# Copy install from previous stage
-WORKDIR /app/renderscript
-COPY --from=base --chown=node:node /app/tmp /app/renderscript
-
 # Do not use root to run the app
 USER pwuser
+
+# Copy install from previous stage
+WORKDIR /app/renderscript
+COPY --from=base --chown=pwuser:pwuser /app/tmp /app/renderscript
 
 CMD [ "node", "dist/index.js" ]
