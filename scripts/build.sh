@@ -9,7 +9,8 @@ echo ""
 
 # Build base image
 
-docker build \
+docker buildx build \
+  --platform linux/arm64/v8,linux/amd64 \
   --progress plain \
   -t algolia/renderscript-pw-chromium:${current} \
   --build-arg "VERSION=${current}" \
@@ -18,7 +19,8 @@ docker build \
 
 # Build renderscript
 
-docker build \
+docker buildx build \
+  --platform linux/arm64/v8,linux/amd64 \
   --progress plain \
   -t algolia/renderscript \
   -t "algolia/renderscript:${current}" \
