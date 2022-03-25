@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/algolia/renderscript/compare/v2.1.0...v2.1.1) (2022-03-25)
+
+
+### Bug Fixes
+
+* **docker:** improve dockerfile size ([#592](https://github.com/algolia/renderscript/issues/592)) ([db395fd](https://github.com/algolia/renderscript/commit/db395fd7f6be80cb308942f6ab980da235516b67))
+
 # [2.1.0](https://github.com/algolia/renderscript/compare/v2.0.1...v2.1.0) (2022-03-21)
 
 
