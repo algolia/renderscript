@@ -56,7 +56,7 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    name: Tests
+    name: Release
     needs: tests
     if: github.ref == 'refs/heads/master'
     steps:
@@ -118,7 +118,7 @@ jobs:
             VERSION=${{ steps.env_var.outputs.RENDERSCRIPT_VERSION }}
 
       - name: Test Image
-        run: ./scripts/test_image.sh
+        run: ./scripts/test_image.sh ${{ env.COMMIT_SHA }}
 
       # Cache should be reused from prev execution
       # - name: Push
