@@ -77,17 +77,15 @@ export const IGNORED_RESOURCES = [
   'manifest',
   'texttrack',
 ];
-export const PAGE_BUFFER_SIZE = 2;
-export const DATA_REGEXP = /^data:/i;
 
-export const MAX_RENDERER_TASKS = 256;
+export const DATA_REGEXP = /^data:/i;
 
 export const WAIT_TIME = {
   min: 500,
   max: 20000,
 };
 
-export const UNHEALTHY_TASK_TTL = 21 * 1000;
+export const UNHEALTHY_TASK_TTL = 30 * 1000;
 
 export const MAX_WAIT_FOR_NEW_PAGE = process.env.MAX_WAIT_FOR_NEW_PAGE
   ? parseInt(process.env.MAX_WAIT_FOR_NEW_PAGE, 10)

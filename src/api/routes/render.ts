@@ -7,7 +7,7 @@ import type {
 import type { Res500 } from 'api/@types/responses';
 import { CSP_HEADERS } from 'api/constants';
 import { getDefaultParams, alt } from 'api/helpers/alt';
-import { revertUrl } from 'api/helpers/buildUrl';
+import { buildUrl, revertUrl } from 'api/helpers/buildUrl';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
 import { report } from 'helpers/errorReporting';
@@ -37,7 +37,7 @@ export async function render(
 ): Promise<void> {
   const { url: rawUrl, ua, waitTime, adblock } = req.query;
   const headersToForward = getForwardedHeadersFromRequest(req);
-  const url = new URL(rawUrl);
+  const url = new URL(buildUrl(rawUrl));
 
   try {
     const { error, statusCode, body, resolvedUrl } = await tasksManager.task(
@@ -80,7 +80,7 @@ export async function renderJSON(
 ): Promise<void> {
   const { url: rawUrl, ua, waitTime, adblock } = req.body;
   const headersToForward = getForwardedHeadersFromRequest(req);
-  const url = new URL(rawUrl);
+  const url = new URL(buildUrl(rawUrl));
 
   try {
     const task = await tasksManager.task(
