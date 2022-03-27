@@ -1,3 +1,11 @@
+## [2.1.4](https://github.com/algolia/renderscript/compare/v2.1.3...v2.1.4) (2022-03-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency pino to v7.9.2 ([#582](https://github.com/algolia/renderscript/issues/582)) ([7f638e7](https://github.com/algolia/renderscript/commit/7f638e77a9777d943e6e5aacd235f08424717d56))
+* **deps:** update dependency undici to v4.16.0 ([#581](https://github.com/algolia/renderscript/issues/581)) ([76ff27b](https://github.com/algolia/renderscript/commit/76ff27b790542d329f48d8b1b3e578c7ec7e5ee5))
+
 ## [2.1.3](https://github.com/algolia/renderscript/compare/v2.1.2...v2.1.3) (2022-03-27)
 
 
