@@ -2,7 +2,7 @@
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: cimg/node:16.14.0-browsers
+    - image: cimg/node:16.14.2-browsers
   environment:
     NODE_ENV: 'test'
     MAX_WAIT_FOR_NEW_PAGE: 40000
