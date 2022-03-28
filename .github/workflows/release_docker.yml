@@ -18,7 +18,6 @@ jobs:
   build-docker:
     runs-on: ubuntu-latest
     name: Build Dockers
-    if: (github.event.workflow_run.conclusion == 'success') || (github.event_name == 'workflow_dispatch')
 
     steps:
       - uses: actions/checkout@v2
