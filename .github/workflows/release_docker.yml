@@ -1,7 +1,7 @@
 name: Release Docker
 on:
   workflow_run:
-    workflows: ["Renderscript"]
+    workflows: ["Release Version"]
     branches: [master]
     types:
       - completed
