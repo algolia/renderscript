@@ -36,6 +36,7 @@ dist/
 .eslinrcjs
 .vscode
 .env.example
+.yarn/cache/
 release.config.js
 nodemon.json
 cypress.json

@@ -3,13 +3,6 @@
 # ------------------
 FROM ubuntu:focal as base
 
-ARG VERSION
-ENV VERSION ${VERSION:-dev}
-
-# Autolink repository https://docs.github.com/en/packages/learn-github-packages/connecting-a-repository-to-a-package
-LABEL org.opencontainers.image.source=https://github.com/algolia/renderscript
-LABEL org.opencontainers.image.revision=$VERSION
-
 # For tzdata
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=America/Los_Angeles
@@ -41,12 +34,20 @@ RUN mkdir /ms-playwright \
 
 
 # ------------------
+# package.json cache
+# ------------------
+FROM apteno/alpine-jq:2022-03-27 AS deps
+
+# To prevent cache invalidation from changes in fields other than dependencies
+COPY package.json /tmp
+RUN jq 'walk(if type == "object" then with_entries(select(.key | test("^jest|prettier|eslint|semantic|dotenv|nodemon") | not)) else . end) | { name, dependencies, devDependencies, packageManager }' < /tmp/package.json > /tmp/deps.json
+
+
+# ------------------
 # New base image
 # ------------------
 FROM base as tmp
 
-ENV VERSION ${VERSION:-dev}
-ENV NODE_ENV production
 ENV IN_DOCKER true
 ENV PLAYWRIGHT_BROWSERS_PATH="/ms-playwright"
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD="true"
@@ -56,17 +57,16 @@ WORKDIR /app/tmp
 
 # Copy and install dependencies separately from the app's code
 # To leverage Docker's cache when no dependency has change
-COPY package.json yarn.lock .yarnrc.yml ./
+COPY --from=deps /tmp/deps.json ./package.json
+COPY yarn.lock .yarnrc.yml ./
 COPY .yarn .yarn
 
 # Install dev dependencies
 RUN true \
-  # Use local version instead of letting yarn auto upgrade itself
-  && yarn set version $(ls -d $PWD/.yarn/releases/*) \
   && yarn install
 
 # This step will invalidates cache
-COPY . /app/tmp
+COPY . ./
 
 # Builds the UI, install chrome and remove dev dependencies
 RUN true \
@@ -76,7 +76,8 @@ RUN true \
   && rm -rf .yarn/
 
 # ------------------
-# New final image that onlys contains built code
+#  New final image that only contains built code
+# ------------------
 FROM base as final
 
 ARG VERSION

@@ -1,10 +1,12 @@
 name: Release Version
 on:
-  workflow_run:
-    workflows: ["Renderscript"]
-    branches: [master]
-    types:
-      - completed
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        required: true
+        type: boolean
+        default: 'true'
+        description: 'DryRun?'
 
 env:
   COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -14,6 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     name: Release
     if: (github.event.workflow_run.conclusion == 'success')
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      GIT_AUTHOR_NAME: ${{ secrets.GH_USER_NAME }}
+      GIT_AUTHOR_EMAIL:	${{ secrets.GH_USER_EMAIL }}
+      GIT_COMMITTER_NAME:	${{ secrets.GH_USER_NAME }}
+      GIT_COMMITTER_EMAIL: ${{ secrets.GH_USER_EMAIL }}
 
     steps:
       - uses: actions/checkout@v2
@@ -27,13 +35,14 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
 
+      - name: Release (--dry-run)
+        if: (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true')
+        run: |
+          yarn install
+          yarn semantic-release --dry-run
+
       - name: Release
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          GIT_AUTHOR_NAME: ${{ secrets.GH_USER_NAME }}
-          GIT_AUTHOR_EMAIL:	${{ secrets.GH_USER_EMAIL }}
-          GIT_COMMITTER_NAME:	${{ secrets.GH_USER_NAME }}
-          GIT_COMMITTER_EMAIL: ${{ secrets.GH_USER_EMAIL }}
+        if: (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run != 'true')
         run: |
           yarn install
           yarn semantic-release
