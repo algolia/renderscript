@@ -68,6 +68,7 @@ jobs:
 
       # Cache should be reused from prev execution
       - name: Push
+        if: (github.event_name == 'release') || (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run != 'true')
         uses: docker/build-push-action@v2
         with:
           file: Dockerfile
