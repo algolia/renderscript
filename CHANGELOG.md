@@ -1,3 +1,10 @@
+## [2.1.6](https://github.com/algolia/renderscript/compare/v2.1.5...v2.1.6) (2022-03-28)
+
+
+### Bug Fixes
+
+* **ci:** use custom email and author name for release ([d4f2b56](https://github.com/algolia/renderscript/commit/d4f2b5658c6b40706f9be3f15c80dd8b785b40ba))
+
 ## [2.1.5](https://github.com/algolia/renderscript/compare/v2.1.4...v2.1.5) (2022-03-28)
 
 
