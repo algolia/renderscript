@@ -1,3 +1,14 @@
+## [2.1.5](https://github.com/algolia/renderscript/compare/v2.1.4...v2.1.5) (2022-03-28)
+
+
+### Bug Fixes
+
+* **actions:** build docker only on release ([#603](https://github.com/algolia/renderscript/issues/603)) ([24ba4a1](https://github.com/algolia/renderscript/commit/24ba4a13cce7f5fd876291ea0984eecf42a86656))
+* **ci:** env is not automatically populated ([1cd78c0](https://github.com/algolia/renderscript/commit/1cd78c081b22f3e358465c53f7736d107d181498))
+* **ci:** use GH_TOKEN defined in secret ([083f334](https://github.com/algolia/renderscript/commit/083f3348a2b6acd9f8c84ce6c1f1b7322e111287))
+* **ci:** use github actions ([#593](https://github.com/algolia/renderscript/issues/593)) ([fac77b0](https://github.com/algolia/renderscript/commit/fac77b0d28e02cb0be1442e8114a3ce8934a2ff8))
+* use default github.token ([09accb7](https://github.com/algolia/renderscript/commit/09accb7511fbc3634f7a6ea08f3bca1169a607aa))
+
 ## [2.1.4](https://github.com/algolia/renderscript/compare/v2.1.3...v2.1.4) (2022-03-27)
 
 
