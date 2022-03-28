@@ -5,6 +5,8 @@ on:
     branches: [master]
     types:
       - completed
+  pull_request:
+    branches: [ master ]
 
 env:
   COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -26,4 +28,6 @@ jobs:
           cache: yarn
 
       - name: Release
-        run: yarn semantic-release
+        run: |
+          yarn install
+          yarn semantic-release --dry-run
