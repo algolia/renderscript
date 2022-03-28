@@ -8,6 +8,7 @@ on:
 
 env:
   COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
 jobs:
   release:
