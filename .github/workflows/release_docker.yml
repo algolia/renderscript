@@ -1,17 +1,15 @@
 name: Release Docker
 on:
-  workflow_run:
-    workflows: ["Release Version"]
-    branches: [master]
-    types:
-      - completed
+  release:
+    types: [published]
 
   workflow_dispatch:
     inputs:
-      is_release:
+      dry_run:
         required: true
         type: boolean
-        description: "Is this a release image?"
+        default: 'true'
+        description: 'DryRun?'
 
 env:
   COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -71,7 +69,7 @@ jobs:
 
       # Cache should be reused from prev execution
       - name: Push
-        if: (github.ref == 'refs/heads/master') || (github.event_name == 'workflow_dispatch' && github.event.inputs.is_release == 'true')
+        if: (github.ref == 'refs/heads/master') || (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run != 'true')
         uses: docker/build-push-action@v2
         with:
           file: Dockerfile

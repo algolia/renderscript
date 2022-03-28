@@ -28,4 +28,4 @@ jobs:
       - name: Release
         run: |
           yarn install
-          yarn semantic-release --dry-run
+          yarn semantic-release
