@@ -35,6 +35,9 @@ dist/
 .eslintignore
 .eslinrcjs
 .vscode
+.env.example
+release.config.js
+nodemon.json
 cypress.json
 README.md
 CHANGELOG.md

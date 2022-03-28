@@ -1,8 +1,8 @@
 #! /bin/bash
 
-set -ex
+set -e
 
-hash=$(git rev-parse HEAD) # the last commit change because of semantic-release
+hash=$1 # the last commit change because of semantic-release
 docker run -d --name renderscript_test -p 3000:3000 algolia/renderscript:$hash
 
 echo "waiting for docker"
@@ -11,11 +11,32 @@ sleep $sleepSec
 
 echo "slept for ${sleepSec}s"
 
-launched=$(docker logs renderscript_test 2>&1 | grep '"svc":"brws","msg":"Ready"')
+curl --silent --request POST \
+  --url http://localhost:3000/render \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"url": "https://www.example.com",
+	"ua": "Renderscript CI",
+	"waitTime": {
+		"min": 1000,
+		"max": 3000
+	}
+}' >/dev/null
 
+logs=$(docker logs renderscript_test 2>&1)
+echo $logs
+
+launched=$(echo $logs | grep '"svc":"brws","msg":"Ready"')
 if [ -z "$launched" ]; then
   echo "Not ready"
   exit 1
 fi
 
+rendered=$(echo $logs | grep '"msg":"Done","data":')
+if [ -z "$rendered" ]; then
+  echo "Not rendered"
+  exit 1
+fi
+
 echo "Ready"
+docker stop renderscript_test && docker rm renderscript_test
