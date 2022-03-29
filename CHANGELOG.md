@@ -1,3 +1,10 @@
+## [2.1.7](https://github.com/algolia/renderscript/compare/v2.1.6...v2.1.7) (2022-03-29)
+
+
+### Bug Fixes
+
+* **release:** improve process and dockerfile again ([#604](https://github.com/algolia/renderscript/issues/604)) ([c75e356](https://github.com/algolia/renderscript/commit/c75e356c2965a76d30640b6c5bfaf445e445d568))
+
 ## [2.1.6](https://github.com/algolia/renderscript/compare/v2.1.5...v2.1.6) (2022-03-28)
 
 
