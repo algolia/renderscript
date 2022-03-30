@@ -85,8 +85,8 @@ export const WAIT_TIME = {
   max: 20000,
 };
 
-export const UNHEALTHY_TASK_TTL = 30 * 1000;
-
 export const MAX_WAIT_FOR_NEW_PAGE = process.env.MAX_WAIT_FOR_NEW_PAGE
   ? parseInt(process.env.MAX_WAIT_FOR_NEW_PAGE, 10)
   : 6000; // In feb 2022 p95 < 6s
+
+export const UNHEALTHY_TASK_TTL = (MAX_WAIT_FOR_NEW_PAGE + WAIT_TIME.max) * 2;

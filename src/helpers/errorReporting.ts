@@ -13,7 +13,7 @@ Sentry.init({
 
 export function report(err: Error, extra: any = {}): void {
   if (!process.env.SENTRY_DSN) {
-    log.error(err.message, err.stack, extra);
+    log.error({ err, extra });
     return;
   }
 

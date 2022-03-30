@@ -1,5 +1,6 @@
 import type { Response } from 'playwright-chromium';
 
+import { wait } from 'helpers/wait';
 import { cleanErrorMessage } from 'lib/helpers/errors';
 import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { RenderTaskParams } from 'lib/types';
@@ -27,7 +28,7 @@ export class RenderTask extends Task<RenderTaskParams> {
       await this.page?.saveMetrics();
 
       // Hard close of the page to avoid reaching the backend
-      await this.page?.page?.close();
+      await this.page?.close();
     });
 
     try {

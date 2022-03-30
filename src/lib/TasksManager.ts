@@ -4,6 +4,7 @@ import { stats } from 'helpers/stats';
 
 import { Browser } from './browser/Browser';
 import { UNHEALTHY_TASK_TTL } from './constants';
+import { cleanErrorMessage } from './helpers/errors';
 import type { Task } from './tasks/Task';
 import type { TaskObject, TaskFinal } from './types';
 
@@ -98,6 +99,16 @@ export class TasksManager {
     try {
       await task.createContext(this.#browser);
       await task.process();
+    } catch (err: any) {
+      // eslint-disable-next-line no-param-reassign
+      task.results.error = cleanErrorMessage(err);
+      if (task.results.error === 'unknown_error') {
+        // Task itself should never break the whole execution
+        report(err, { url });
+      }
+    }
+
+    try {
       await task.saveMetrics();
     } catch (err: any) {
       // Task itself should never break the whole execution
