@@ -1,3 +1,10 @@
+import type {
+  BrowserContext,
+  Page,
+  Route,
+  Response,
+} from 'playwright-chromium';
+
 import { report } from 'helpers/errorReporting';
 import { log } from 'helpers/logger';
 import { stats } from 'helpers/stats';
@@ -5,12 +12,6 @@ import { cleanErrorMessage } from 'lib/helpers/errors';
 import { isURLAllowed } from 'lib/helpers/validateURL';
 import { adblocker } from 'lib/singletons';
 import type { PageMetrics, TaskBaseParams } from 'lib/types';
-import type {
-  BrowserContext,
-  Page,
-  Route,
-  Response,
-} from 'playwright-chromium';
 
 import { DATA_REGEXP, IGNORED_RESOURCES } from '../constants';
 

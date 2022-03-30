@@ -1,6 +1,6 @@
 export type HandledError =
   | 'dns_error'
-  | 'fetch_abort'
+  | 'fetch_aborted'
   | 'fetch_timeout'
   | 'page_closed_too_soon';
 export type UnhandledError = 'unknown_error';
@@ -13,7 +13,7 @@ export function cleanErrorMessage(error: Error): HandledError | UnhandledError {
     return 'dns_error';
   }
   if (error.message.includes('ERR_ABORTED')) {
-    return 'fetch_abort';
+    return 'fetch_aborted';
   }
   if (
     error.message.includes('ETIMEDOUT') ||

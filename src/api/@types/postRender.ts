@@ -1,3 +1,4 @@
+import type { HandledError, UnhandledError } from 'lib/helpers/errors';
 import type { Metrics, TaskBaseParams } from 'lib/types';
 
 import type { Res500 } from './responses';
@@ -49,5 +50,5 @@ export interface PostRenderSuccess {
    * Any error encountered along the way.
    * If this field is filled that means the rest of the payload is partial.
    */
-  error: string | null;
+  error: HandledError | UnhandledError | null;
 }
