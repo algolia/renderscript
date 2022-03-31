@@ -1,3 +1,5 @@
+import { nextTick } from 'process';
+
 import type { Api } from 'api/index';
 import type { TasksManager } from 'lib/TasksManager';
 
@@ -45,6 +47,8 @@ export async function gracefulClose(opts: Params): Promise<void> {
   }
   log.flush();
 
-  // eslint-disable-next-line no-process-exit
-  process.exit(0);
+  nextTick(() => {
+    // eslint-disable-next-line no-process-exit
+    process.exit(0);
+  });
 }

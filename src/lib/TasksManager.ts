@@ -22,14 +22,22 @@ export class TasksManager {
     }
 
     // Tasks lifecycle
-    const lostTask: string[][] = [];
+    const tasks: any[][] = [];
     this.#tasks.forEach((task) => {
       if (Date.now() - task.ref.createdAt!.getTime() > UNHEALTHY_TASK_TTL) {
-        lostTask.push([task.ref.id, task.ref.params.url.href]);
+        tasks.push([
+          task.ref.id,
+          task.ref.params.url.href,
+          task.ref.isProcessed,
+          task.ref.results,
+        ]);
       }
     });
-    if (lostTask.length > 0) {
-      report(new Error('Many lost tasks'), { lostTask });
+    if (tasks.length > 0) {
+      report(new Error('Tasks running for too long'), {
+        tasks,
+        max: UNHEALTHY_TASK_TTL,
+      });
       return false;
     }
 
@@ -65,6 +73,10 @@ export class TasksManager {
    * Register and execute a task.
    */
   async task(task: Task): Promise<TaskFinal> {
+    if (!this.healthy) {
+      throw new Error('Unhealthy node received a job');
+    }
+
     const promise = this.#exec(task);
     this.#totalRun += 1;
     this.#tasks.set(task.id, {
@@ -135,6 +147,8 @@ export class TasksManager {
       stats.increment(`renderscript.task.requests.amount`, mp.requests.total);
       stats.histogram(`renderscript.task.blockedRequests`, mp.requests.blocked);
       stats.increment(`renderscript.task.blockedRequests.amount`, mp.requests.blocked);
+      stats.increment(`renderscript.task.contentLength.amount`, mp.contentLength.main);
+      stats.increment(`renderscript.task.contentLengthTotal.amount`, mp.contentLength.total);
       /* eslint-enable prettier/prettier */
     }
 
