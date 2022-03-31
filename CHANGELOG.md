@@ -1,3 +1,10 @@
+## [2.1.9](https://github.com/algolia/renderscript/compare/v2.1.8...v2.1.9) (2022-03-31)
+
+
+### Bug Fixes
+
+* unnecessary dot ([b29de34](https://github.com/algolia/renderscript/commit/b29de34ac1e300600cd847ddee249eb87ad4935a))
+
 ## [2.1.8](https://github.com/algolia/renderscript/compare/v2.1.7...v2.1.8) (2022-03-31)
 
 
