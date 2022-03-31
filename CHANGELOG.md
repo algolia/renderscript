@@ -1,3 +1,10 @@
+## [2.1.10](https://github.com/algolia/renderscript/compare/v2.1.9...v2.1.10) (2022-03-31)
+
+
+### Bug Fixes
+
+* missing metrics + more details on health check ([af5a97c](https://github.com/algolia/renderscript/commit/af5a97c25f0861e60214b918d1ed48b1f7da5b74))
+
 ## [2.1.9](https://github.com/algolia/renderscript/compare/v2.1.8...v2.1.9) (2022-03-31)
 
 
