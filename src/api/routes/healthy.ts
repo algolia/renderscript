@@ -3,6 +3,7 @@ import os from 'os';
 import type express from 'express';
 
 import type { GetHealthySuccess } from 'api/@types/getHealthy';
+import { log } from 'helpers/logger';
 import { stats } from 'helpers/stats';
 import { tasksManager } from 'lib/singletons';
 
@@ -28,6 +29,15 @@ export function healthy(
       hostname,
     }
   );
+
+  if (!isHealthy) {
+    log.error({
+      err: 'Reporting not healthy',
+      tasksRunning,
+      pagesOpen,
+      totalRun,
+    });
+  }
 
   res
     .status(isHealthy ? 200 : 503)

@@ -27,7 +27,7 @@ export class RenderTask extends Task<RenderTaskParams> {
       await this.page?.saveMetrics();
 
       // Hard close of the page to avoid reaching the backend
-      await this.page?.page?.close();
+      await this.page?.close();
     });
 
     try {

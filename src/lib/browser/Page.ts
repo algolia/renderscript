@@ -8,6 +8,7 @@ import type {
 import { report } from 'helpers/errorReporting';
 import { log } from 'helpers/logger';
 import { stats } from 'helpers/stats';
+import { cleanErrorMessage } from 'lib/helpers/errors';
 import { isURLAllowed } from 'lib/helpers/validateURL';
 import { adblocker } from 'lib/singletons';
 import type { PageMetrics, TaskBaseParams } from 'lib/types';
@@ -57,6 +58,10 @@ export class BrowserPage {
 
   get isReady(): boolean {
     return Boolean(this.#page && this.#context);
+  }
+
+  get isClosed(): boolean {
+    return this.#page?.isClosed() === true;
   }
 
   get hasTimeout(): boolean {
@@ -284,7 +289,7 @@ export class BrowserPage {
       await onNavigation(url);
 
       // We still report just in case.
-      report(new Error('unexpected navigation'), {
+      report(new Error('Unexpected navigation'), {
         pageUrl: originalUrl,
         to: url,
       });
@@ -301,7 +306,7 @@ export class BrowserPage {
       if (!redir || (redir && !main) || originalUrl === url) {
         return;
       }
-      log.info('Will navigate', { url });
+      log.info('Will navigate', { pageUrl: originalUrl, url });
 
       this.#redirection = url;
       await onNavigation(url);
@@ -410,6 +415,10 @@ export class BrowserPage {
         return;
       }
 
+      if (this.isClosed) {
+        return;
+      }
+
       const reqUrl = res.url();
       const headers = await res.allHeaders();
       let length = 0;
@@ -434,7 +443,7 @@ export class BrowserPage {
       }
 
       try {
-        if (length === 0) {
+        if (length === 0 && !this.isClosed) {
           // Not every request has the content-length header, the byteLength match perfectly
           // but does not necessarly represent what was transfered (if it was gzipped for example)
           length = (await res.body()).byteLength;
@@ -487,7 +496,10 @@ export class BrowserPage {
       log.debug('Meta refresh found', { redir: redirectURL.href });
 
       return redirectURL;
-    } catch (err) {
+    } catch (err: any) {
+      if (err instanceof Error && cleanErrorMessage(err) !== 'unknown_error') {
+        return;
+      }
       report(new Error('Error while trying to check for meta refresh'), {
         err,
         timeout: this.#hasTimeout,
