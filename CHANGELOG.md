@@ -1,3 +1,10 @@
+## [2.1.11](https://github.com/algolia/renderscript/compare/v2.1.10...v2.1.11) (2022-03-31)
+
+
+### Bug Fixes
+
+* increase verbosity for long tasks ([3ee891d](https://github.com/algolia/renderscript/commit/3ee891dcb1273dcca21ef979f6943d83be96fa05))
+
 ## [2.1.10](https://github.com/algolia/renderscript/compare/v2.1.9...v2.1.10) (2022-03-31)
 
 
