@@ -1,3 +1,10 @@
+## [2.1.8](https://github.com/algolia/renderscript/compare/v2.1.7...v2.1.8) (2022-03-31)
+
+
+### Bug Fixes
+
+* improve errors reporting ([#605](https://github.com/algolia/renderscript/issues/605)) ([72a51a3](https://github.com/algolia/renderscript/commit/72a51a36168542b4322a6a2fa0f13c1b7a9b2324))
+
 ## [2.1.7](https://github.com/algolia/renderscript/compare/v2.1.6...v2.1.7) (2022-03-29)
 
 
