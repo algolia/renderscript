@@ -101,6 +101,7 @@ export async function renderJSON(
       statusCode: task.statusCode,
       timeout: task.timeout,
       error: task.error,
+      rawError: task.rawError,
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

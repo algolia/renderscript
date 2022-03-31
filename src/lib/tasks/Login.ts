@@ -42,6 +42,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     log.info('Entering username...', { userName: login.username });
     const elTextInput = (await textInputLoc.elementHandle())!;
     await elTextInput.type(login.username, {
+      noWaitAfter: true,
       timeout: this.timeBudget.get(),
     });
     this.timeBudget.consume();
@@ -100,6 +101,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     try {
       // We submit the form
       await textInput!.press('Enter', {
+        noWaitAfter: true,
         timeout: this.timeBudget.limit(1000),
       });
       this.timeBudget.consume();
@@ -149,16 +151,12 @@ export class LoginTask extends Task<LoginTaskParams> {
           waitUntil: 'domcontentloaded',
         }),
         passwordInput.press('Enter', {
+          noWaitAfter: true,
           timeout: this.timeBudget.limit(1000),
         }),
       ]);
     } catch (err: any) {
-      report(new Error('Error while submit'), {
-        err: err.message,
-        pageUrl: page.url(),
-      });
-      this.results.error = cleanErrorMessage(err);
-      return;
+      this.page!.throwIfNotTimeout(err);
     } finally {
       this.timeBudget.consume();
     }

@@ -1,7 +1,6 @@
 import type { Response } from 'playwright-chromium';
 
 import { cleanErrorMessage } from 'lib/helpers/errors';
-import { injectBaseHref } from 'lib/helpers/injectBaseHref';
 import type { RenderTaskParams } from 'lib/types';
 
 import { Task } from './Task';
@@ -14,7 +13,6 @@ export class RenderTask extends Task<RenderTaskParams> {
 
     /* Setup */
     const { url } = this.params;
-    const baseHref = url.origin;
     const page = this.page.page!;
     let response: Response;
 
@@ -37,6 +35,7 @@ export class RenderTask extends Task<RenderTaskParams> {
       });
     } catch (err: any) {
       this.results.error = cleanErrorMessage(err);
+      this.results.rawError = err;
 
       return;
     }
@@ -53,7 +52,9 @@ export class RenderTask extends Task<RenderTaskParams> {
     }
 
     // Check for html refresh
-    const redirect = await this.page.checkForHttpEquivRefresh();
+    const redirect = await this.page.checkForHttpEquivRefresh({
+      timeout: this.timeBudget.limit(1000),
+    });
     this.setMetric('equiv');
     if (redirect) {
       this.results.error = 'redirection';
@@ -91,8 +92,8 @@ export class RenderTask extends Task<RenderTaskParams> {
     }
 
     /* Transforming */
-    await page.evaluate(injectBaseHref, baseHref);
-    const body = await page.content();
+    // await page.evaluate(injectBaseHref, baseHref);
+    const body = await this.page.renderBody();
     this.results.body = body;
     this.setMetric('serialize');
   }

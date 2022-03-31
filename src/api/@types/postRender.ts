@@ -51,4 +51,5 @@ export interface PostRenderSuccess {
    * If this field is filled that means the rest of the payload is partial.
    */
   error: HandledError | UnhandledError | null;
+  rawError: string | null;
 }

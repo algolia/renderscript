@@ -221,7 +221,6 @@ export class BrowserPage {
       };
     } catch (err: any) {
       if (!METRICS_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
-        log.error(err);
         report(new Error('Error saving metrics'), { err });
       }
     }
@@ -470,7 +469,11 @@ export class BrowserPage {
   /**
    * Returns the URL if found.
    */
-  async checkForHttpEquivRefresh(): Promise<URL | void> {
+  async checkForHttpEquivRefresh({
+    timeout,
+  }: {
+    timeout: number;
+  }): Promise<URL | void> {
     try {
       const metaRefreshElement = this.page!.locator(
         'meta[http-equiv="refresh"]'
@@ -480,7 +483,7 @@ export class BrowserPage {
         return;
       }
 
-      const el = (await metaRefreshElement.elementHandle())!;
+      const el = (await metaRefreshElement.elementHandle({ timeout }))!;
       const metaRefreshContent = await el.getProperty('content');
       const refreshContent = await metaRefreshContent?.jsonValue();
       const match = refreshContent?.match(/\d+;\s(?:url|URL)=(.*)/);

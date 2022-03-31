@@ -21,6 +21,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     body: null,
     headers: {},
     error: null,
+    rawError: null,
     resolvedUrl: null,
     cookies: [],
   };
@@ -109,7 +110,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     }
 
     await context.route('**/*', page.getOnRequestHandler(this.params));
-    await page.setDisableServiceWorker();
+    // does not work await page.setDisableServiceWorker();
 
     page.page!.on('response', page.getOnResponseHandler(this.params));
 
