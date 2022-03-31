@@ -3,8 +3,9 @@ import os from 'os';
 import type express from 'express';
 
 import type { GetHealthySuccess } from 'api/@types/getHealthy';
-import { log } from 'helpers/logger';
+import { report } from 'helpers/errorReporting';
 import { stats } from 'helpers/stats';
+import { UNHEALTHY_TASK_TTL } from 'lib/constants';
 import { tasksManager } from 'lib/singletons';
 
 const hostname = os.hostname();
@@ -13,7 +14,7 @@ export function healthy(
   req: express.Request,
   res: express.Response<GetHealthySuccess>
 ): void {
-  const isHealthy = tasksManager.healthy;
+  const health = tasksManager.getHealth();
   const tasksRunning = tasksManager.currentConcurrency;
   const pagesOpen = tasksManager.currentBrowser?.getCurrentConcurrency() || 0;
   const totalRun = tasksManager.totalRun;
@@ -24,15 +25,16 @@ export function healthy(
   stats.gauge('renderscript.pages.open', pagesOpen);
   stats.check(
     'renderscript.up',
-    isHealthy ? stats.CHECKS.OK : stats.CHECKS.CRITICAL,
+    health.ready ? stats.CHECKS.OK : stats.CHECKS.CRITICAL,
     {
       hostname,
     }
   );
 
-  if (!isHealthy) {
-    log.error({
-      err: 'Reporting not healthy',
+  if (!health.ready) {
+    report(new Error('Reporting not healthy'), {
+      tasks: health.oldTasks,
+      max: UNHEALTHY_TASK_TTL,
       tasksRunning,
       pagesOpen,
       totalRun,
@@ -40,6 +42,6 @@ export function healthy(
   }
 
   res
-    .status(isHealthy ? 200 : 503)
-    .json({ ready: isHealthy, tasksRunning, pagesOpen, totalRun });
+    .status(health.ready ? 200 : 503)
+    .json({ ready: health.ready, tasksRunning, pagesOpen, totalRun });
 }

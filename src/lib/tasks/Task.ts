@@ -45,7 +45,6 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   timeBudget: TimeBudget;
 
   #closed: boolean = false;
-  #processed: boolean = false;
   #context?: BrowserContext;
 
   constructor(params: TTaskType, logger?: Logger) {
@@ -64,12 +63,12 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     this.log = logger ?? log.child({ svc: 'task', ctx: { id: this.id } });
   }
 
-  get isProcessed(): boolean {
-    return this.#processed;
-  }
-
   get metrics(): Metrics {
     return this.#metrics;
+  }
+
+  get isDone(): boolean {
+    return this.#closed;
   }
 
   async close(): Promise<void> {
@@ -90,7 +89,6 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
    * Create the incognito context and the page so each task has a fresh start.
    */
   async createContext(browser: Browser): Promise<void> {
-    this.#processed = true;
     this.timeBudget.lastConsumption = Date.now();
     this.startedAt = new Date();
 

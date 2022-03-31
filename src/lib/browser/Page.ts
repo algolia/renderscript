@@ -145,6 +145,7 @@ export class BrowserPage {
 
     stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
       success: response ? 'true' : 'false',
+      waitUntil: opts?.waitUntil || 'unknown',
     });
 
     if (!response) {

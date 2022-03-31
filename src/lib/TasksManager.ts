@@ -16,36 +16,37 @@ export class TasksManager {
   #tasks: Map<string, TaskObject> = new Map();
   #totalRun: number = 0;
 
-  get healthy(): boolean {
+  getHealth(): { ready: boolean; oldTasks: string[][] } {
+    const oldTasks: any[][] = [];
+
     if (this.#stopping) {
-      return false;
+      return { ready: false, oldTasks };
     }
 
     // Tasks lifecycle
-    const tasks: any[][] = [];
     this.#tasks.forEach((task) => {
-      if (Date.now() - task.ref.createdAt!.getTime() > UNHEALTHY_TASK_TTL) {
-        tasks.push([
-          task.ref.id,
-          task.ref.params.url.href,
-          task.ref.isProcessed,
-          task.ref.results,
-        ]);
+      const duration = Date.now() - task.ref.createdAt!.getTime();
+      if (duration < UNHEALTHY_TASK_TTL) {
+        return;
       }
+      oldTasks.push([
+        duration,
+        task.ref.id,
+        task.ref.params.url.href,
+        JSON.stringify(task.ref.results),
+        task.ref.isDone,
+      ]);
     });
-    if (tasks.length > 0) {
-      report(new Error('Tasks running for too long'), {
-        tasks,
-        max: UNHEALTHY_TASK_TTL,
-      });
-      return false;
+
+    if (oldTasks.length > 0) {
+      return { ready: false, oldTasks };
     }
 
     if (this.#browser) {
-      return this.#browser.isReady;
+      return { ready: this.#browser.isReady, oldTasks };
     }
 
-    return false;
+    return { ready: false, oldTasks };
   }
 
   get currentBrowser(): Browser | null {
@@ -73,7 +74,7 @@ export class TasksManager {
    * Register and execute a task.
    */
   async task(task: Task): Promise<TaskFinal> {
-    if (!this.healthy) {
+    if (!this.getHealth().ready) {
       throw new Error('Unhealthy node received a job');
     }
 
@@ -83,9 +84,12 @@ export class TasksManager {
       ref: task,
       promise,
     });
-    return await promise.finally(() => {
+
+    try {
+      return await promise;
+    } finally {
       this.#tasks.delete(task.id);
-    });
+    }
   }
 
   /**
@@ -148,13 +152,19 @@ export class TasksManager {
       stats.histogram(`renderscript.task.blockedRequests`, mp.requests.blocked);
       stats.increment(`renderscript.task.blockedRequests.amount`, mp.requests.blocked);
       stats.increment(`renderscript.task.contentLength.amount`, mp.contentLength.main);
+      stats.histogram(`renderscript.task.contentLength`, mp.contentLength.main);
       stats.increment(`renderscript.task.contentLengthTotal.amount`, mp.contentLength.total);
+      stats.histogram(`renderscript.task.contentLengthTotal`, mp.contentLength.total);
       /* eslint-enable prettier/prettier */
     }
 
     log.info('Done', { id, url });
     const res = task.results;
-    return { ...res, timeout: task.page!.hasTimeout, metrics: task.metrics };
+    return {
+      ...res,
+      timeout: task.page?.hasTimeout || false,
+      metrics: task.metrics,
+    };
   }
 
   /**
