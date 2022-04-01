@@ -66,7 +66,6 @@ export class RenderTask extends Task<RenderTaskParams> {
         }),
         1000
       );
-      this.setMetric('equiv');
       if (redirect) {
         this.results.error = 'redirection';
         this.results.resolvedUrl = redirect.href;
@@ -77,6 +76,8 @@ export class RenderTask extends Task<RenderTaskParams> {
       if (!(err instanceof PromiseWithTimeoutError)) {
         throw err;
       }
+    } finally {
+      this.setMetric('equiv');
     }
 
     if (this.results.statusCode !== 200) {

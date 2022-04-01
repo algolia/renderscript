@@ -467,9 +467,6 @@ export class BrowserPage {
 
       // Redirections do not have a body
       if (status > 300 && status < 400) {
-        if (!res.request().frame().parentFrame()) {
-          this.#redirection = new URL(headers.location, url).href;
-        }
         return;
       }
 
