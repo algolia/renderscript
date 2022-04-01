@@ -102,7 +102,7 @@ export class TasksManager {
     if (this.#stopping) {
       throw new Error('Task can not be executed: stopping');
     }
-    if (!this.#browser) {
+    if (!this.#browser || this.#browser.isReady) {
       throw new Error('Task can not be executed: no_browser');
     }
 
