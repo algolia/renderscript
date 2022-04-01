@@ -21,6 +21,7 @@ export const METRICS_IGNORED_ERRORS = [
   // Navigation or page closed, okay for metrics
   'Target closed',
   'Execution context was destroyed',
+  'Renderscript Controlled Timeout',
 ];
 
 export const WIDTH = 1280;

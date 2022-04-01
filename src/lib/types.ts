@@ -32,6 +32,16 @@ export interface TaskBaseParams {
   };
 }
 
+export interface Perf {
+  curr: PerformanceNavigationTiming;
+  all: PerformanceEntryList;
+  mem: {
+    jsHeapSizeLimit?: number;
+    totalJSHeapSize?: number;
+    usedJSHeapSize?: number;
+  };
+}
+
 export type RenderTaskParams = TaskBaseParams;
 
 export interface LoginTaskParams extends TaskBaseParams {

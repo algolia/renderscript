@@ -94,6 +94,11 @@ export async function renderJSON(
       })
     );
 
+    if (!task.error && !task.body) {
+      // Tmp while trying to understand the issue.
+      report(new Error('No error but no body'), { task });
+    }
+
     const resolvedUrl = revertUrl(task.resolvedUrl)?.href || null;
     const code = task.error && retryableErrors.includes(task.error) ? 500 : 200;
     res.status(code).json({

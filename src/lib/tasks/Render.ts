@@ -1,5 +1,9 @@
 import type { Response } from 'playwright-chromium';
 
+import {
+  promiseWithTimeout,
+  PromiseWithTimeoutError,
+} from 'helpers/promiseWithTimeout';
 import { cleanErrorMessage } from 'lib/helpers/errors';
 import type { RenderTaskParams } from 'lib/types';
 
@@ -37,29 +41,42 @@ export class RenderTask extends Task<RenderTaskParams> {
       this.results.rawError = err;
 
       return;
+    } finally {
+      this.setMetric('goto');
     }
 
     // --- At this point we have just the DOM, but we want to do some checks
     await this.saveMetrics();
-    this.setMetric('goto');
 
     // In case of redirection, initialResponse is prefered since response is probably now incorrect
     await this.saveStatus(this.page.initialResponse || response);
 
     if (this.page.redirection) {
+      this.results.error = this.results.error || 'redirection';
+      this.results.resolvedUrl =
+        this.results.resolvedUrl || this.page.redirection;
       return;
     }
 
     // Check for html refresh
-    const redirect = await this.page.checkForHttpEquivRefresh({
-      timeout: this.timeBudget.limit(1000),
-    });
-    this.setMetric('equiv');
-    if (redirect) {
-      this.results.error = 'redirection';
-      this.results.resolvedUrl = redirect.href;
+    try {
+      const redirect = await promiseWithTimeout(
+        this.page.checkForHttpEquivRefresh({
+          timeout: this.timeBudget.limit(1000),
+        }),
+        1000
+      );
+      this.setMetric('equiv');
+      if (redirect) {
+        this.results.error = 'redirection';
+        this.results.resolvedUrl = redirect.href;
 
-      return;
+        return;
+      }
+    } catch (err) {
+      if (!(err instanceof PromiseWithTimeoutError)) {
+        throw err;
+      }
     }
 
     if (this.results.statusCode !== 200) {
@@ -76,9 +93,10 @@ export class RenderTask extends Task<RenderTaskParams> {
       });
     } catch (err: any) {
       this.page.throwIfNotTimeout(err);
+    } finally {
+      this.setMetric('ready');
     }
 
-    this.setMetric('ready');
     await this.minWait();
 
     this.checkFinalURL();

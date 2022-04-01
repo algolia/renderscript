@@ -83,6 +83,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     this.setMetric('close');
 
     this.metrics.timings.total = Date.now() - this.startedAt!.getTime();
+    this.#metrics.renderingBudget.consumed = this.timeBudget.consumed;
     this.#context = undefined;
   }
 
@@ -154,7 +155,6 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   async saveMetrics(): Promise<void> {
     try {
       this.#metrics.page = await this.page!.saveMetrics();
-      this.#metrics.renderingBudget.consumed = this.timeBudget.consumed;
     } catch (err) {
       // Can happen if target is already closed or redirection
     }

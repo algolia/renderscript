@@ -7,11 +7,15 @@ import type {
 
 import { report } from 'helpers/errorReporting';
 import { log } from 'helpers/logger';
+import {
+  promiseWithTimeout,
+  PromiseWithTimeoutError,
+} from 'helpers/promiseWithTimeout';
 import { stats } from 'helpers/stats';
 import { cleanErrorMessage } from 'lib/helpers/errors';
 import { isURLAllowed } from 'lib/helpers/validateURL';
 import { adblocker } from 'lib/singletons';
-import type { PageMetrics, TaskBaseParams } from 'lib/types';
+import type { PageMetrics, Perf, TaskBaseParams } from 'lib/types';
 
 import { DATA_REGEXP, IGNORED_RESOURCES } from '../constants';
 
@@ -192,29 +196,27 @@ export class BrowserPage {
    */
   async saveMetrics(): Promise<PageMetrics> {
     try {
-      if (!this.#ref) {
+      if (!this.#ref || this.#ref.isClosed()) {
         // page has been closed or not yet open
         return this.#metrics;
       }
 
-      const perf: {
-        curr: PerformanceNavigationTiming;
-        all: PerformanceEntryList;
-        mem: {
-          jsHeapSizeLimit?: number;
-          totalJSHeapSize?: number;
-          usedJSHeapSize?: number;
-        };
-      } = JSON.parse(
-        await this.#ref!.evaluate(() => {
+      const evaluate = await promiseWithTimeout(
+        this.#ref!.evaluate(() => {
           return JSON.stringify({
             curr: performance.getEntriesByType('navigation')[0],
             all: performance.getEntries(),
             // @ts-expect-error only exists in chromium
             mem: performance.memory || {},
           });
-        })
+        }),
+        200
       );
+
+      if (!evaluate) {
+        throw new Error('Getting perf error');
+      }
+      const perf: Perf = JSON.parse(evaluate);
 
       this.#metrics.timings.download = Math.round(perf.curr.duration || 0);
       this.#metrics.mem = {
@@ -226,6 +228,7 @@ export class BrowserPage {
         report(new Error('Error saving metrics'), { err });
       }
     }
+
     return this.#metrics;
   }
 
@@ -233,7 +236,19 @@ export class BrowserPage {
    * Output body as a string at the moment it is requested.
    */
   async renderBody(): Promise<string | null> {
-    return (await this.#ref?.content()) || null;
+    try {
+      return await promiseWithTimeout(
+        (async (): Promise<string | null> => {
+          return (await this.#ref?.content()) || null;
+        })(),
+        10000 // this is the most important part so we try hard
+      );
+    } catch (err) {
+      if (!(err instanceof PromiseWithTimeoutError)) {
+        throw err;
+      }
+    }
+    return null;
   }
 
   /**
