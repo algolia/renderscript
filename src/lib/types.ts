@@ -2,6 +2,23 @@ import type { Cookie } from 'playwright-chromium';
 
 import type { Task } from './tasks/Task';
 
+export type HandledError =
+  | 'body_serialisation_failed'
+  | 'connection_error'
+  | 'dns_error'
+  | 'fetch_aborted'
+  | 'fetch_timeout'
+  | 'field_not_found'
+  | 'forbidden_by_website'
+  | 'no_response_after_login'
+  | 'page_closed_too_soon'
+  | 'page_crashed'
+  | 'redirection'
+  | 'timedout'
+  | 'wrong_redirection';
+
+export type UnhandledError = 'unknown_error';
+
 export interface TaskBaseParams {
   url: URL;
   userAgent: string;
@@ -35,7 +52,7 @@ export interface TaskFinal extends TaskResult {
 export interface TaskResult {
   statusCode: number | null;
   body: string | null;
-  error: string | null;
+  error: HandledError | UnhandledError | null;
   rawError: Error | null;
   headers: Record<string, string>;
   resolvedUrl: string | null;

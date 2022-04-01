@@ -149,7 +149,7 @@ export class BrowserPage {
     });
 
     if (!response) {
-      // Just in case
+      // Can happen in case of chrome crash
       throw new Error('goto_no_response');
     }
 
@@ -288,8 +288,10 @@ export class BrowserPage {
         // Sub Frame we don't care
         return;
       }
-      console.log(originalUrl, new URL(newUrl).href);
-
+      if (newUrl.href === 'chrome-error://chromewebdata/') {
+        // Page crashed
+        return;
+      }
       if (!this.#redirection) {
         // Can happen that on('framenavigated') event comes before on('request')
         this.#redirection = newUrl.href;
@@ -355,51 +357,51 @@ export class BrowserPage {
       const reqUrl = req.url();
       this.#metrics.requests.total += 1;
 
-      if (this.#hasTimeout) {
-        // If the page was killed in the meantime we don't want to process anything else
-        route.abort('blockedbyclient');
-        return;
-      }
-
-      // Skip data URIs
-      if (DATA_REGEXP.test(reqUrl)) {
-        this.#metrics.requests.blocked += 1;
-        await route.abort('blockedbyclient');
-        return;
-      }
-
-      // Iframe block
-      if (req.frame().parentFrame()) {
-        this.#metrics.requests.blocked += 1;
-
-        await route.abort('blockedbyclient');
-        return;
-      }
-
-      // Ignore some type of resources
-      if (IGNORED_RESOURCES.includes(req.resourceType())) {
-        this.#metrics.requests.blocked += 1;
-
-        await route.abort('blockedbyclient');
-        return;
-      }
-
-      // Adblocking
-      if (adblock && adblocker.match(new URL(reqUrl))) {
-        this.#metrics.requests.blocked += 1;
-
-        await route.abort('blockedbyclient');
-        return;
-      }
-
-      // Check for ssrf attempts = page that redirects to localhost for example
-      if (!(await isURLAllowed(reqUrl))) {
-        this.#metrics.requests.blocked += 1;
-        await route.abort('blockedbyclient');
-        return;
-      }
-
       try {
+        if (this.#hasTimeout) {
+          // If the page was killed in the meantime we don't want to process anything else
+          await route.abort('blockedbyclient');
+          return;
+        }
+
+        // Skip data URIs
+        if (DATA_REGEXP.test(reqUrl)) {
+          this.#metrics.requests.blocked += 1;
+          await route.abort('blockedbyclient');
+          return;
+        }
+
+        // Iframe block
+        if (req.frame().parentFrame()) {
+          this.#metrics.requests.blocked += 1;
+
+          await route.abort('blockedbyclient');
+          return;
+        }
+
+        // Ignore some type of resources
+        if (IGNORED_RESOURCES.includes(req.resourceType())) {
+          this.#metrics.requests.blocked += 1;
+
+          await route.abort('blockedbyclient');
+          return;
+        }
+
+        // Adblocking
+        if (adblock && adblocker.match(new URL(reqUrl))) {
+          this.#metrics.requests.blocked += 1;
+
+          await route.abort('blockedbyclient');
+          return;
+        }
+
+        // Check for ssrf attempts = page that redirects to localhost for example
+        if (!(await isURLAllowed(reqUrl))) {
+          this.#metrics.requests.blocked += 1;
+          await route.abort('blockedbyclient');
+          return;
+        }
+
         if (req.isNavigationRequest()) {
           const headers = await req.allHeaders();
           await route.continue({

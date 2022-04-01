@@ -35,7 +35,8 @@ export class LoginTask extends Task<LoginTaskParams> {
       'input[type=text], input[type=email]'
     );
     if (!textInputLoc || (await textInputLoc.count()) <= 0) {
-      this.results.error = `field_not_found: input[type=text], input[type=email]`;
+      this.results.error = 'field_not_found';
+      this.results.rawError = new Error('input[type=text], input[type=email]');
       return;
     }
 
@@ -203,7 +204,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     if (!res) {
       if (this.page!.ref?.url() === url.href) {
         // Return an error if we got no login response and are still on the same URL
-        this.results.error = 'no_response';
+        this.results.error = 'no_response_after_login';
         return;
       }
 

@@ -9,7 +9,7 @@ import { v4 as uuid } from 'uuid';
 import { log as mainLog } from 'helpers/logger';
 import { stats } from 'helpers/stats';
 
-import { flags, HEIGHT, WIDTH } from '../constants';
+import { flags, HEIGHT, WIDTH } from './constants';
 
 const log = mainLog.child({ svc: 'brws' });
 

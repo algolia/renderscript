@@ -11,6 +11,7 @@ import { buildUrl, revertUrl } from 'api/helpers/buildUrl';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
 import { report } from 'helpers/errorReporting';
+import { retryableErrors } from 'lib/helpers/errors';
 import { tasksManager } from 'lib/singletons';
 import { RenderTask } from 'lib/tasks/Render';
 
@@ -94,8 +95,8 @@ export async function renderJSON(
     );
 
     const resolvedUrl = revertUrl(task.resolvedUrl)?.href || null;
-
-    res.status(200).json({
+    const code = task.error && retryableErrors.includes(task.error) ? 500 : 200;
+    res.status(code).json({
       body: task.body,
       headers: task.headers,
       metrics: task.metrics,
@@ -104,10 +105,10 @@ export async function renderJSON(
       timeout: task.timeout,
       error: task.error,
       rawError: task.rawError
-        ? JSON.stringify({
+        ? {
             message: task.rawError.message,
             stack: task.rawError.stack,
-          })
+          }
         : null,
     });
   } catch (err: any) {
