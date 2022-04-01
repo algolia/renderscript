@@ -33,7 +33,7 @@ export class RenderTask extends Task<RenderTaskParams> {
         waitUntil: 'domcontentloaded',
       });
     } catch (err: any) {
-      this.results.error = cleanErrorMessage(err);
+      this.results.error = this.results.error || cleanErrorMessage(err);
       this.results.rawError = err;
 
       return;
@@ -82,11 +82,8 @@ export class RenderTask extends Task<RenderTaskParams> {
     this.setMetric('ready');
     await this.minWait();
 
-    const newUrl = this.page.ref?.url();
-    if (newUrl !== url.href) {
-      // Redirection was not caught this should not happen
-      this.results.error = 'wrong_redirection';
-      this.results.resolvedUrl = newUrl || 'unknown';
+    this.checkFinalURL();
+    if (this.results.error) {
       return;
     }
 
@@ -95,5 +92,22 @@ export class RenderTask extends Task<RenderTaskParams> {
     const body = await this.page.renderBody();
     this.results.body = body;
     this.setMetric('serialize');
+  }
+
+  private checkFinalURL(): void {
+    const newUrl = this.page!.ref?.url() ? new URL(this.page!.ref.url()) : null;
+    if (!newUrl) {
+      // Redirection was not caught this should not happen
+      this.results.error = 'wrong_redirection';
+      this.results.resolvedUrl = 'about:blank/';
+      return;
+    }
+
+    newUrl.hash = '';
+    if (newUrl.href !== this.params.url.href) {
+      // Redirection was not caught this should not happen
+      this.results.error = 'wrong_redirection';
+      this.results.resolvedUrl = newUrl.href;
+    }
   }
 }

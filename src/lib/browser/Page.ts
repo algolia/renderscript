@@ -279,21 +279,27 @@ export class BrowserPage {
     onNavigation: (url: string) => Promise<void>
   ): void {
     this.#ref?.on('framenavigated', async (frame) => {
-      if (originalUrl === frame.url()) {
+      const newUrl = new URL(frame.url());
+      newUrl.hash = '';
+      if (originalUrl === newUrl.href) {
         return;
       }
       if (frame.parentFrame()) {
         // Sub Frame we don't care
         return;
       }
+      console.log(originalUrl, new URL(newUrl).href);
 
-      const url = frame.url();
-      await onNavigation(url);
+      if (!this.#redirection) {
+        // Can happen that on('framenavigated') event comes before on('request')
+        this.#redirection = newUrl.href;
+      }
+      await onNavigation(newUrl.href);
 
       // We still report just in case.
       report(new Error('Unexpected navigation'), {
         pageUrl: originalUrl,
-        to: url,
+        to: newUrl,
       });
     });
 

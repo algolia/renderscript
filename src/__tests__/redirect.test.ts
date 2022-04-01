@@ -110,6 +110,55 @@ describe('js redirects', () => {
     expect(json.metrics.timings.close).toBeGreaterThanOrEqual(0);
   });
 
+  it('should catch path', async () => {
+    const { res, body } = await postRender({
+      url: 'http://localhost:3000/test-website/js-redirect-path.html',
+      ua: 'Algolia Crawler',
+      waitTime: {
+        min: 2000,
+      },
+    });
+
+    const json: PostRenderSuccess = JSON.parse(body);
+    expect(res.statusCode).toBe(200);
+
+    expect(json.statusCode).toBe(200);
+    expect(json.body).toBeNull();
+    expect(json.resolvedUrl).toBe(
+      'http://localhost:3000/test-website/basic.html'
+    );
+    expect(json.error).toBe('redirection');
+
+    // Make sure execution was interrupted gracefully
+    expect(json.metrics.timings.total).toBeGreaterThan(0);
+    expect(json.metrics.timings.serialize).toBeNull();
+    expect(json.metrics.timings.close).toBeGreaterThanOrEqual(0);
+  });
+
+  it('should catch hash but render normally', async () => {
+    const { res, body } = await postRender({
+      url: 'http://localhost:3000/test-website/js-redirect-hash.html',
+      ua: 'Algolia Crawler',
+      waitTime: {
+        min: 2000,
+      },
+    });
+
+    const json: PostRenderSuccess = JSON.parse(body);
+    expect(res.statusCode).toBe(200);
+
+    expect(json.statusCode).toBe(200);
+    expect(json.body).toBe(
+      `<!DOCTYPE html><html><head> </head>\n\n<body>\n  <script>window.location.hash = \"#redirection\";</script>\n\n\n\n</body></html>`
+    );
+    expect(json.error).toBeNull();
+
+    // Make sure execution was interrupted gracefully
+    expect(json.metrics.timings.total).toBeGreaterThan(0);
+    expect(json.metrics.timings.serialize).toBeGreaterThan(0);
+    expect(json.metrics.timings.close).toBeGreaterThanOrEqual(0);
+  });
+
   it('should output 307', async () => {
     const { res, body } = await request(
       `http://localhost:3000/render?url=http%3A%2F%2Flocalhost%3A3000%2Ftest-website%2Fjs-redirect.html?to=${encodeURIComponent(
