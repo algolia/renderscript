@@ -311,13 +311,17 @@ export class BrowserPage {
         // Can happen that on('framenavigated') event comes before on('request')
         this.#redirection = newUrl.href;
       }
+
       await onNavigation(newUrl.href);
 
       // We still report just in case.
-      report(new Error('Unexpected navigation'), {
-        pageUrl: originalUrl,
-        to: newUrl.href,
-      });
+      log.warn(
+        {
+          pageUrl: originalUrl,
+          to: newUrl.href,
+        },
+        'Unexpected navigation'
+      );
     });
 
     this.#ref?.on('request', async (req) => {

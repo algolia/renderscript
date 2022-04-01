@@ -118,7 +118,7 @@ export class TasksManager {
       await task.process();
     } catch (err: any) {
       // eslint-disable-next-line no-param-reassign
-      task.results.error = cleanErrorMessage(err);
+      task.results.error = task.results.error || cleanErrorMessage(err);
       // eslint-disable-next-line no-param-reassign
       task.results.rawError = err;
       if (task.results.error === 'unknown_error') {
@@ -161,7 +161,7 @@ export class TasksManager {
       /* eslint-enable prettier/prettier */
     }
 
-    log.info('Done', { id, url });
+    log.info({ id, url, code: task.results.error }, 'Done');
     const res = task.results;
     return {
       ...res,

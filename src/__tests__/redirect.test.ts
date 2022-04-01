@@ -135,6 +135,31 @@ describe('js redirects', () => {
     expect(json.metrics.timings.close).toBeGreaterThanOrEqual(0);
   });
 
+  it('should catch history pushState', async () => {
+    const { res, body } = await postRender({
+      url: 'http://localhost:3000/test-website/js-redirect-history.html',
+      ua: 'Algolia Crawler',
+      waitTime: {
+        min: 2000,
+      },
+    });
+
+    const json: PostRenderSuccess = JSON.parse(body);
+    expect(res.statusCode).toBe(200);
+
+    expect(json.statusCode).toBe(200);
+    expect(json.body).toBeNull();
+    expect(json.resolvedUrl).toBe(
+      'http://localhost:3000/test-website/basic.html'
+    );
+    expect(json.error).toBe('redirection');
+
+    // Make sure execution was interrupted gracefully
+    expect(json.metrics.timings.total).toBeGreaterThan(0);
+    expect(json.metrics.timings.serialize).toBeNull();
+    expect(json.metrics.timings.close).toBeGreaterThanOrEqual(0);
+  });
+
   it('should catch hash but render normally', async () => {
     const { res, body } = await postRender({
       url: 'http://localhost:3000/test-website/js-redirect-hash.html',
