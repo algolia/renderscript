@@ -1,3 +1,5 @@
+import { report } from 'helpers/errorReporting';
+
 const DOCKER_LOCALHOST = 'host.docker.internal';
 
 const USE_DOCKER_LOCALHOST = process.env.USE_DOCKER_LOCALHOST === 'true';
@@ -10,12 +12,21 @@ export function replaceHost(url: URL, from: string, to: string): URL {
   return url;
 }
 
-export function revertUrl(href: string): URL {
-  const url = new URL(href);
-  if (!USE_DOCKER_LOCALHOST) {
-    return url;
+export function revertUrl(href: string | null): URL | null {
+  if (!href) {
+    return null;
   }
-  return replaceHost(url, DOCKER_LOCALHOST, 'localhost');
+
+  try {
+    const url = new URL(href);
+    if (!USE_DOCKER_LOCALHOST) {
+      return url;
+    }
+    return replaceHost(url, DOCKER_LOCALHOST, 'localhost');
+  } catch (err) {
+    report(new Error('invalid revertUrl'), { href });
+    return null;
+  }
 }
 
 export function buildUrl(href: string): URL {

@@ -51,7 +51,7 @@ export async function render(
     );
 
     if (resolvedUrl && resolvedUrl !== url.href) {
-      const location = revertUrl(resolvedUrl).href;
+      const location = revertUrl(resolvedUrl)?.href || url.href;
       res.status(307).header('Location', location).send();
       return;
     }
@@ -93,15 +93,22 @@ export async function renderJSON(
       })
     );
 
+    const resolvedUrl = revertUrl(task.resolvedUrl)?.href || null;
+
     res.status(200).json({
       body: task.body,
       headers: task.headers,
       metrics: task.metrics,
-      resolvedUrl: task.resolvedUrl ? revertUrl(task.resolvedUrl).href : null,
+      resolvedUrl,
       statusCode: task.statusCode,
       timeout: task.timeout,
       error: task.error,
-      rawError: task.rawError,
+      rawError: task.rawError
+        ? JSON.stringify({
+            message: task.rawError.message,
+            stack: task.rawError.stack,
+          })
+        : null,
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });

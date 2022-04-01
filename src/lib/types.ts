@@ -36,7 +36,7 @@ export interface TaskResult {
   statusCode: number | null;
   body: string | null;
   error: string | null;
-  rawError: string | null;
+  rawError: Error | null;
   headers: Record<string, string>;
   resolvedUrl: string | null;
   cookies: Cookie[];
