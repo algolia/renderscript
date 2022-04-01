@@ -82,7 +82,7 @@ describe('main', () => {
     });
 
     expect(cleanString(body)).toBe(
-      `<!DOCTYPE html><html><head><base href="http://localhost:3000"></head><body>A basic page</body></html>`
+      `<!DOCTYPE html><html><head></head><body>A basic page</body></html>`
     );
   });
 });
