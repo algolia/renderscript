@@ -13,7 +13,6 @@ export class RenderTask extends Task<RenderTaskParams> {
 
     /* Setup */
     const { url } = this.params;
-    const page = this.page.page!;
     let response: Response;
 
     // Important to catch any redirect
@@ -73,7 +72,7 @@ export class RenderTask extends Task<RenderTaskParams> {
     // --- Basic checks passed we wait a bit more to page to render
     try {
       // Computing maxWait minus what we already consumed
-      await page.waitForLoadState('networkidle', {
+      await this.page.ref?.waitForLoadState('networkidle', {
         timeout: this.timeBudget.get(),
       });
     } catch (err: any) {
@@ -83,11 +82,11 @@ export class RenderTask extends Task<RenderTaskParams> {
     this.setMetric('ready');
     await this.minWait();
 
-    const newUrl = page.url();
+    const newUrl = this.page.ref?.url();
     if (newUrl !== url.href) {
       // Redirection was not caught this should not happen
       this.results.error = 'wrong_redirection';
-      this.results.resolvedUrl = newUrl;
+      this.results.resolvedUrl = newUrl || 'unknown';
       return;
     }
 

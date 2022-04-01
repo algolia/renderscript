@@ -112,7 +112,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     await context.route('**/*', page.getOnRequestHandler(this.params));
     // does not work await page.setDisableServiceWorker();
 
-    page.page!.on('response', page.getOnResponseHandler(this.params));
+    page.ref?.on('response', page.getOnResponseHandler(this.params));
 
     this.setMetric('context');
   }
@@ -136,7 +136,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     }
 
     this.log.debug(`Waiting ${todo} extra ms...`);
-    await this.page!.page!.waitForTimeout(todo);
+    await this.page!.ref?.waitForTimeout(todo);
     this.setMetric('minWait');
   }
 

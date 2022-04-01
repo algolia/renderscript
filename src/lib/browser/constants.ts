@@ -8,6 +8,7 @@ export const RESPONSE_IGNORED_ERRORS = [
   'This might happen if the request is a preflight request',
   // Can happen if the page that trigger this response was closed in the meantime
   'Target closed',
+  'Target page, context or browser has been closed',
 ];
 
 export const REQUEST_IGNORED_ERRORS = ['Request is already handled'];

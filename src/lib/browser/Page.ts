@@ -25,7 +25,7 @@ import {
  * Abstract some logics around playwright pages.
  */
 export class BrowserPage {
-  #page: Page | undefined;
+  #ref: Page | undefined;
   #context: BrowserContext | undefined;
   #metrics: PageMetrics = {
     timings: {
@@ -48,8 +48,8 @@ export class BrowserPage {
   #hasTimeout: boolean = false;
   #initialResponse?: Response;
 
-  get page(): Page | undefined {
-    return this.#page;
+  get ref(): Page | undefined {
+    return this.#ref;
   }
 
   get context(): BrowserContext | undefined {
@@ -57,11 +57,11 @@ export class BrowserPage {
   }
 
   get isReady(): boolean {
-    return Boolean(this.#page && this.#context);
+    return Boolean(this.#ref && this.#context);
   }
 
   get isClosed(): boolean {
-    return this.#page?.isClosed() === true;
+    return this.#ref?.isClosed() === true;
   }
 
   get hasTimeout(): boolean {
@@ -88,7 +88,7 @@ export class BrowserPage {
     const page = await this.#context!.newPage();
 
     stats.timing('renderscript.page.create', Date.now() - start);
-    this.#page = page;
+    this.#ref = page;
 
     page.on('crash', () => {
       // e.g: crash happen on OOM.
@@ -109,8 +109,8 @@ export class BrowserPage {
    * Destroy the page and the private context.
    */
   async close(): Promise<void> {
-    await this.#page?.close();
-    this.#page = undefined;
+    await this.#ref?.close();
+    this.#ref = undefined;
   }
 
   /**
@@ -128,19 +128,19 @@ export class BrowserPage {
         response = res;
       }
     }
-    this.#page!.once('response', onResponse);
+    this.#ref!.once('response', onResponse);
 
     const start = Date.now();
     try {
       // Response can be assigned here or on('response')
-      response = await this.#page!.goto(url, opts);
+      response = await this.#ref!.goto(url, opts);
     } catch (err: any) {
       if (!this.redirection && !err.message.includes('ERR_ABORTED')) {
         this.throwIfNotTimeout(err);
       }
     } finally {
       // We remove listener, because we don't want more response
-      this.#page!.removeListener('response', onResponse);
+      this.#ref!.removeListener('response', onResponse);
     }
 
     stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
@@ -169,15 +169,17 @@ export class BrowserPage {
         response = res;
       }
     }
-    this.#page!.once('response', onResponse);
+    this.#ref!.once('response', onResponse);
 
     try {
-      response = await this.page!.waitForNavigation(opts);
+      if (this.#ref) {
+        response = await this.#ref.waitForNavigation(opts);
+      }
     } catch (err: any) {
       this.throwIfNotTimeout(err);
     } finally {
       // We remove listener, because we don't want more response
-      this.#page!.removeListener('response', onResponse);
+      this.#ref!.removeListener('response', onResponse);
     }
 
     return response;
@@ -190,7 +192,7 @@ export class BrowserPage {
    */
   async saveMetrics(): Promise<PageMetrics> {
     try {
-      if (!this.#page) {
+      if (!this.#ref) {
         // page has been closed or not yet open
         return this.#metrics;
       }
@@ -204,7 +206,7 @@ export class BrowserPage {
           usedJSHeapSize?: number;
         };
       } = JSON.parse(
-        await this.#page!.evaluate(() => {
+        await this.#ref!.evaluate(() => {
           return JSON.stringify({
             curr: performance.getEntriesByType('navigation')[0],
             all: performance.getEntries(),
@@ -231,7 +233,7 @@ export class BrowserPage {
    * Output body as a string at the moment it is requested.
    */
   async renderBody(): Promise<string> {
-    return await this.#page!.content();
+    return await this.#ref!.content();
   }
 
   /**
@@ -260,9 +262,9 @@ export class BrowserPage {
       // @ts-expect-error read-only prop
       delete window.navigator.serviceWorker;
     });
-    this.#page!.on('worker', () => {
+    this.#ref!.on('worker', () => {
       report(new Error('WebWorker disabled but created'), {
-        pageUrl: this.#page!.url(),
+        pageUrl: this.#ref!.url(),
       });
     });
   }
@@ -276,7 +278,7 @@ export class BrowserPage {
     originalUrl: string,
     onNavigation: (url: string) => Promise<void>
   ): void {
-    this.#page!.on('framenavigated', async (frame) => {
+    this.#ref?.on('framenavigated', async (frame) => {
       if (originalUrl === frame.url()) {
         return;
       }
@@ -295,7 +297,7 @@ export class BrowserPage {
       });
     });
 
-    this.page!.on('request', async (req) => {
+    this.#ref?.on('request', async (req) => {
       const url = req.url();
 
       // Playwright does not route redirection to route() so we need to manually catch them
@@ -474,12 +476,17 @@ export class BrowserPage {
   }: {
     timeout: number;
   }): Promise<URL | void> {
+    if (!this.#ref) {
+      return;
+    }
+
     try {
-      const metaRefreshElement = this.page!.locator(
+      const url = new URL(this.#ref.url());
+      const metaRefreshElement = this.#ref.locator(
         'meta[http-equiv="refresh"]'
       );
 
-      if ((await metaRefreshElement.count()) <= 0) {
+      if (!metaRefreshElement || (await metaRefreshElement.count()) <= 0) {
         return;
       }
 
@@ -490,8 +497,6 @@ export class BrowserPage {
       if (!match) {
         return;
       }
-
-      const url = new URL(this.page!.url());
 
       // Sometimes URLs are surrounded by quotes
       const matchedURL = match[1].replace(/'/g, '');
