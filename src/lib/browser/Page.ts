@@ -299,25 +299,31 @@ export class BrowserPage {
       // We still report just in case.
       report(new Error('Unexpected navigation'), {
         pageUrl: originalUrl,
-        to: newUrl,
+        to: newUrl.href,
       });
     });
 
     this.#ref?.on('request', async (req) => {
-      const url = req.url();
+      const newUrl = new URL(req.url());
 
       // Playwright does not route redirection to route() so we need to manually catch them
-      log.debug('request_start', { pageUrl: originalUrl, url });
+      log.debug('request_start', { pageUrl: originalUrl, url: newUrl.href });
       const main = req.frame().parentFrame() === null;
       const redir = req.isNavigationRequest();
 
-      if (!redir || (redir && !main) || originalUrl === url) {
+      if (!redir || (redir && !main) || originalUrl === newUrl.href) {
         return;
       }
-      log.info('Will navigate', { pageUrl: originalUrl, url });
 
-      this.#redirection = url;
-      await onNavigation(url);
+      newUrl.hash = '';
+      if (originalUrl === newUrl.href) {
+        return;
+      }
+
+      log.info('Will navigate', { pageUrl: originalUrl, url: newUrl.href });
+
+      this.#redirection = newUrl.href;
+      await onNavigation(newUrl.href);
     });
   }
 

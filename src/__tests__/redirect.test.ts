@@ -149,7 +149,7 @@ describe('js redirects', () => {
 
     expect(json.statusCode).toBe(200);
     expect(json.body).toBe(
-      `<!DOCTYPE html><html><head> </head>\n\n<body>\n  <script>window.location.hash = \"#redirection\";</script>\n\n\n\n</body></html>`
+      `<!DOCTYPE html><html><head> </head>\n\n<body>\n  <script>window.location.hash = "#redirection";</script>\n\n\n\n</body></html>`
     );
     expect(json.error).toBeNull();
 
