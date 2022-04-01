@@ -65,7 +65,6 @@ export class RenderTask extends Task<RenderTaskParams> {
     if (this.results.statusCode !== 200) {
       // Everything is different than OK is not worth processing
       this.results.body = await this.page.renderBody();
-
       return;
     }
 
@@ -90,6 +89,11 @@ export class RenderTask extends Task<RenderTaskParams> {
     /* Transforming */
     // await page.evaluate(injectBaseHref, baseHref);
     const body = await this.page.renderBody();
+    if (body === null) {
+      this.results.error = 'body_serialisation_failed';
+      return;
+    }
+
     this.results.body = body;
     this.setMetric('serialize');
   }

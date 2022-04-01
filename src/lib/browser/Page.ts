@@ -232,8 +232,8 @@ export class BrowserPage {
   /**
    * Output body as a string at the moment it is requested.
    */
-  async renderBody(): Promise<string> {
-    return await this.#ref!.content();
+  async renderBody(): Promise<string | null> {
+    return (await this.#ref?.content()) || null;
   }
 
   /**
