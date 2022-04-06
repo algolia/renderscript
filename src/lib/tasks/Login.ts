@@ -59,7 +59,10 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     // Type the password
     log.debug('Entering password and logging in...');
-    await passwordInput.type(login.password);
+    await passwordInput.type(login.password, {
+      noWaitAfter: true,
+      timeout: this.timeBudget.get(),
+    });
 
     // Submit
     await this.#submitForm(passwordInput);
@@ -82,7 +85,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     // we get the cookie for the requested domain
     // this is not ideal for some SSO, returning valid cookies but missing some of them
     this.results.cookies = await this.page.ref?.context().cookies([url.href]);
-    const body = await this.page.ref?.content();
+    const body = await this.page.renderBody();
     this.results.body = body;
     this.setMetric('serialize');
   }

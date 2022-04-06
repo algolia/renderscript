@@ -96,7 +96,8 @@ export async function renderJSON(
 
     if (!task.error && !task.body) {
       // Tmp while trying to understand the issue.
-      report(new Error('No error but no body'), { task });
+      report(new Error('No error but no body'), { task, url, waitTime });
+      task.error = 'body_serialisation_failed';
     }
 
     const resolvedUrl = revertUrl(task.resolvedUrl)?.href || null;
