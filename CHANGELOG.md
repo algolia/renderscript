@@ -1,3 +1,10 @@
+## [2.1.12](https://github.com/algolia/renderscript/compare/v2.1.11...v2.1.12) (2022-04-07)
+
+
+### Bug Fixes
+
+* various production issues ([#606](https://github.com/algolia/renderscript/issues/606)) ([cd12d3b](https://github.com/algolia/renderscript/commit/cd12d3bc7bde50fb7e6e3dcb433f4c5d858e4dfb))
+
 ## [2.1.11](https://github.com/algolia/renderscript/compare/v2.1.10...v2.1.11) (2022-03-31)
 
 
