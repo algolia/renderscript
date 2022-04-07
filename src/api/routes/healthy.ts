@@ -31,7 +31,7 @@ export function healthy(
     }
   );
 
-  if (!health.ready) {
+  if (!health.ready && health.oldTasks.length > 0) {
     report(new Error('Reporting not healthy'), {
       tasks: health.oldTasks,
       max: UNHEALTHY_TASK_TTL,

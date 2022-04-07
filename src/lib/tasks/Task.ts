@@ -21,6 +21,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     body: null,
     headers: {},
     error: null,
+    rawError: null,
     resolvedUrl: null,
     cookies: [],
   };
@@ -82,6 +83,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     this.setMetric('close');
 
     this.metrics.timings.total = Date.now() - this.startedAt!.getTime();
+    this.#metrics.renderingBudget.consumed = this.timeBudget.consumed;
     this.#context = undefined;
   }
 
@@ -109,9 +111,9 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     }
 
     await context.route('**/*', page.getOnRequestHandler(this.params));
-    await page.setDisableServiceWorker();
+    // does not work await page.setDisableServiceWorker();
 
-    page.page!.on('response', page.getOnResponseHandler(this.params));
+    page.ref?.on('response', page.getOnResponseHandler(this.params));
 
     this.setMetric('context');
   }
@@ -135,7 +137,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     }
 
     this.log.debug(`Waiting ${todo} extra ms...`);
-    await this.page!.page!.waitForTimeout(todo);
+    await this.page!.ref?.waitForTimeout(todo);
     this.setMetric('minWait');
   }
 
@@ -153,7 +155,6 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   async saveMetrics(): Promise<void> {
     try {
       this.#metrics.page = await this.page!.saveMetrics();
-      this.#metrics.renderingBudget.consumed = this.timeBudget.consumed;
     } catch (err) {
       // Can happen if target is already closed or redirection
     }

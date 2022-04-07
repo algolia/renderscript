@@ -72,17 +72,17 @@ describe('main', () => {
     expect(res.statusCode).toBe(200);
     expect(res.headers).toEqual({
       connection: 'keep-alive',
-      'content-length': '114',
+      'content-length': '79',
       'content-security-policy':
         "default-src 'none'; style-src * 'unsafe-inline'; img-src * data:; font-src *",
       'content-type': 'text/html; charset=utf-8',
       date: expect.any(String),
-      etag: 'W/"72-04PIukRCuHHMZy/XC0YF6D6TDfc"',
+      etag: 'W/"4f-3aYUmdp4dkv6HiR9rJEG+VKiCsw"',
       'keep-alive': 'timeout=5',
     });
 
     expect(cleanString(body)).toBe(
-      `<!DOCTYPE html><html><head><base href="http://localhost:3000"></head><body>A basic page</body></html>`
+      `<!DOCTYPE html><html><head></head><body>A basic page</body></html>`
     );
   });
 });

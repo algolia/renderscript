@@ -7,11 +7,15 @@ import type {
 
 import { report } from 'helpers/errorReporting';
 import { log } from 'helpers/logger';
+import {
+  promiseWithTimeout,
+  PromiseWithTimeoutError,
+} from 'helpers/promiseWithTimeout';
 import { stats } from 'helpers/stats';
 import { cleanErrorMessage } from 'lib/helpers/errors';
 import { isURLAllowed } from 'lib/helpers/validateURL';
 import { adblocker } from 'lib/singletons';
-import type { PageMetrics, TaskBaseParams } from 'lib/types';
+import type { PageMetrics, Perf, TaskBaseParams } from 'lib/types';
 
 import { DATA_REGEXP, IGNORED_RESOURCES } from '../constants';
 
@@ -25,7 +29,7 @@ import {
  * Abstract some logics around playwright pages.
  */
 export class BrowserPage {
-  #page: Page | undefined;
+  #ref: Page | undefined;
   #context: BrowserContext | undefined;
   #metrics: PageMetrics = {
     timings: {
@@ -48,8 +52,8 @@ export class BrowserPage {
   #hasTimeout: boolean = false;
   #initialResponse?: Response;
 
-  get page(): Page | undefined {
-    return this.#page;
+  get ref(): Page | undefined {
+    return this.#ref;
   }
 
   get context(): BrowserContext | undefined {
@@ -57,11 +61,11 @@ export class BrowserPage {
   }
 
   get isReady(): boolean {
-    return Boolean(this.#page && this.#context);
+    return Boolean(this.#ref && this.#context);
   }
 
   get isClosed(): boolean {
-    return this.#page?.isClosed() === true;
+    return this.#ref?.isClosed() === true;
   }
 
   get hasTimeout(): boolean {
@@ -88,7 +92,7 @@ export class BrowserPage {
     const page = await this.#context!.newPage();
 
     stats.timing('renderscript.page.create', Date.now() - start);
-    this.#page = page;
+    this.#ref = page;
 
     page.on('crash', () => {
       // e.g: crash happen on OOM.
@@ -109,8 +113,8 @@ export class BrowserPage {
    * Destroy the page and the private context.
    */
   async close(): Promise<void> {
-    await this.#page?.close();
-    this.#page = undefined;
+    await this.#ref?.close();
+    this.#ref = undefined;
   }
 
   /**
@@ -128,19 +132,19 @@ export class BrowserPage {
         response = res;
       }
     }
-    this.#page!.once('response', onResponse);
+    this.#ref!.once('response', onResponse);
 
     const start = Date.now();
     try {
       // Response can be assigned here or on('response')
-      response = await this.#page!.goto(url, opts);
+      response = await this.#ref!.goto(url, opts);
     } catch (err: any) {
       if (!this.redirection && !err.message.includes('ERR_ABORTED')) {
         this.throwIfNotTimeout(err);
       }
     } finally {
       // We remove listener, because we don't want more response
-      this.#page!.removeListener('response', onResponse);
+      this.#ref!.removeListener('response', onResponse);
     }
 
     stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
@@ -149,7 +153,7 @@ export class BrowserPage {
     });
 
     if (!response) {
-      // Just in case
+      // Can happen in case of chrome crash
       throw new Error('goto_no_response');
     }
 
@@ -169,15 +173,17 @@ export class BrowserPage {
         response = res;
       }
     }
-    this.#page!.once('response', onResponse);
+    this.#ref!.once('response', onResponse);
 
     try {
-      response = await this.page!.waitForNavigation(opts);
+      if (this.#ref) {
+        response = await this.#ref.waitForNavigation(opts);
+      }
     } catch (err: any) {
       this.throwIfNotTimeout(err);
     } finally {
       // We remove listener, because we don't want more response
-      this.#page!.removeListener('response', onResponse);
+      this.#ref!.removeListener('response', onResponse);
     }
 
     return response;
@@ -190,29 +196,27 @@ export class BrowserPage {
    */
   async saveMetrics(): Promise<PageMetrics> {
     try {
-      if (!this.#page) {
+      if (!this.#ref || this.#ref.isClosed()) {
         // page has been closed or not yet open
         return this.#metrics;
       }
 
-      const perf: {
-        curr: PerformanceNavigationTiming;
-        all: PerformanceEntryList;
-        mem: {
-          jsHeapSizeLimit?: number;
-          totalJSHeapSize?: number;
-          usedJSHeapSize?: number;
-        };
-      } = JSON.parse(
-        await this.#page!.evaluate(() => {
+      const evaluate = await promiseWithTimeout(
+        this.#ref!.evaluate(() => {
           return JSON.stringify({
             curr: performance.getEntriesByType('navigation')[0],
             all: performance.getEntries(),
             // @ts-expect-error only exists in chromium
             mem: performance.memory || {},
           });
-        })
+        }),
+        200
       );
+
+      if (!evaluate) {
+        throw new Error('Getting perf error');
+      }
+      const perf: Perf = JSON.parse(evaluate);
 
       this.#metrics.timings.download = Math.round(perf.curr.duration || 0);
       this.#metrics.mem = {
@@ -221,18 +225,30 @@ export class BrowserPage {
       };
     } catch (err: any) {
       if (!METRICS_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
-        log.error(err);
         report(new Error('Error saving metrics'), { err });
       }
     }
+
     return this.#metrics;
   }
 
   /**
    * Output body as a string at the moment it is requested.
    */
-  async renderBody(): Promise<string> {
-    return await this.#page!.content();
+  async renderBody(): Promise<string | null> {
+    try {
+      return await promiseWithTimeout(
+        (async (): Promise<string | null> => {
+          return (await this.#ref?.content()) || null;
+        })(),
+        10000 // this is the most important part so we try hard
+      );
+    } catch (err) {
+      if (!(err instanceof PromiseWithTimeoutError)) {
+        throw err;
+      }
+    }
+    return null;
   }
 
   /**
@@ -261,9 +277,9 @@ export class BrowserPage {
       // @ts-expect-error read-only prop
       delete window.navigator.serviceWorker;
     });
-    this.#page!.on('worker', () => {
+    this.#ref!.on('worker', () => {
       report(new Error('WebWorker disabled but created'), {
-        pageUrl: this.#page!.url(),
+        pageUrl: this.#ref!.url(),
       });
     });
   }
@@ -277,40 +293,58 @@ export class BrowserPage {
     originalUrl: string,
     onNavigation: (url: string) => Promise<void>
   ): void {
-    this.#page!.on('framenavigated', async (frame) => {
-      if (originalUrl === frame.url()) {
+    this.#ref?.on('framenavigated', async (frame) => {
+      const newUrl = new URL(frame.url());
+      newUrl.hash = '';
+      if (originalUrl === newUrl.href) {
         return;
       }
       if (frame.parentFrame()) {
         // Sub Frame we don't care
         return;
       }
+      if (newUrl.href === 'chrome-error://chromewebdata/') {
+        // Page crashed
+        return;
+      }
+      if (!this.#redirection) {
+        // Can happen that on('framenavigated') event comes before on('request')
+        this.#redirection = newUrl.href;
+      }
 
-      const url = frame.url();
-      await onNavigation(url);
+      await onNavigation(newUrl.href);
 
       // We still report just in case.
-      report(new Error('Unexpected navigation'), {
-        pageUrl: originalUrl,
-        to: url,
-      });
+      log.warn(
+        {
+          pageUrl: originalUrl,
+          to: newUrl.href,
+        },
+        'Unexpected navigation'
+      );
     });
 
-    this.page!.on('request', async (req) => {
-      const url = req.url();
+    this.#ref?.on('request', async (req) => {
+      const newUrl = new URL(req.url());
 
       // Playwright does not route redirection to route() so we need to manually catch them
-      log.debug('request_start', { pageUrl: originalUrl, url });
+      log.debug('request_start', { pageUrl: originalUrl, url: newUrl.href });
       const main = req.frame().parentFrame() === null;
       const redir = req.isNavigationRequest();
 
-      if (!redir || (redir && !main) || originalUrl === url) {
+      if (!redir || (redir && !main) || originalUrl === newUrl.href) {
         return;
       }
-      log.info('Will navigate', { pageUrl: originalUrl, url });
 
-      this.#redirection = url;
-      await onNavigation(url);
+      newUrl.hash = '';
+      if (originalUrl === newUrl.href) {
+        return;
+      }
+
+      log.info('Will navigate', { pageUrl: originalUrl, url: newUrl.href });
+
+      this.#redirection = newUrl.href;
+      await onNavigation(newUrl.href);
     });
   }
 
@@ -342,51 +376,51 @@ export class BrowserPage {
       const reqUrl = req.url();
       this.#metrics.requests.total += 1;
 
-      if (this.#hasTimeout) {
-        // If the page was killed in the meantime we don't want to process anything else
-        route.abort('blockedbyclient');
-        return;
-      }
-
-      // Skip data URIs
-      if (DATA_REGEXP.test(reqUrl)) {
-        this.#metrics.requests.blocked += 1;
-        await route.abort('blockedbyclient');
-        return;
-      }
-
-      // Iframe block
-      if (req.frame().parentFrame()) {
-        this.#metrics.requests.blocked += 1;
-
-        await route.abort('blockedbyclient');
-        return;
-      }
-
-      // Ignore some type of resources
-      if (IGNORED_RESOURCES.includes(req.resourceType())) {
-        this.#metrics.requests.blocked += 1;
-
-        await route.abort('blockedbyclient');
-        return;
-      }
-
-      // Adblocking
-      if (adblock && adblocker.match(new URL(reqUrl))) {
-        this.#metrics.requests.blocked += 1;
-
-        await route.abort('blockedbyclient');
-        return;
-      }
-
-      // Check for ssrf attempts = page that redirects to localhost for example
-      if (!(await isURLAllowed(reqUrl))) {
-        this.#metrics.requests.blocked += 1;
-        await route.abort('blockedbyclient');
-        return;
-      }
-
       try {
+        if (this.#hasTimeout) {
+          // If the page was killed in the meantime we don't want to process anything else
+          await route.abort('blockedbyclient');
+          return;
+        }
+
+        // Skip data URIs
+        if (DATA_REGEXP.test(reqUrl)) {
+          this.#metrics.requests.blocked += 1;
+          await route.abort('blockedbyclient');
+          return;
+        }
+
+        // Iframe block
+        if (req.frame().parentFrame()) {
+          this.#metrics.requests.blocked += 1;
+
+          await route.abort('blockedbyclient');
+          return;
+        }
+
+        // Ignore some type of resources
+        if (IGNORED_RESOURCES.includes(req.resourceType())) {
+          this.#metrics.requests.blocked += 1;
+
+          await route.abort('blockedbyclient');
+          return;
+        }
+
+        // Adblocking
+        if (adblock && adblocker.match(new URL(reqUrl))) {
+          this.#metrics.requests.blocked += 1;
+
+          await route.abort('blockedbyclient');
+          return;
+        }
+
+        // Check for ssrf attempts = page that redirects to localhost for example
+        if (!(await isURLAllowed(reqUrl))) {
+          this.#metrics.requests.blocked += 1;
+          await route.abort('blockedbyclient');
+          return;
+        }
+
         if (req.isNavigationRequest()) {
           const headers = await req.allHeaders();
           await route.continue({
@@ -437,9 +471,6 @@ export class BrowserPage {
 
       // Redirections do not have a body
       if (status > 300 && status < 400) {
-        if (!res.request().frame().parentFrame()) {
-          this.#redirection = new URL(headers.location, url).href;
-        }
         return;
       }
 
@@ -470,25 +501,32 @@ export class BrowserPage {
   /**
    * Returns the URL if found.
    */
-  async checkForHttpEquivRefresh(): Promise<URL | void> {
+  async checkForHttpEquivRefresh({
+    timeout,
+  }: {
+    timeout: number;
+  }): Promise<URL | void> {
+    if (!this.#ref) {
+      return;
+    }
+
     try {
-      const metaRefreshElement = this.page!.locator(
+      const url = new URL(this.#ref.url());
+      const metaRefreshElement = this.#ref.locator(
         'meta[http-equiv="refresh"]'
       );
 
-      if ((await metaRefreshElement.count()) <= 0) {
+      if (!metaRefreshElement || (await metaRefreshElement.count()) <= 0) {
         return;
       }
 
-      const el = (await metaRefreshElement.elementHandle())!;
+      const el = (await metaRefreshElement.elementHandle({ timeout }))!;
       const metaRefreshContent = await el.getProperty('content');
       const refreshContent = await metaRefreshContent?.jsonValue();
       const match = refreshContent?.match(/\d+;\s(?:url|URL)=(.*)/);
       if (!match) {
         return;
       }
-
-      const url = new URL(this.page!.url());
 
       // Sometimes URLs are surrounded by quotes
       const matchedURL = match[1].replace(/'/g, '');

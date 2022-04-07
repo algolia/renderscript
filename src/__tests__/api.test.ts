@@ -17,6 +17,7 @@ describe('POST /render', () => {
     expect(json).toStrictEqual({
       body: expect.any(String),
       error: null,
+      rawError: null,
       headers: {
         'accept-ranges': 'bytes',
         'cache-control': 'public, max-age=0',

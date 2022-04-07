@@ -15,7 +15,6 @@ export class LoginTask extends Task<LoginTaskParams> {
     /* Setup */
     const { url, login } = this.params;
     const log = this.log;
-    const page = this.page.page!;
     let response: Response;
 
     try {
@@ -32,16 +31,20 @@ export class LoginTask extends Task<LoginTaskParams> {
     await this.saveStatus(response);
 
     // We first check if there is form
-    const textInputLoc = page.locator('input[type=text], input[type=email]');
-    if ((await textInputLoc.count()) <= 0) {
-      this.results.error = `field_not_found: input[type=text], input[type=email]`;
+    const textInputLoc = this.page.ref?.locator(
+      'input[type=text], input[type=email]'
+    );
+    if (!textInputLoc || (await textInputLoc.count()) <= 0) {
+      this.results.error = 'field_not_found';
+      this.results.rawError = new Error('input[type=text], input[type=email]');
       return;
     }
 
-    log.debug('Current URL', { pageUrl: page.url() });
+    log.debug('Current URL', { pageUrl: this.page.ref?.url() });
     log.info('Entering username...', { userName: login.username });
     const elTextInput = (await textInputLoc.elementHandle())!;
     await elTextInput.type(login.username, {
+      noWaitAfter: true,
       timeout: this.timeBudget.get(),
     });
     this.timeBudget.consume();
@@ -56,7 +59,10 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     // Type the password
     log.debug('Entering password and logging in...');
-    await passwordInput.type(login.password);
+    await passwordInput.type(login.password, {
+      noWaitAfter: true,
+      timeout: this.timeBudget.get(),
+    });
 
     // Submit
     await this.#submitForm(passwordInput);
@@ -70,12 +76,16 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     await this.saveStatus(response);
 
+    if (!this.page.ref) {
+      return;
+    }
+
     /* Transforming */
-    this.results.resolvedUrl = page.url();
+    this.results.resolvedUrl = this.page.ref.url();
     // we get the cookie for the requested domain
     // this is not ideal for some SSO, returning valid cookies but missing some of them
-    this.results.cookies = await page.context().cookies([url.href]);
-    const body = await page.content();
+    this.results.cookies = await this.page.ref?.context().cookies([url.href]);
+    const body = await this.page.renderBody();
     this.results.body = body;
     this.setMetric('serialize');
   }
@@ -87,11 +97,10 @@ export class LoginTask extends Task<LoginTaskParams> {
     textInput: ElementHandle<HTMLElement | SVGElement>
   ): Promise<ElementHandle<HTMLElement | SVGElement> | null | void> {
     const log = this.log;
-    const page = this.page!.page!;
     const inputSel = 'input[type=password]:not([aria-hidden="true"])';
 
-    const passwordInputLoc = page.locator(inputSel);
-    if ((await passwordInputLoc.count()) > 0) {
+    const passwordInputLoc = this.page!.ref?.locator(inputSel);
+    if (passwordInputLoc && (await passwordInputLoc.count()) > 0) {
       return await passwordInputLoc.elementHandle();
     }
 
@@ -100,27 +109,28 @@ export class LoginTask extends Task<LoginTaskParams> {
     try {
       // We submit the form
       await textInput!.press('Enter', {
+        noWaitAfter: true,
         timeout: this.timeBudget.limit(1000),
       });
       this.timeBudget.consume();
 
       // And wait for a new input to be there maybe
       // page!.waitForNavigation() doesn't work with Okta for example, it's JS based
-      await page.waitForSelector(inputSel, {
+      await this.page!.ref?.waitForSelector(inputSel, {
         timeout: this.timeBudget.limit(1000),
       });
       this.timeBudget.consume();
 
-      log.debug('Current URL', { pageUrl: page.url() });
+      log.debug('Current URL', { pageUrl: this.page!.ref?.url() });
 
-      const loc = page.locator(inputSel);
-      if ((await loc.count()) > 0) {
+      const loc = this.page!.ref?.locator(inputSel);
+      if (loc && (await loc.count()) > 0) {
         return await loc.elementHandle();
       }
     } catch (err: any) {
       log.info('No password input on the page', {
         err: err.message,
-        pageUrl: page.url(),
+        pageUrl: this.page!.ref?.url(),
       });
 
       this.results.error = cleanErrorMessage(err);
@@ -137,8 +147,7 @@ export class LoginTask extends Task<LoginTaskParams> {
   ): Promise<void> {
     const log = this.log;
     const { url } = this.params;
-    const page = this.page!.page!;
-    let res: Response | null;
+    let res: Response | null = null;
 
     try {
       // We don't submit form directly because sometimes there are no form
@@ -149,16 +158,12 @@ export class LoginTask extends Task<LoginTaskParams> {
           waitUntil: 'domcontentloaded',
         }),
         passwordInput.press('Enter', {
+          noWaitAfter: true,
           timeout: this.timeBudget.limit(1000),
         }),
       ]);
     } catch (err: any) {
-      report(new Error('Error while submit'), {
-        err: err.message,
-        pageUrl: page.url(),
-      });
-      this.results.error = cleanErrorMessage(err);
-      return;
+      this.page!.throwIfNotTimeout(err);
     } finally {
       this.timeBudget.consume();
     }
@@ -192,7 +197,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       this.results.error = cleanErrorMessage(err);
       report(new Error('Error while spec'), {
         err: err.message,
-        pageUrl: page.url(),
+        pageUrl: this.page!.ref?.url(),
       });
       return;
     } finally {
@@ -200,14 +205,16 @@ export class LoginTask extends Task<LoginTaskParams> {
     }
 
     if (!res) {
-      if (page.url() === url.href) {
+      if (this.page!.ref?.url() === url.href) {
         // Return an error if we got no login response and are still on the same URL
-        this.results.error = 'no_response';
+        this.results.error = 'no_response_after_login';
         return;
       }
 
       // Can happen if navigation was done through History API
-      log.debug('No login response, but redirected', { pageUrl: page.url() });
+      log.debug('No login response, but redirected', {
+        pageUrl: this.page!.ref?.url(),
+      });
       return;
     }
 
@@ -222,21 +229,27 @@ export class LoginTask extends Task<LoginTaskParams> {
       }
       chain.push(prev.url());
     }
-    log.debug('Login after redirections', { pageUrl: page.url(), chain });
+    log.debug('Login after redirections', {
+      pageUrl: this.page!.ref?.url(),
+      chain,
+    });
   }
 
   async #handleSpecForm(): Promise<void> {
     const { log } = this;
-    const page = this.page!.page!;
-    const currentUrl = page.url();
+    if (!this.page?.ref) {
+      return;
+    }
+
+    const currentUrl = this.page.ref.url();
 
     // Spec for Microsoft SSO
     if (currentUrl.startsWith('https://login.live.com')) {
       log.debug('MSFT: Entering specs');
 
       // There is a "Keep me sign in?" checkbox now
-      const confirm = page.locator('#KmsiCheckboxField');
-      const submit = page.locator('input[type=submit]');
+      const confirm = this.page.ref.locator('#KmsiCheckboxField');
+      const submit = this.page.ref.locator('input[type=submit]');
 
       if ((await confirm.count()) === 1 && (await submit.count()) === 1) {
         log.debug('MSFT: found confirm and submit');

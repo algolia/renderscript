@@ -34,6 +34,7 @@ export class TasksManager {
         task.ref.id,
         task.ref.params.url.href,
         JSON.stringify(task.ref.results),
+        JSON.stringify(task.ref.metrics),
         task.ref.isDone,
       ]);
     });
@@ -78,14 +79,14 @@ export class TasksManager {
       throw new Error('Unhealthy node received a job');
     }
 
-    const promise = this.#exec(task);
-    this.#totalRun += 1;
-    this.#tasks.set(task.id, {
-      ref: task,
-      promise,
-    });
-
     try {
+      const promise = this.#exec(task);
+      this.#totalRun += 1;
+      this.#tasks.set(task.id, {
+        ref: task,
+        promise,
+      });
+
       return await promise;
     } finally {
       this.#tasks.delete(task.id);
@@ -101,7 +102,7 @@ export class TasksManager {
     if (this.#stopping) {
       throw new Error('Task can not be executed: stopping');
     }
-    if (!this.#browser) {
+    if (!this.#browser || !this.#browser.isReady) {
       throw new Error('Task can not be executed: no_browser');
     }
 
@@ -117,7 +118,9 @@ export class TasksManager {
       await task.process();
     } catch (err: any) {
       // eslint-disable-next-line no-param-reassign
-      task.results.error = cleanErrorMessage(err);
+      task.results.error = task.results.error || cleanErrorMessage(err);
+      // eslint-disable-next-line no-param-reassign
+      task.results.rawError = err;
       if (task.results.error === 'unknown_error') {
         // Task itself should never break the whole execution
         report(err, { url });
@@ -158,7 +161,7 @@ export class TasksManager {
       /* eslint-enable prettier/prettier */
     }
 
-    log.info('Done', { id, url });
+    log.info({ id, url, code: task.results.error }, 'Done');
     const res = task.results;
     return {
       ...res,

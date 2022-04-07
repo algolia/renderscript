@@ -9,7 +9,7 @@ import { v4 as uuid } from 'uuid';
 import { log as mainLog } from 'helpers/logger';
 import { stats } from 'helpers/stats';
 
-import { flags, HEIGHT, WIDTH } from '../constants';
+import { flags, HEIGHT, WIDTH } from './constants';
 
 const log = mainLog.child({ svc: 'brws' });
 
@@ -23,7 +23,11 @@ export class Browser {
   }
 
   get isReady(): boolean {
-    return this.#ready;
+    return (
+      this.#ready &&
+      typeof this.#browser !== 'undefined' &&
+      this.#browser.isConnected()
+    );
   }
 
   get instance(): BrowserInterface | undefined {
@@ -84,6 +88,10 @@ export class Browser {
   }
 
   async getNewContext(opts: BrowserContextOptions): Promise<BrowserContext> {
+    if (!this.#browser?.isConnected()) {
+      throw new Error('No browser available');
+    }
+
     const start = Date.now();
     const ctx = await this.#browser!.newContext({
       acceptDownloads: false,
