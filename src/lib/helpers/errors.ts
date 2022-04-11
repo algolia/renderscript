@@ -5,8 +5,11 @@ export const retryableErrors: Array<HandledError | UnhandledError> = [
   'connection_error',
   'fetch_aborted',
   'fetch_timeout',
+  'no_cookies',
+  'no_response_after_login',
   'page_closed_too_soon',
   'page_crashed',
+  'timedout',
   'unknown_error',
 ];
 
@@ -44,7 +47,9 @@ export function cleanErrorMessage(error: Error): HandledError | UnhandledError {
   }
   if (
     error.message.includes('goto_no_response') ||
-    error.message.includes('ERR_FAILED')
+    error.message.includes('Navigation failed because page crashed') ||
+    error.message.includes('ERR_FAILED') ||
+    error.message.includes('Element is not attached to the DOM')
   ) {
     return 'page_crashed';
   }

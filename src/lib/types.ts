@@ -10,6 +10,7 @@ export type HandledError =
   | 'fetch_timeout'
   | 'field_not_found'
   | 'forbidden_by_website'
+  | 'no_cookies'
   | 'no_response_after_login'
   | 'page_closed_too_soon'
   | 'page_crashed'

@@ -3,9 +3,11 @@ import type express from 'express';
 import type { PostLoginParams, PostLoginResponse } from 'api/@types/postLogin';
 import { CSP_HEADERS } from 'api/constants';
 import { getDefaultParams, alt } from 'api/helpers/alt';
+import { buildUrl, revertUrl } from 'api/helpers/buildUrl';
 import { badRequest } from 'api/helpers/errors';
 import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
 import { report } from 'helpers/errorReporting';
+import { retryableErrors } from 'lib/helpers/errors';
 import { tasksManager } from 'lib/singletons';
 import { LoginTask } from 'lib/tasks/Login';
 
@@ -35,8 +37,9 @@ export async function processLogin(
   req: express.Request<any, any, PostLoginParams>,
   res: express.Response<PostLoginResponse | string | null>
 ): Promise<void> {
-  const { url, ua, username, password, renderHTML, waitTime } = req.body;
+  const { ua, username, password, renderHTML, waitTime } = req.body;
   const headersToForward = getForwardedHeadersFromRequest(req);
+  const url = new URL(buildUrl(req.body.url));
 
   try {
     const task = await tasksManager.task(
@@ -62,15 +65,24 @@ export async function processLogin(
       return;
     }
 
-    res.status(200).json({
+    const resolvedUrl = revertUrl(task.resolvedUrl)?.href || null;
+    const code = task.error && retryableErrors.includes(task.error) ? 500 : 200;
+
+    res.status(code).json({
       headers: task.headers,
       metrics: task.metrics,
       statusCode: task.statusCode,
       timeout: task.timeout,
       error: task.error,
       cookies: task.cookies,
-      resolvedUrl: task.resolvedUrl,
+      resolvedUrl,
       body: task.body,
+      rawError: task.rawError
+        ? {
+            message: task.rawError.message,
+            stack: task.rawError.stack,
+          }
+        : null,
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
