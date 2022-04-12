@@ -45,6 +45,7 @@ export interface PostLoginSuccess {
    * If this field is filled that means the rest of the payload is partial.
    */
   error: string | null;
+  rawError: { message: string; stack?: string } | null;
 
   /**
    * Cookie generated from a succesful login.

@@ -113,12 +113,15 @@ describe('login', () => {
 
     expect(res.statusCode).toBe(200);
 
-    const cookies: Cookie[] = JSON.parse(body).cookies;
+    const parsed: PostLoginSuccess = JSON.parse(body);
+    expect(parsed.cookies).toHaveLength(1);
     expect(
-      cookies.find((cookie) => cookie.name === 'sessionToken')
+      parsed.cookies.find((cookie) => cookie.name === 'sessionToken')
     ).toBeUndefined();
     // Check that we actually went through the form
-    expect(cookies.find((cookie) => cookie.name === '_csrf')).toBeDefined();
+    expect(
+      parsed.cookies.find((cookie) => cookie.name === '_csrf')
+    ).toBeDefined();
   });
 });
 

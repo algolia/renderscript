@@ -1,4 +1,9 @@
-import type { ElementHandle, Response, Request } from 'playwright-chromium';
+import type {
+  ElementHandle,
+  Response,
+  Request,
+  Locator,
+} from 'playwright-chromium';
 
 import { report } from 'helpers/errorReporting';
 import { cleanErrorMessage } from 'lib/helpers/errors';
@@ -13,8 +18,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     }
 
     /* Setup */
-    const { url, login } = this.params;
-    const log = this.log;
+    const { url } = this.params;
     let response: Response;
 
     try {
@@ -31,42 +35,25 @@ export class LoginTask extends Task<LoginTaskParams> {
     await this.saveStatus(response);
 
     // We first check if there is form
-    const textInputLoc = this.page.ref?.locator(
-      'input[type=text], input[type=email]'
-    );
-    if (!textInputLoc || (await textInputLoc.count()) <= 0) {
-      this.results.error = 'field_not_found';
-      this.results.rawError = new Error('input[type=text], input[type=email]');
+    const usernameInputLoc = await this.#checkForm();
+    if (this.results.error || !usernameInputLoc) {
       return;
     }
 
-    log.debug('Current URL', { pageUrl: this.page.ref?.url() });
-    log.info('Entering username...', { userName: login.username });
-    const elTextInput = (await textInputLoc.elementHandle())!;
-    await elTextInput.type(login.username, {
-      noWaitAfter: true,
-      timeout: this.timeBudget.get(),
-    });
-    this.timeBudget.consume();
+    const usernameInput = await this.#typeUsername(usernameInputLoc);
+    if (this.results.error || !usernameInput) {
+      return;
+    }
 
     // Get the password input
-    const passwordInput = await this.#getPasswordInput(elTextInput);
-    if (!passwordInput) {
-      await this.saveStatus(response);
-
+    const passwordInput = await this.#typePasswordInput(usernameInput);
+    this.saveStatus(response);
+    if (this.results.error || !passwordInput) {
       return;
     }
-
-    // Type the password
-    log.debug('Entering password and logging in...');
-    await passwordInput.type(login.password, {
-      noWaitAfter: true,
-      timeout: this.timeBudget.get(),
-    });
 
     // Submit
     await this.#submitForm(passwordInput);
-
     await this.saveStatus(response);
     if (this.results.error) {
       return;
@@ -85,58 +72,123 @@ export class LoginTask extends Task<LoginTaskParams> {
     // we get the cookie for the requested domain
     // this is not ideal for some SSO, returning valid cookies but missing some of them
     this.results.cookies = await this.page.ref?.context().cookies([url.href]);
+
+    if (this.results.cookies.length <= 0) {
+      this.results.error = 'no_cookies';
+      return;
+    }
+
     const body = await this.page.renderBody();
     this.results.body = body;
     this.setMetric('serialize');
   }
 
   /**
-   * Get password input.
+   * Check if there is an usable form in the page.
    */
-  async #getPasswordInput(
-    textInput: ElementHandle<HTMLElement | SVGElement>
-  ): Promise<ElementHandle<HTMLElement | SVGElement> | null | void> {
-    const log = this.log;
-    const inputSel = 'input[type=password]:not([aria-hidden="true"])';
-
-    const passwordInputLoc = this.page!.ref?.locator(inputSel);
-    if (passwordInputLoc && (await passwordInputLoc.count()) > 0) {
-      return await passwordInputLoc.elementHandle();
+  async #checkForm(): Promise<Locator | void> {
+    const textInputLoc = this.page?.ref?.locator(
+      'input[type=text], input[type=email]'
+    );
+    if (!textInputLoc || (await textInputLoc.count()) <= 0) {
+      this.results.error = 'field_not_found';
+      this.results.rawError = new Error('input[type=text], input[type=email]');
+      return;
     }
 
-    // it can be that we are in a "two step form"
-    log.info('No password input found: validating username...');
+    return textInputLoc;
+  }
+
+  /**
+   * Get username input and type the value in it.
+   */
+  async #typeUsername(
+    usernameInputLoc?: Locator
+  ): Promise<ElementHandle<HTMLElement | SVGElement> | null | undefined> {
+    const log = this.log;
+    const { login } = this.params;
+
     try {
-      // We submit the form
-      await textInput!.press('Enter', {
+      log.debug('Current URL', { pageUrl: this.page?.ref?.url() });
+      log.info('Entering username...', { userName: login.username });
+
+      const usernameInput = await usernameInputLoc?.elementHandle({
+        timeout: 500,
+      });
+      await usernameInput?.type(login.username, {
         noWaitAfter: true,
         timeout: this.timeBudget.limit(1000),
       });
+
+      return usernameInput;
+    } finally {
       this.timeBudget.consume();
+    }
+  }
 
-      // And wait for a new input to be there maybe
-      // page!.waitForNavigation() doesn't work with Okta for example, it's JS based
-      await this.page!.ref?.waitForSelector(inputSel, {
-        timeout: this.timeBudget.limit(1000),
-      });
-      this.timeBudget.consume();
+  /**
+   * Get password input.
+   */
+  async #typePasswordInput(
+    textInput: ElementHandle<HTMLElement | SVGElement>
+  ): Promise<ElementHandle<HTMLElement | SVGElement> | null | void> {
+    const { login } = this.params;
+    const log = this.log;
+    const inputSel = 'input[type=password]:not([aria-hidden="true"])';
 
-      log.debug('Current URL', { pageUrl: this.page!.ref?.url() });
+    try {
+      // Find the input
+      let passwordInputLoc = this.page!.ref?.locator(inputSel);
 
-      const loc = this.page!.ref?.locator(inputSel);
-      if (loc && (await loc.count()) > 0) {
-        return await loc.elementHandle();
+      if (!passwordInputLoc || (await passwordInputLoc.count()) <= 0) {
+        // It can be that we are in a "two step form"
+        log.info('No password input found: validating username...');
+
+        // Submit the form to see if the second step appears
+        await textInput.press('Enter', {
+          noWaitAfter: true,
+          timeout: this.timeBudget.limit(1000),
+        });
+        this.timeBudget.consume();
+
+        // And wait for a new input to be there maybe
+        // page!.waitForNavigation() doesn't work with Okta for example, it's JS based
+        await this.page!.ref?.waitForSelector(inputSel, {
+          timeout: this.timeBudget.limit(3000),
+        });
+        this.timeBudget.consume();
+
+        log.debug('Current URL', { pageUrl: this.page!.ref?.url() });
+
+        passwordInputLoc = this.page!.ref?.locator(inputSel);
       }
+
+      if (!passwordInputLoc || (await passwordInputLoc.count()) <= 0) {
+        // Can definitely not find a password input
+        this.results.error = 'field_not_found';
+        this.results.rawError = new Error(inputSel);
+        return;
+      }
+
+      // Type the password
+      log.debug('Entering password and logging in...');
+      await passwordInputLoc.type(login.password, {
+        noWaitAfter: true,
+        timeout: this.timeBudget.get(),
+      });
+
+      return passwordInputLoc?.elementHandle();
     } catch (err: any) {
+      await this.page?.close();
+
       log.info('No password input on the page', {
         err: err.message,
         pageUrl: this.page!.ref?.url(),
       });
 
       this.results.error = cleanErrorMessage(err);
+      this.results.rawError = err;
     }
-
-    return null;
   }
 
   /**
@@ -159,7 +211,7 @@ export class LoginTask extends Task<LoginTaskParams> {
         }),
         passwordInput.press('Enter', {
           noWaitAfter: true,
-          timeout: this.timeBudget.limit(1000),
+          timeout: this.timeBudget.limit(3000),
         }),
       ]);
     } catch (err: any) {
@@ -195,6 +247,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       }
     } catch (err: any) {
       this.results.error = cleanErrorMessage(err);
+      this.results.rawError = err;
       report(new Error('Error while spec'), {
         err: err.message,
         pageUrl: this.page!.ref?.url(),
