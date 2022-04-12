@@ -154,7 +154,7 @@ export class LoginTask extends Task<LoginTaskParams> {
         // And wait for a new input to be there maybe
         // page!.waitForNavigation() doesn't work with Okta for example, it's JS based
         await this.page!.ref?.waitForSelector(inputSel, {
-          timeout: this.timeBudget.limit(1000),
+          timeout: this.timeBudget.limit(3000),
         });
         this.timeBudget.consume();
 
@@ -164,7 +164,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       }
 
       if (!passwordInputLoc || (await passwordInputLoc.count()) <= 0) {
-        // Can't definitely not find a password input
+        // Can definitely not find a password input
         this.results.error = 'field_not_found';
         this.results.rawError = new Error(inputSel);
         return;
@@ -211,7 +211,7 @@ export class LoginTask extends Task<LoginTaskParams> {
         }),
         passwordInput.press('Enter', {
           noWaitAfter: true,
-          timeout: this.timeBudget.limit(1000),
+          timeout: this.timeBudget.limit(3000),
         }),
       ]);
     } catch (err: any) {
