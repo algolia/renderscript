@@ -1,3 +1,10 @@
+## [2.1.13](https://github.com/algolia/renderscript/compare/v2.1.12...v2.1.13) (2022-04-14)
+
+
+### Bug Fixes
+
+* **login:** catch more errors ([#608](https://github.com/algolia/renderscript/issues/608)) ([6344fa3](https://github.com/algolia/renderscript/commit/6344fa3c2bb8415fb104bdf98cf6826fbaf4ba69))
+
 ## [2.1.12](https://github.com/algolia/renderscript/compare/v2.1.11...v2.1.12) (2022-04-07)
 
 
