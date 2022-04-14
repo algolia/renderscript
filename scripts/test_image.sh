@@ -6,10 +6,13 @@ hash=$1 # the last commit change because of semantic-release
 docker run -d --name renderscript_test -p 3000:3000 algolia/renderscript:$hash
 
 echo "waiting for docker"
-sleepSec=10
+sleepSec=20
 sleep $sleepSec
 
 echo "slept for ${sleepSec}s"
+
+logs=$(docker logs renderscript_test 2>&1)
+echo $logs
 
 curl --silent --request POST \
   --url http://localhost:3000/render \
