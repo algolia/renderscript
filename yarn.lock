@@ -55,7 +55,7 @@ __metadata:
     nodemon: 2.0.15
     pino: 7.9.2
     pino-pretty: 7.5.4
-    playwright-chromium: 1.20.1
+    playwright-chromium: 1.21.0
     prettier: 2.5.1
     semantic-release: 19.0.2
     ts-jest: 27.1.3
@@ -7828,20 +7828,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-chromium@npm:1.20.1":
-  version: 1.20.1
-  resolution: "playwright-chromium@npm:1.20.1"
+"playwright-chromium@npm:1.21.0":
+  version: 1.21.0
+  resolution: "playwright-chromium@npm:1.21.0"
   dependencies:
-    playwright-core: 1.20.1
+    playwright-core: 1.21.0
   bin:
     playwright: cli.js
-  checksum: 32c86a7b04625d83fc05f11221f7cecc603eaffd39a4f7c2631fe033668d6b1e4157ff8646da44e7150d700a168c708db1d29e4264cd22afcd9f59210f624af5
+  checksum: 7ed1f15174abe11614edcc9310e65fc3b1fc07aa0138cbd0353c60b8ce577555719bcc8da468047779d8375c8b1f9a1b57217389f75284c10ce35023da888cf2
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.20.1":
-  version: 1.20.1
-  resolution: "playwright-core@npm:1.20.1"
+"playwright-core@npm:1.21.0":
+  version: 1.21.0
+  resolution: "playwright-core@npm:1.21.0"
   dependencies:
     colors: 1.4.0
     commander: 8.3.0
@@ -7863,7 +7863,7 @@ __metadata:
     yazl: 2.5.1
   bin:
     playwright: cli.js
-  checksum: a436eff4cfb88a68d6c2da7941c0ace35f940f885f97c125e1a0103e4601f1be313eada81283f1208d5cded57a841482f743526fc3960c5f2a383b08220401de
+  checksum: 9221b65a4a10d9df93f59ff9ac788382f6e8b25e7a68bd2f46ad9178b6d94055704f6ad9aa5885a1648dec0ff01f6611d1eced519a0a834615c6924944058fdf
   languageName: node
   linkType: hard
 
