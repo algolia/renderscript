@@ -71,7 +71,9 @@ export class LoginTask extends Task<LoginTaskParams> {
     this.results.resolvedUrl = this.page.ref.url();
     // we get the cookie for the requested domain
     // this is not ideal for some SSO, returning valid cookies but missing some of them
-    this.results.cookies = await this.page.ref?.context().cookies([url.href]);
+    this.results.cookies = await this.page.ref
+      ?.context()
+      .cookies([url.href, this.results.resolvedUrl]);
 
     if (this.results.cookies.length <= 0) {
       this.results.error = 'no_cookies';
