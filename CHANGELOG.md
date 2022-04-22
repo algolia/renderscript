@@ -1,3 +1,10 @@
+## [2.1.15](https://github.com/algolia/renderscript/compare/v2.1.14...v2.1.15) (2022-04-22)
+
+
+### Bug Fixes
+
+* **cookies:** output from original url and resolved url ([#610](https://github.com/algolia/renderscript/issues/610)) ([d738a4e](https://github.com/algolia/renderscript/commit/d738a4eff569b3a2ad9f529cf66fab8e4cd0f276))
+
 ## [2.1.14](https://github.com/algolia/renderscript/compare/v2.1.13...v2.1.14) (2022-04-15)
 
 
