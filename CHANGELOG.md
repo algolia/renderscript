@@ -1,3 +1,10 @@
+## [2.1.16](https://github.com/algolia/renderscript/compare/v2.1.15...v2.1.16) (2022-04-25)
+
+
+### Bug Fixes
+
+* **login:** wait more ([8bb32d6](https://github.com/algolia/renderscript/commit/8bb32d65672a1ad864a4a8d24601b6403111bc01))
+
 ## [2.1.15](https://github.com/algolia/renderscript/compare/v2.1.14...v2.1.15) (2022-04-22)
 
 
