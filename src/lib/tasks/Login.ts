@@ -119,7 +119,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       });
       await usernameInput?.type(login.username, {
         noWaitAfter: true,
-        timeout: this.timeBudget.limit(1000),
+        timeout: this.timeBudget.limit(3000),
       });
 
       return usernameInput;
@@ -156,7 +156,7 @@ export class LoginTask extends Task<LoginTaskParams> {
         // And wait for a new input to be there maybe
         // page!.waitForNavigation() doesn't work with Okta for example, it's JS based
         await this.page!.ref?.waitForSelector(inputSel, {
-          timeout: this.timeBudget.limit(3000),
+          timeout: this.timeBudget.min(3000),
         });
         this.timeBudget.consume();
 
@@ -176,7 +176,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       log.debug('Entering password and logging in...');
       await passwordInputLoc.type(login.password, {
         noWaitAfter: true,
-        timeout: this.timeBudget.get(),
+        timeout: this.timeBudget.limit(3000),
       });
 
       return passwordInputLoc?.elementHandle();
@@ -208,7 +208,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       // We wait both at the same time because navigation happens quickly
       [res] = await Promise.all([
         this.page!.waitForNavigation({
-          timeout: this.timeBudget.limit(3000),
+          timeout: this.timeBudget.min(3000),
           waitUntil: 'domcontentloaded',
         }),
         passwordInput.press('Enter', {
@@ -227,7 +227,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       // we could do it before but it's easier to split domcontentloaded and networkidle for debug
       const [resAfterNetwork] = await Promise.all([
         this.page!.waitForNavigation({
-          timeout: this.timeBudget.limit(5000),
+          timeout: this.timeBudget.min(5000),
           waitUntil: 'networkidle',
         }),
       ]);
@@ -236,10 +236,22 @@ export class LoginTask extends Task<LoginTaskParams> {
         // but we don't want to erase res because it is most of the time normal if we already reached the final page
         res = resAfterNetwork;
       }
+    } catch (err: any) {
+      this.results.error = cleanErrorMessage(err);
+      this.results.rawError = err;
+      report(new Error('Error waiting for na'), {
+        err: err.message,
+        pageUrl: this.page!.ref?.url(),
+      });
+      return;
+    } finally {
+      this.timeBudget.consume();
+    }
 
+    try {
       const [resAfterSpec] = await Promise.all([
         this.page!.waitForNavigation({
-          timeout: this.timeBudget.limit(5000),
+          timeout: this.timeBudget.min(5000),
           waitUntil: 'networkidle',
         }),
         this.#handleSpecForm(),
@@ -248,13 +260,7 @@ export class LoginTask extends Task<LoginTaskParams> {
         res = resAfterSpec;
       }
     } catch (err: any) {
-      this.results.error = cleanErrorMessage(err);
-      this.results.rawError = err;
-      report(new Error('Error while spec'), {
-        err: err.message,
-        pageUrl: this.page!.ref?.url(),
-      });
-      return;
+      this.page!.throwIfNotTimeout(err);
     } finally {
       this.timeBudget.consume();
     }
@@ -310,12 +316,12 @@ export class LoginTask extends Task<LoginTaskParams> {
         log.debug('MSFT: found confirm and submit');
 
         await confirm.click({
-          timeout: this.timeBudget.limit(100),
+          timeout: this.timeBudget.limit(300),
           noWaitAfter: true, // Otherwise wait for navigation
         });
 
         await submit.click({
-          timeout: this.timeBudget.limit(100),
+          timeout: this.timeBudget.limit(300),
           noWaitAfter: true, // Otherwise wait for navigation
         });
       }

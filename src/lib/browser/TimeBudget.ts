@@ -24,6 +24,10 @@ export class TimeBudget {
     return Math.max(1, this.max - this.consumed);
   }
 
+  min(min: number): number {
+    return Math.max(min, this.get());
+  }
+
   limit(max: number): number {
     return Math.min(max, this.get());
   }
