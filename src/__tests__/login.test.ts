@@ -4,7 +4,7 @@ import type { PostLoginSuccess } from 'api/@types/postLogin';
 
 import { sendLoginRequest } from './helpers';
 
-jest.setTimeout(25000);
+jest.setTimeout(45000);
 
 describe('login', () => {
   it('should error when no username', async () => {
