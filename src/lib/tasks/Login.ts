@@ -45,10 +45,8 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     // Submit
     await this.#submitForm(passwordInput!);
-    this.log.debug(`dkjfdkfjdkfjdk???`);
 
     await this.saveStatus(response);
-    this.log.debug(`hello???`);
 
     await this.minWait();
     await this.saveStatus(response);
@@ -134,9 +132,8 @@ export class LoginTask extends Task<LoginTaskParams> {
         return this.throwHandledError(passwordInputLoc);
       }
 
-      if (step === '2') {
-        // Should not happen
-        throw new Error("Can't find password");
+      if (step === '2' && passwordInputLoc.error === 'field_not_found') {
+        return this.throwHandledError(passwordInputLoc);
       }
 
       return await this.#handleFirstStepForm({ textInput });

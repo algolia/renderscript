@@ -122,9 +122,6 @@ export class TasksManager {
         task.results.error = task.results.error || cleanErrorMessage(err);
         task.results.rawError = err;
       }
-
-      task.results.body =
-        (await task.page?.renderBody({ silent: true })) || null;
       report(err, { url });
       /* eslint-enable no-param-reassign */
     }
