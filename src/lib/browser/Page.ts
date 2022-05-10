@@ -235,7 +235,9 @@ export class BrowserPage {
   /**
    * Output body as a string at the moment it is requested.
    */
-  async renderBody(): Promise<string | null> {
+  async renderBody(
+    { silent }: { silent: boolean } = { silent: false }
+  ): Promise<string | null> {
     try {
       return await promiseWithTimeout(
         (async (): Promise<string | null> => {
@@ -244,7 +246,7 @@ export class BrowserPage {
         10000 // this is the most important part so we try hard
       );
     } catch (err) {
-      if (!(err instanceof PromiseWithTimeoutError)) {
+      if (!(err instanceof PromiseWithTimeoutError) && !silent) {
         throw err;
       }
     }

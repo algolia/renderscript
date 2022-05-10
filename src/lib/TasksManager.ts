@@ -4,7 +4,7 @@ import { stats } from 'helpers/stats';
 
 import { Browser } from './browser/Browser';
 import { UNHEALTHY_TASK_TTL } from './constants';
-import { cleanErrorMessage } from './helpers/errors';
+import { cleanErrorMessage, ErrorIsHandledError } from './helpers/errors';
 import type { Task } from './tasks/Task';
 import type { TaskObject, TaskFinal } from './types';
 
@@ -117,14 +117,16 @@ export class TasksManager {
       await task.createContext(this.#browser);
       await task.process();
     } catch (err: any) {
-      // eslint-disable-next-line no-param-reassign
-      task.results.error = task.results.error || cleanErrorMessage(err);
-      // eslint-disable-next-line no-param-reassign
-      task.results.rawError = err;
-      if (task.results.error === 'unknown_error') {
-        // Task itself should never break the whole execution
-        report(err, { url });
+      /* eslint-disable no-param-reassign */
+      if (!(err instanceof ErrorIsHandledError)) {
+        task.results.error = task.results.error || cleanErrorMessage(err);
+        task.results.rawError = err;
       }
+
+      task.results.body =
+        (await task.page?.renderBody({ silent: true })) || null;
+      report(err, { url });
+      /* eslint-enable no-param-reassign */
     }
 
     try {

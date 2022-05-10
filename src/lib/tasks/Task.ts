@@ -8,7 +8,13 @@ import type { Browser } from 'lib/browser/Browser';
 import { BrowserPage } from 'lib/browser/Page';
 import { TimeBudget } from 'lib/browser/TimeBudget';
 import { WAIT_TIME } from 'lib/constants';
-import type { Metrics, TaskBaseParams, TaskResult } from 'lib/types';
+import { ErrorIsHandledError } from 'lib/helpers/errors';
+import type {
+  ErrorReturn,
+  Metrics,
+  TaskBaseParams,
+  TaskResult,
+} from 'lib/types';
 
 export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   id: string;
@@ -122,8 +128,15 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
    * Save status in results.
    */
   async saveStatus(response: Response): Promise<void> {
-    this.results.statusCode = response.status();
-    this.results.headers = await response.allHeaders();
+    try {
+      this.results.statusCode = response.status();
+      this.results.headers = await response.allHeaders();
+    } catch (err: any) {
+      return this.throwHandledError({
+        error: 'error_reading_response',
+        rawError: err,
+      });
+    }
   }
 
   /**
@@ -158,6 +171,15 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     } catch (err) {
       // Can happen if target is already closed or redirection
     }
+  }
+
+  /**
+   * Shortcut everything.
+   */
+  throwHandledError(res: ErrorReturn): void {
+    this.results.error = res.error;
+    this.results.rawError = res.rawError || null;
+    throw new ErrorIsHandledError();
   }
 
   abstract process(): Promise<void>;

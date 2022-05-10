@@ -37,10 +37,10 @@ export class RenderTask extends Task<RenderTaskParams> {
         waitUntil: 'domcontentloaded',
       });
     } catch (err: any) {
-      this.results.error = this.results.error || cleanErrorMessage(err);
-      this.results.rawError = err;
-
-      return;
+      return this.throwHandledError({
+        error: this.results.error || cleanErrorMessage(err),
+        rawError: err,
+      });
     } finally {
       this.setMetric('goto');
     }
@@ -52,25 +52,26 @@ export class RenderTask extends Task<RenderTaskParams> {
     await this.saveStatus(this.page.initialResponse || response);
 
     if (this.page.redirection) {
-      this.results.error = this.results.error || 'redirection';
       this.results.resolvedUrl =
         this.results.resolvedUrl || this.page.redirection;
-      return;
+      return this.throwHandledError({
+        error: this.results.error || 'redirection',
+      });
     }
 
     // Check for html refresh
     try {
       const redirect = await promiseWithTimeout(
         this.page.checkForHttpEquivRefresh({
-          timeout: this.timeBudget.limit(1000),
+          timeout: this.timeBudget.minmax(1000, 3000),
         }),
         1000
       );
       if (redirect) {
-        this.results.error = 'redirection';
         this.results.resolvedUrl = redirect.href;
-
-        return;
+        return this.throwHandledError({
+          error: this.results.error || 'redirection',
+        });
       }
     } catch (err) {
       if (!(err instanceof PromiseWithTimeoutError)) {
@@ -101,16 +102,12 @@ export class RenderTask extends Task<RenderTaskParams> {
     await this.minWait();
 
     this.checkFinalURL();
-    if (this.results.error) {
-      return;
-    }
 
     /* Transforming */
     // await page.evaluate(injectBaseHref, baseHref);
-    const body = await this.page.renderBody();
+    const body = await this.page.renderBody({ silent: true });
     if (body === null) {
-      this.results.error = 'body_serialisation_failed';
-      return;
+      return this.throwHandledError({ error: 'body_serialisation_failed' });
     }
 
     this.results.body = body;
@@ -120,17 +117,16 @@ export class RenderTask extends Task<RenderTaskParams> {
   private checkFinalURL(): void {
     const newUrl = this.page!.ref?.url() ? new URL(this.page!.ref.url()) : null;
     if (!newUrl) {
-      // Redirection was not caught this should not happen
-      this.results.error = 'wrong_redirection';
+      // Redirected to nowhere
       this.results.resolvedUrl = 'about:blank/';
-      return;
+      return this.throwHandledError({ error: 'wrong_redirection' });
     }
 
     newUrl.hash = '';
     if (newUrl.href !== this.params.url.href) {
       // Redirection was not caught this should not happen
-      this.results.error = 'wrong_redirection';
       this.results.resolvedUrl = newUrl.href;
+      return this.throwHandledError({ error: 'wrong_redirection' });
     }
   }
 }
