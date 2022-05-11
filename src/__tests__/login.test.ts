@@ -62,7 +62,7 @@ describe('login', () => {
     const parsed: PostLoginSuccess = JSON.parse(body);
     expect(parsed.error).toBe('too_many_fields');
     expect(parsed.rawError?.message).toBe(
-      'For input[type=text], input[type=email] found 2'
+      'Too many input found for "input[type=text], input[type=email]", found "2"'
     );
   });
 
@@ -77,7 +77,7 @@ describe('login', () => {
     const parsed: PostLoginSuccess = JSON.parse(body);
     expect(parsed.error).toBe('too_many_fields');
     expect(parsed.rawError?.message).toBe(
-      'For input[type=password]:not([aria-hidden="true"]) found 2'
+      'Too many input found for "input[type=password]:not([aria-hidden="true"])", found "2"'
     );
   });
 
