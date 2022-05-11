@@ -27,7 +27,6 @@ describe('get()', () => {
     await wait(100);
     tb.consume();
 
-    // Still 99 even if budget does not allow
     expect(tb.get()).toBeGreaterThanOrEqual(1);
     expect(tb.get()).toBeLessThanOrEqual(2);
   });
