@@ -20,7 +20,7 @@ describe('consume()', () => {
 });
 
 describe('get()', () => {
-  it('shoumd return correct get', async () => {
+  it('should return correct get', async () => {
     const tb = new TimeBudget(100);
     expect(tb.get()).toBeGreaterThanOrEqual(99);
 
@@ -34,7 +34,7 @@ describe('get()', () => {
 });
 
 describe('min()', () => {
-  it('shoumd return correct min', async () => {
+  it('should return correct min', async () => {
     const tb = new TimeBudget(100);
     expect(tb.min(99)).toBeGreaterThanOrEqual(99);
 
@@ -46,17 +46,17 @@ describe('min()', () => {
   });
 });
 
-describe('minmax()', () => {
-  it('shoumd return correct inside range', () => {
+describe('getRange()', () => {
+  it('should return correct inside range', () => {
     const tb = new TimeBudget(100);
-    expect(tb.minmax(0, 10)).toBe(10);
+    expect(tb.getRange(0, 10)).toBe(10);
   });
-  it('shoumd return correct outside range', () => {
+  it('should return correct outside range', () => {
     const tb = new TimeBudget(100);
-    expect(tb.minmax(0, 200)).toBe(100);
+    expect(tb.getRange(0, 200)).toBe(100);
   });
-  it('shoumd return correct outside range but forced', () => {
+  it('should return correct outside range but forced', () => {
     const tb = new TimeBudget(100);
-    expect(tb.minmax(200, 300)).toBe(200);
+    expect(tb.getRange(200, 300)).toBe(200);
   });
 });

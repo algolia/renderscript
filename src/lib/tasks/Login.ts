@@ -94,7 +94,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       });
       await usernameInput?.type(login.username, {
         noWaitAfter: true,
-        timeout: this.timeBudget.minmax(2000, 3000),
+        timeout: this.timeBudget.getRange(2000, 3000),
       });
 
       return usernameInput!;
@@ -122,7 +122,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       if (!('error' in passwordInputLoc)) {
         await passwordInputLoc.type(login.password, {
           noWaitAfter: true,
-          timeout: this.timeBudget.minmax(2000, 3000),
+          timeout: this.timeBudget.getRange(2000, 3000),
         });
 
         return passwordInputLoc.elementHandle();
@@ -158,7 +158,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     // Submit the form to see if the second step appears
     await textInput.press('Enter', {
       noWaitAfter: true,
-      timeout: this.timeBudget.minmax(2000, 3000),
+      timeout: this.timeBudget.getRange(2000, 3000),
     });
     this.timeBudget.consume();
 
@@ -194,7 +194,7 @@ export class LoginTask extends Task<LoginTaskParams> {
         }),
         passwordInput.press('Enter', {
           noWaitAfter: true,
-          timeout: this.timeBudget.minmax(2000, 3000),
+          timeout: this.timeBudget.getRange(2000, 3000),
         }),
       ]);
     } catch (err: any) {
@@ -232,8 +232,8 @@ export class LoginTask extends Task<LoginTaskParams> {
       this.timeBudget.consume();
     }
 
-    const hasSpec = this.#needSpec();
-    if (hasSpec) {
+    const hasSpecialCase = this.#needSpecialCase();
+    if (hasSpecialCase) {
       log.debug(`Login wait for spec`);
       try {
         const [resAfterSpec] = await Promise.all([
@@ -241,7 +241,7 @@ export class LoginTask extends Task<LoginTaskParams> {
             timeout: this.timeBudget.min(5000),
             waitUntil: 'networkidle',
           }),
-          this.#handleSpecForm({ spec: hasSpec }),
+          this.#handleSpecialCaseForm({ name: hasSpecialCase }),
         ]);
         if (resAfterSpec) {
           res = resAfterSpec;
@@ -283,7 +283,7 @@ export class LoginTask extends Task<LoginTaskParams> {
     });
   }
 
-  #needSpec(): 'login.live.com' | false {
+  #needSpecialCase(): 'login.live.com' | false {
     if (!this.page?.ref) {
       return false;
     }
@@ -296,14 +296,18 @@ export class LoginTask extends Task<LoginTaskParams> {
     return false;
   }
 
-  async #handleSpecForm({ spec }: { spec: 'login.live.com' }): Promise<void> {
+  async #handleSpecialCaseForm({
+    name,
+  }: {
+    name: 'login.live.com';
+  }): Promise<void> {
     const { log } = this;
     if (!this.page?.ref) {
       return;
     }
 
     // Spec for Microsoft SSO
-    if (spec === 'login.live.com') {
+    if (name === 'login.live.com') {
       log.debug('MSFT: Entering specs');
 
       // There is a "Keep me sign in?" checkbox now
@@ -314,12 +318,12 @@ export class LoginTask extends Task<LoginTaskParams> {
         log.debug('MSFT: found confirm and submit');
 
         await confirm.click({
-          timeout: this.timeBudget.minmax(200, 500),
+          timeout: this.timeBudget.getRange(200, 500),
           noWaitAfter: true, // Otherwise wait for navigation
         });
 
         await submit.click({
-          timeout: this.timeBudget.minmax(200, 500),
+          timeout: this.timeBudget.getRange(200, 500),
           noWaitAfter: true, // Otherwise wait for navigation
         });
       }

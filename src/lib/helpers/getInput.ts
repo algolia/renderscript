@@ -15,14 +15,16 @@ export async function getInput(
   if (!textInputLoc || count <= 0) {
     return {
       error: 'field_not_found',
-      rawError: new Error(sel),
+      rawError: new Error(`Field not found "${sel}"`),
     };
   }
 
   if (count > 1) {
     return {
       error: 'too_many_fields',
-      rawError: new Error(`For ${sel} found ${count}`),
+      rawError: new Error(
+        `Too many input found for "${sel}", found "${count}"`
+      ),
     };
   }
 

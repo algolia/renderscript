@@ -63,7 +63,7 @@ export class RenderTask extends Task<RenderTaskParams> {
     try {
       const redirect = await promiseWithTimeout(
         this.page.checkForHttpEquivRefresh({
-          timeout: this.timeBudget.minmax(1000, 3000),
+          timeout: this.timeBudget.getRange(1000, 3000),
         }),
         1000
       );
