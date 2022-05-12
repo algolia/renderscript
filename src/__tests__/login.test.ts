@@ -51,6 +51,36 @@ describe('login', () => {
     });
   });
 
+  it('should error double text input', async () => {
+    const { res, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/test-website/login-double-input.html',
+      username: 'admin',
+      password: 'paswword',
+    });
+
+    expect(res.statusCode).toBe(200);
+    const parsed: PostLoginSuccess = JSON.parse(body);
+    expect(parsed.error).toBe('too_many_fields');
+    expect(parsed.rawError?.message).toBe(
+      'Too many input found for "input[type=text], input[type=email]", found "2"'
+    );
+  });
+
+  it('should error double password', async () => {
+    const { res, body } = await sendLoginRequest({
+      url: 'http://localhost:3000/test-website/login-double-password.html',
+      username: 'admin',
+      password: 'paswword',
+    });
+
+    expect(res.statusCode).toBe(200);
+    const parsed: PostLoginSuccess = JSON.parse(body);
+    expect(parsed.error).toBe('too_many_fields');
+    expect(parsed.rawError?.message).toBe(
+      'Too many input found for "input[type=password]:not([aria-hidden="true"])", found "2"'
+    );
+  });
+
   it('should works with correct credentials', async () => {
     const { res, body } = await sendLoginRequest({
       url: 'http://localhost:3000/secure/login',
@@ -160,7 +190,6 @@ describe('JavaScript redirect', () => {
     expect(parsed.body).toBe(
       '<!DOCTYPE html><html lang="en"><head></head><body>OK(/test)</body></html>'
     );
-    expect(parsed.timeout).toBe(true); // timeout since we don't do any network call
     expect(parsed.statusCode).toBe(200);
     expect(parsed.metrics.timings.total).toBeGreaterThan(1000);
     expect(parsed.resolvedUrl).toBe('http://localhost:3000/secure/test');

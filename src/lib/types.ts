@@ -3,20 +3,25 @@ import type { Cookie } from 'playwright-chromium';
 import type { Task } from './tasks/Task';
 
 export type HandledError =
+  | HandledLoginError
   | 'body_serialisation_failed'
   | 'connection_error'
   | 'dns_error'
+  | 'error_reading_response'
   | 'fetch_aborted'
   | 'fetch_timeout'
-  | 'field_not_found'
   | 'forbidden_by_website'
   | 'no_cookies'
-  | 'no_response_after_login'
   | 'page_closed_too_soon'
   | 'page_crashed'
   | 'redirection'
   | 'timedout'
   | 'wrong_redirection';
+
+export type HandledLoginError =
+  | 'field_not_found'
+  | 'no_response_after_login'
+  | 'too_many_fields';
 
 export type UnhandledError = 'unknown_error';
 
@@ -70,6 +75,11 @@ export interface TaskResult {
   cookies: Cookie[];
 }
 
+export type ErrorReturn = Optional<
+  Pick<TaskResult, 'error' | 'rawError'>,
+  'rawError'
+>;
+
 export interface Metrics {
   timings: {
     context: number | null;
@@ -110,3 +120,48 @@ export interface TaskObject {
   ref: Task;
   promise: Promise<TaskFinal>;
 }
+
+/**
+ * Take an interface and list the keys that are optional.
+ *
+ * @example
+ * interface Hello {
+ *   foo?: string;
+ *   bar?: string;
+ *   baz: string;
+ * }
+ *
+ * OptionalKeys<Hello>;
+ *
+ * Will result in:
+ * 'foo' | 'bar'
+ */
+export type OptionalKeys<T> = {
+  [K in keyof T]: undefined extends T[K] ? K : never;
+}[keyof T];
+
+/**
+ * Take an interface and choose what property should undefined.
+ *
+ * @example
+ * interface Hello {
+ *  foo: string;
+ *  bar: string;
+ *  baz?: string;
+ * };
+ *
+ * Optional<Hello, 'bar'>;
+ *
+ * Will results in:
+ * {
+ *  foo: string;
+ *  bar?: string;
+ *  baz?: string;
+ * }
+ *
+ */
+export type Optional<T, K extends keyof T> = {
+  [P in Exclude<keyof T, Exclude<keyof T, K | OptionalKeys<T>>>]?: T[P];
+} & {
+  [P in Exclude<keyof T, K | OptionalKeys<T>>]: T[P];
+};

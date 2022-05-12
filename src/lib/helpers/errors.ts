@@ -11,6 +11,7 @@ export const retryableErrors: Array<HandledError | UnhandledError> = [
   'page_crashed',
   'timedout',
   'unknown_error',
+  'error_reading_response',
 ];
 
 export function cleanErrorMessage(error: Error): HandledError | UnhandledError {
@@ -63,3 +64,5 @@ export function cleanErrorMessage(error: Error): HandledError | UnhandledError {
 
   return `unknown_error`;
 }
+
+export class ErrorIsHandledError extends Error {}
