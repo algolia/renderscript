@@ -23,6 +23,7 @@ import {
   postLogin,
   postStep2,
 } from './routes/privates/login';
+import { root } from './routes/root';
 
 export class Api {
   server: http.Server;
@@ -42,7 +43,38 @@ export class Api {
     this._routes();
     if (process.env.NODE_ENV !== 'production') {
       this._privateRoutes();
+    } else {
+      this._app.get('/', root);
     }
+
+    // 404
+    this._app.use('*', (req, res) => {
+      res.status(404).json({
+        status: 404,
+        error: 'Endpoint not found',
+        code: 'not_found',
+      });
+    });
+    // error handler
+    this._app.use(
+      (
+        err: any,
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+      ) => {
+        if (err.code !== 'EBADCSRFTOKEN') {
+          return next(err);
+        }
+
+        // CSRF token errors
+        res.status(403).json({
+          status: 403,
+          error: 'The form has expired',
+          code: 'form_expired',
+        });
+      }
+    );
 
     this.server.listen(port, () => {
       log.info(`Ready http://localhost:${port}`);
@@ -73,23 +105,6 @@ export class Api {
       .get('/render', routeRender.validate, routeRender.render)
       .post('/render', routeRender.validate, routeRender.renderJSON)
       .post('/login', routeLogin.validate, routeLogin.processLogin);
-
-    // error handler
-    this._app.use(
-      (
-        err: any,
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-      ) => {
-        if (err.code !== 'EBADCSRFTOKEN') {
-          return next(err);
-        }
-
-        // CSRF token errors
-        res.status(403).send('The form has expired');
-      }
-    );
   }
 
   private _privateRoutes(): void {
