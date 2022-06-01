@@ -12,6 +12,6 @@ export function requestLogger(
     return;
   }
 
-  log.info('New request', { method: req.method, path: req.url });
+  log.info('Received', { method: req.method, path: req.url });
   next();
 }
