@@ -1,6 +1,6 @@
 import type express from 'express';
 
-import type { GetRoot } from 'api/@types/GetRoot';
+import type { GetRoot } from '../@types/GetRoot';
 
 export function root(
   req: express.Request,
