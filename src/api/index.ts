@@ -63,7 +63,7 @@ export class Api {
         res: express.Response,
         next: express.NextFunction
       ) => {
-        if (err.code !== 'EBADCSRFTOKEN') {
+        if (err?.code !== 'EBADCSRFTOKEN') {
           return next(err);
         }
 
