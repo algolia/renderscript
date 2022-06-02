@@ -1,3 +1,12 @@
+## [2.1.17](https://github.com/algolia/renderscript/compare/v2.1.16...v2.1.17) (2022-06-02)
+
+
+### Bug Fixes
+
+* **api:** catch all at the end + 404 + / in prod ([#613](https://github.com/algolia/renderscript/issues/613)) ([c1402d3](https://github.com/algolia/renderscript/commit/c1402d311c1e8da4982261e194f6995c4e863650))
+* **deps:** update dependency @sentry/node to v6.19.7 ([#599](https://github.com/algolia/renderscript/issues/599)) ([0da3e06](https://github.com/algolia/renderscript/commit/0da3e06fe940fbe143673bb26972d36e9d2a5b64))
+* **error:** handle more ([#612](https://github.com/algolia/renderscript/issues/612)) ([ec2a722](https://github.com/algolia/renderscript/commit/ec2a72298906824416b15912a5b3ebb24554d245))
+
 ## [2.1.16](https://github.com/algolia/renderscript/compare/v2.1.15...v2.1.16) (2022-04-25)
 
 
