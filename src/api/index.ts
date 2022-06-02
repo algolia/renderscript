@@ -55,26 +55,25 @@ export class Api {
         code: 'not_found',
       });
     });
-    // error handler
-    this._app.use(
-      (
-        err: any,
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-      ) => {
-        if (err?.code !== 'EBADCSRFTOKEN') {
-          return next(err);
-        }
 
-        // CSRF token errors
-        res.status(403).json({
-          status: 403,
-          error: 'The form has expired',
-          code: 'form_expired',
+    // error handler
+    this._app.use((err: any, req: express.Request, res: express.Response) => {
+      if (err?.code !== 'EBADCSRFTOKEN') {
+        // return next();
+        return res.status(500).json({
+          status: 500,
+          error: 'Internal Server Error',
+          code: 'internal_server_error',
         });
       }
-    );
+
+      // CSRF token errors
+      res.status(403).json({
+        status: 403,
+        error: 'The form has expired',
+        code: 'form_expired',
+      });
+    });
 
     this.server.listen(port, () => {
       log.info(`Ready http://localhost:${port}`);
@@ -86,10 +85,23 @@ export class Api {
   }
 
   private _setup(): void {
+    const jsonParser = json({ limit: '1mb' });
     this._app.disable('x-powered-by');
 
     this._app.use(urlencoded({ limit: '1mb', extended: true }));
-    this._app.use(json({ limit: '1mb' }));
+    this._app.use((req, res, next) => {
+      return jsonParser(req, res, (err) => {
+        if (!err) {
+          return next();
+        }
+
+        return res.status(400).json({
+          status: 400,
+          error: `Invalid json: ${err.message}`,
+          code: 'invalid_json',
+        });
+      });
+    });
 
     this._app.use(requestLogger);
     this._app.use(cookieParser());

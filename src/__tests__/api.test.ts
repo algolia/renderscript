@@ -1,6 +1,6 @@
 import type { PostRenderSuccess } from 'api/@types/postRender';
 
-import { postRender } from './helpers';
+import { postRender, request } from './helpers';
 
 /**
  * Test the schema only on this file.
@@ -65,6 +65,22 @@ describe('POST /render', () => {
           },
         },
       },
+    });
+  });
+
+  it('should handle bad json', async () => {
+    const res = await request('http://localhost:3000/render', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: '{"url": "https://example.com", "ua": "test}',
+    });
+
+    expect(JSON.parse(res.body)).toStrictEqual({
+      status: 400,
+      error: 'Invalid json: Unexpected end of JSON input',
+      code: 'invalid_json',
     });
   });
 });
