@@ -1,3 +1,11 @@
+## [2.1.18](https://github.com/algolia/renderscript/compare/v2.1.17...v2.1.18) (2022-06-27)
+
+
+### Bug Fixes
+
+* **adblocking:** use the more restrictive one that do disable GTM ([3df848f](https://github.com/algolia/renderscript/commit/3df848f6eccf5b423c6d42aa535ec6ca30b62e95))
+* **api:** more error handling ([#616](https://github.com/algolia/renderscript/issues/616)) ([271dcdf](https://github.com/algolia/renderscript/commit/271dcdf9b7e7146f349079861c8a31c41df85c26))
+
 ## [2.1.17](https://github.com/algolia/renderscript/compare/v2.1.16...v2.1.17) (2022-06-02)
 
 
