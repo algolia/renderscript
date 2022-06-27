@@ -44,7 +44,7 @@ __metadata:
     eslint-plugin-algolia: 2.0.0
     eslint-plugin-eslint-comments: 3.2.0
     eslint-plugin-import: 2.25.4
-    eslint-plugin-jest: 26.4.5
+    eslint-plugin-jest: 26.5.3
     eslint-plugin-jsdoc: 38.1.6
     eslint-plugin-node: 11.1.0
     eslint-plugin-prettier: 4.0.0
@@ -3795,9 +3795,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jest@npm:26.4.5":
-  version: 26.4.5
-  resolution: "eslint-plugin-jest@npm:26.4.5"
+"eslint-plugin-jest@npm:26.5.3":
+  version: 26.5.3
+  resolution: "eslint-plugin-jest@npm:26.5.3"
   dependencies:
     "@typescript-eslint/utils": ^5.10.0
   peerDependencies:
@@ -3808,7 +3808,7 @@ __metadata:
       optional: true
     jest:
       optional: true
-  checksum: f27b9f57628c424a7a67963cac07d7b7c6093cb5b5f0ac7a33dd384b726f43705d719adc110133ec7f699b4cc4a0a109b7340bb28f97ef7557c557094fee31bb
+  checksum: 16897c56eadf3da19a96e18b1bd983bbd0a34ad9545d5bc6f9ee67d2940e6e2fd2f067f44dbbb26dcaf17c75c0132f89a06a09ff5169761ce48c9708a2acf7d7
   languageName: node
   linkType: hard
 
