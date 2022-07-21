@@ -86,7 +86,7 @@
     "hot-shots": "9.0.0",
     "pino": "7.9.2",
     "playwright-chromium": "1.21.0",
-    "undici": "4.16.0",
+    "undici": "5.8.0",
     "uuid": "8.3.2"
   },
   "resolutions": {
