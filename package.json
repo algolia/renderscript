@@ -65,7 +65,7 @@
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-promise": "6.0.0",
     "jest": "27.5.1",
-    "nodemon": "2.0.15",
+    "nodemon": "2.0.20",
     "pino-pretty": "7.6.1",
     "prettier": "2.6.2",
     "semantic-release": "19.0.3",
