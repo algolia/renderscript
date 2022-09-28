@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`JavaScript redirect should not try to render the body if renderHTML was not requested 1`] = `
-Object {
+{
   "domain": "localhost",
   "expires": -1,
   "httpOnly": false,
@@ -14,7 +14,7 @@ Object {
 `;
 
 exports[`login should works even with a 2-steps login 1`] = `
-Object {
+{
   "domain": "localhost",
   "expires": -1,
   "httpOnly": false,
@@ -27,7 +27,7 @@ Object {
 `;
 
 exports[`login should works with a 2-steps JS login 1`] = `
-Object {
+{
   "domain": "localhost",
   "expires": -1,
   "httpOnly": false,
@@ -40,7 +40,7 @@ Object {
 `;
 
 exports[`login should works with correct credentials 1`] = `
-Object {
+{
   "domain": "localhost",
   "expires": -1,
   "httpOnly": false,
