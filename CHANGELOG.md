@@ -1,3 +1,10 @@
+## [2.1.21](https://github.com/algolia/renderscript/compare/v2.1.20...v2.1.21) (2022-09-29)
+
+
+### Bug Fixes
+
+* **login:** try multiple selector for username ([#642](https://github.com/algolia/renderscript/issues/642)) ([ac981a7](https://github.com/algolia/renderscript/commit/ac981a7a03d66f8c90438de8817cc0ae18221811))
+
 ## [2.1.20](https://github.com/algolia/renderscript/compare/v2.1.19...v2.1.20) (2022-09-29)
 
 
