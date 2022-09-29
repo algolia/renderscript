@@ -1,4 +1,9 @@
-import type { ElementHandle, Response, Request } from 'playwright-chromium';
+import type {
+  ElementHandle,
+  Response,
+  Request,
+  Locator,
+} from 'playwright-chromium';
 
 import { report } from 'helpers/errorReporting';
 import { cleanErrorMessage } from 'lib/helpers/errors';
@@ -7,7 +12,18 @@ import type { LoginTaskParams } from 'lib/types';
 
 import { Task } from './Task';
 
-const usernameSel = 'input[type=text], input[type=email]';
+const usernameSelectors = [
+  'input[type=email][id*=login i]',
+  'input[type=email][name*=login i]',
+  'input[type=text][id*=login i]',
+  'input[type=text][id*=email i]',
+  'input[type=text][id*=username i]',
+  'input[type=text][name*=login i]',
+  'input[type=text][name*=email i]',
+  'input[type=text][name*=username i]',
+  'input[type=email]',
+  'input[type=text]',
+];
 const passwordSel = 'input[type=password]:not([aria-hidden="true"])';
 
 export class LoginTask extends Task<LoginTaskParams> {
@@ -82,14 +98,28 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     try {
       // We first check if there is form
-      const usernameInputLoc = await getInput(page, usernameSel);
+      // Try mutliple selector from the most to less precise
+      let usernameInputLoc: Locator | null = null;
+      for (const usernameSel of usernameSelectors) {
+        const input = await getInput(page, usernameSel);
+        if (!('error' in input)) {
+          usernameInputLoc = input;
+          break;
+        }
+      }
+      if (!usernameInputLoc) {
+        return this.throwHandledError({
+          error: 'field_not_found',
+          rawError: new Error('Username field not found'),
+        });
+      }
       if ('error' in usernameInputLoc) {
         return this.throwHandledError(usernameInputLoc);
       }
 
       log.info('Entering username...', { userName: login.username });
 
-      const usernameInput = await usernameInputLoc?.elementHandle({
+      const usernameInput = await usernameInputLoc.elementHandle({
         timeout: 500,
       });
       await usernameInput?.type(login.username, {

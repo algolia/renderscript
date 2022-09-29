@@ -51,19 +51,17 @@ describe('login', () => {
     });
   });
 
-  it('should error double text input', async () => {
+  it('should error multiple text input', async () => {
     const { res, body } = await sendLoginRequest({
-      url: 'http://localhost:3000/test-website/login-double-input.html',
+      url: 'http://localhost:3000/test-website/login-multiple-input.html',
       username: 'admin',
       password: 'paswword',
     });
 
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(500);
     const parsed: PostLoginSuccess = JSON.parse(body);
-    expect(parsed.error).toBe('too_many_fields');
-    expect(parsed.rawError?.message).toBe(
-      'Too many input found for "input[type=text], input[type=email]", found "2"'
-    );
+    expect(parsed.error).toBe('no_cookies');
+    expect(parsed.rawError).toBeNull();
   });
 
   it('should error double password', async () => {
