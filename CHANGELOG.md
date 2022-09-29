@@ -1,3 +1,10 @@
+## [2.1.20](https://github.com/algolia/renderscript/compare/v2.1.19...v2.1.20) (2022-09-29)
+
+
+### Bug Fixes
+
+* **docker:** build image locally and on CI ([#641](https://github.com/algolia/renderscript/issues/641)) ([b51386f](https://github.com/algolia/renderscript/commit/b51386f27bbd67a8e8a9944bf41d4e96ada04866))
+
 ## [2.1.19](https://github.com/algolia/renderscript/compare/v2.1.18...v2.1.19) (2022-08-30)
 
 
