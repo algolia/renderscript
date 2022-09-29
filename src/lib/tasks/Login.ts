@@ -102,10 +102,10 @@ export class LoginTask extends Task<LoginTaskParams> {
       let usernameInputLoc: Locator | null = null;
       for (const usernameSel of usernameSelectors) {
         const input = await getInput(page, usernameSel);
-        if ('error' in input) {
-          continue;
+        if (!('error' in input)) {
+          usernameInputLoc = input;
+          break;
         }
-        usernameInputLoc = input;
       }
       if (!usernameInputLoc) {
         return this.throwHandledError({
