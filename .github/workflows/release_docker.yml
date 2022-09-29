@@ -8,7 +8,7 @@ on:
       dry_run:
         required: true
         type: boolean
-        default: 'true'
+        default: true
         description: 'DryRun?'
 
 env:

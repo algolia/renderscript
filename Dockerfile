@@ -1,7 +1,7 @@
 # ------------------
 # Build playwright
 # ------------------
-FROM ubuntu:focal as base
+FROM ubuntu:jammy as base
 
 # For tzdata
 ARG DEBIAN_FRONTEND=noninteractive
@@ -25,9 +25,10 @@ RUN apt-get update && \
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # Browsers will be downloaded in `/ms-playwright`.
+# !!! MAKE SURE THE PLAYWRIGHT VERSION MATCHES THE ONE IN package.json
 RUN mkdir /ms-playwright \
-  && npx playwright install chromium \
-  && npx playwright install-deps chromium \
+  && npx playwright@1.26.1 install chromium \
+  && npx playwright@1.26.1 install-deps chromium \
   # Clean cache
   && rm -rf /var/lib/apt/lists/* \
   && chmod -R 777 /ms-playwright
@@ -36,7 +37,7 @@ RUN mkdir /ms-playwright \
 # ------------------
 # package.json cache
 # ------------------
-FROM apteno/alpine-jq:2022-03-27 AS deps
+FROM apteno/alpine-jq:2022-09-25 AS deps
 
 # To prevent cache invalidation from changes in fields other than dependencies
 COPY package.json /tmp

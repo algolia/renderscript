@@ -5,11 +5,16 @@ set -e
 hash=$1 # the last commit change because of semantic-release
 docker run -d --name renderscript_test -p 3000:3000 algolia/renderscript:$hash
 
-echo "waiting for docker"
-sleepSec=20
-sleep $sleepSec
-
-echo "slept for ${sleepSec}s"
+ATTEMPTS=10
+until $(curl -o /dev/null -s -f http://localhost:3000/ready); do
+  echo "waiting for docker..."
+  sleep 1
+  ((ATTEMPTS=ATTEMPTS-1))
+  if [[ $ATTEMPTS -eq "0" ]]; then
+    echo "Timed out, check the logs of renderscript_test container"
+    exit 1
+  fi
+done
 
 logs=$(docker logs renderscript_test 2>&1)
 echo $logs

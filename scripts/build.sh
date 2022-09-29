@@ -9,11 +9,15 @@ echo ""
 
 # Build renderscript
 
+# To run locally on your mac m1, you need to change platform to linux/arm64/v8
+# For deploy, it should be linux/amd64
 docker buildx build \
-  --platform linux/arm64/v8,linux/amd64 \
+  --platform linux/amd64 \
   --progress plain \
   -t algolia/renderscript \
   -t "algolia/renderscript:${current}" \
   -t "algolia/renderscript:${hash}" \
+  -t "algolia/renderscript:latest" \
   --build-arg "VERSION=${current}" \
+  --load \
   .
