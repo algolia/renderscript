@@ -51,9 +51,9 @@ describe('login', () => {
     });
   });
 
-  it('should error double text input', async () => {
+  it('should error multiple text input', async () => {
     const { res, body } = await sendLoginRequest({
-      url: 'http://localhost:3000/test-website/login-double-input.html',
+      url: 'http://localhost:3000/test-website/login-multiple-input.html',
       username: 'admin',
       password: 'paswword',
     });
