@@ -70,7 +70,7 @@ export class RenderTask extends Task<RenderTaskParams> {
         this.page.checkForHttpEquivRefresh({
           timeout: this.timeBudget.getRange(1000, 3000),
         }),
-        1000
+        3000
       );
       if (redirect) {
         this.results.resolvedUrl = redirect.href;
