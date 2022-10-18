@@ -160,7 +160,10 @@ export class TasksManager {
       /* eslint-enable prettier/prettier */
     }
 
-    log.info({ id, url, code: task.results.error }, 'Done');
+    log.info(
+      { id, url, code: task.results.error, metrics: task.metrics },
+      'Done'
+    );
     const res = task.results;
     return {
       ...res,

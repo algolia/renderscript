@@ -38,6 +38,7 @@ export class BrowserPage {
     requests: {
       total: 0,
       blocked: 0,
+      pending: 0,
     },
     contentLength: {
       main: 0,
@@ -80,6 +81,10 @@ export class BrowserPage {
     return this.#initialResponse;
   }
 
+  get pendingRequests(): number {
+    return this.#metrics.requests.pending;
+  }
+
   constructor(context: BrowserContext) {
     this.#context = context;
   }
@@ -101,11 +106,17 @@ export class BrowserPage {
     page.on('popup', () => {
       report(new Error('Popup created'), { pageUrl: page.url() });
     });
+    page.on('request', (req) => {
+      log.debug('request_start', { url: req.url(), pageUrl: page.url() });
+      this.#metrics.requests.pending += 1;
+    });
     page.on('requestfailed', (req) => {
-      log.debug('request_failed', { url: req.url() });
+      log.debug('request_failed', { url: req.url(), pageUrl: page.url() });
+      this.#metrics.requests.pending -= 1;
     });
     page.on('requestfinished', (req) => {
-      log.debug('request_finished', { url: req.url() });
+      log.debug('request_finished', { url: req.url(), pageUrl: page.url() });
+      this.#metrics.requests.pending -= 1;
     });
   }
 
@@ -330,7 +341,6 @@ export class BrowserPage {
       const newUrl = new URL(req.url());
 
       // Playwright does not route redirection to route() so we need to manually catch them
-      log.debug('request_start', { pageUrl: originalUrl, url: newUrl.href });
       const main = req.frame().parentFrame() === null;
       const redir = req.isNavigationRequest();
 
