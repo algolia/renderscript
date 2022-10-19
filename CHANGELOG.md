@@ -1,3 +1,10 @@
+## [2.1.22](https://github.com/algolia/renderscript/compare/v2.1.21...v2.1.22) (2022-10-19)
+
+
+### Bug Fixes
+
+* manually check pending requests ([#654](https://github.com/algolia/renderscript/issues/654)) ([21b6a80](https://github.com/algolia/renderscript/commit/21b6a80ac7b58deb1fda21deeee17a8924b8a9b7))
+
 ## [2.1.21](https://github.com/algolia/renderscript/compare/v2.1.20...v2.1.21) (2022-09-29)
 
 
