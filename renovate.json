@@ -3,6 +3,9 @@
     "config:js-app",
     "algolia"
   ],
+  "baseBranches": [
+    "chore/renovateBaseBranch"
+  ],
   "prHourlyLimit": 5,
   "prConcurrentLimit": 10
 }
