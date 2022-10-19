@@ -58,6 +58,7 @@ describe('POST /render', () => {
           },
           requests: {
             blocked: 0,
+            pending: 0,
             total: 1,
           },
           timings: {

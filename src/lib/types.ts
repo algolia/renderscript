@@ -109,6 +109,7 @@ export interface PageMetrics {
   requests: {
     total: number;
     blocked: number;
+    pending: number;
   };
   contentLength: {
     main: number;

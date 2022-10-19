@@ -1,5 +1,8 @@
+import { setTimeout } from 'timers/promises';
+
 import type { Response } from 'playwright-chromium';
 
+import { log as mainLog } from 'helpers/logger';
 import {
   promiseWithTimeout,
   PromiseWithTimeoutError,
@@ -8,6 +11,8 @@ import { cleanErrorMessage } from 'lib/helpers/errors';
 import type { RenderTaskParams } from 'lib/types';
 
 import { Task } from './Task';
+
+const log = mainLog.child({ svc: 'render' });
 
 export class RenderTask extends Task<RenderTaskParams> {
   async process(): Promise<void> {
@@ -65,7 +70,7 @@ export class RenderTask extends Task<RenderTaskParams> {
         this.page.checkForHttpEquivRefresh({
           timeout: this.timeBudget.getRange(1000, 3000),
         }),
-        1000
+        3000
       );
       if (redirect) {
         this.results.resolvedUrl = redirect.href;
@@ -89,10 +94,30 @@ export class RenderTask extends Task<RenderTaskParams> {
 
     // --- Basic checks passed we wait a bit more to page to render
     try {
-      // Computing maxWait minus what we already consumed
+      const timeBudget = this.timeBudget.get();
+      const startWaitTime = Date.now();
+
       await this.page.ref?.waitForLoadState('networkidle', {
-        timeout: this.timeBudget.get(),
+        timeout: timeBudget,
       });
+      // waitForLoadState('networkidle') can be flaky and return too soon:
+      // https://github.com/microsoft/playwright/issues/4664#issuecomment-742691215
+      // https://github.com/microsoft/playwright/issues/2515#issuecomment-724163391
+      // So if we still have pending requests, we manually wait.
+      while (
+        this.page.pendingRequests > 0 &&
+        Date.now() - startWaitTime < timeBudget
+      ) {
+        log.debug(
+          { pageUrl: this.page.ref?.url() },
+          `Waiting for ${
+            this.page.pendingRequests
+          } requests to complete... WaitTime:${
+            Date.now() - startWaitTime
+          }, timeBudget: ${timeBudget}`
+        );
+        await setTimeout(1000);
+      }
     } catch (err: any) {
       this.page.throwIfNotTimeout(err);
     } finally {
