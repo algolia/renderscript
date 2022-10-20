@@ -16,6 +16,7 @@ describe('native', () => {
     expect(res.statusCode).toBe(200);
     expect(json.metrics.page!.requests).toStrictEqual({
       total: 11,
+      pending: 0,
       blocked: 6,
     });
   });
@@ -34,6 +35,7 @@ describe('adblocker', () => {
     expect(res.statusCode).toBe(200);
     expect(json.metrics.page!.requests).toStrictEqual({
       total: 11,
+      pending: 0,
       blocked: 9,
     });
     /**
