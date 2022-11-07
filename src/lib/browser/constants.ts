@@ -39,7 +39,6 @@ export const flags = [
   "--proxy-server='direct://'",
   '--proxy-bypass-list=*',
   // Disable cache
-  '--disk-cache-dir=/dev/null',
   '--media-cache-size=1',
   '--disk-cache-size=1',
   // Disable useless UI features
