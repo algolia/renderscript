@@ -12,7 +12,7 @@ jobs:
       - name: Renovate Automatic Branch
         uses: bodinsamuel/renovate-automatic-branch@v1
         with:
-          github-token: ${{ secrets.ALGOLIA_BOT_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           repo-owner: algolia
           repo-name: renderscript
           branch-base: master
