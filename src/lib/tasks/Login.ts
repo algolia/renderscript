@@ -1,5 +1,3 @@
-import { setTimeout } from 'timers/promises';
-
 import type {
   ElementHandle,
   Response,
@@ -8,6 +6,7 @@ import type {
 } from 'playwright-chromium';
 
 import { report } from 'helpers/errorReporting';
+import { waitForPendingRequests } from 'helpers/waitForPendingRequests';
 import { cleanErrorMessage } from 'lib/helpers/errors';
 import { getInput } from 'lib/helpers/getInput';
 import type { LoginTaskParams } from 'lib/types';
@@ -253,24 +252,8 @@ export class LoginTask extends Task<LoginTaskParams> {
         // but we don't want to erase res because it is most of the time normal if we already reached the final page
         res = resAfterNetwork;
       }
-      // waitForNavigation({ waitUntil: 'networkidle' }) can be flaky and return too soon:
-      // https://github.com/microsoft/playwright/issues/4664#issuecomment-742691215
-      // https://github.com/microsoft/playwright/issues/2515#issuecomment-724163391
-      // So if we still have pending requests, we manually wait.
-      while (
-        this.page!.pendingRequests > 0 &&
-        Date.now() - startWaitTime < timeBudget
-      ) {
-        log.debug(
-          { pageUrl: this.page!.ref?.url() },
-          `Waiting for ${
-            this.page!.pendingRequests
-          } requests to complete... WaitTime:${
-            Date.now() - startWaitTime
-          }, timeBudget: ${timeBudget}`
-        );
-        await setTimeout(1000);
-      }
+      const timeWaited = Date.now() - startWaitTime;
+      await waitForPendingRequests(this.page!, timeBudget - timeWaited);
     } catch (err: any) {
       report(new Error('Error waiting to submit form'), {
         err: err.message,
