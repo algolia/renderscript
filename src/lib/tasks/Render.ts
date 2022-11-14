@@ -1,18 +1,14 @@
-import { setTimeout } from 'timers/promises';
-
 import type { Response } from 'playwright-chromium';
 
-import { log as mainLog } from 'helpers/logger';
 import {
   promiseWithTimeout,
   PromiseWithTimeoutError,
 } from 'helpers/promiseWithTimeout';
+import { waitForPendingRequests } from 'helpers/waitForPendingRequests';
 import { cleanErrorMessage } from 'lib/helpers/errors';
 import type { RenderTaskParams } from 'lib/types';
 
 import { Task } from './Task';
-
-const log = mainLog.child({ svc: 'render' });
 
 export class RenderTask extends Task<RenderTaskParams> {
   async process(): Promise<void> {
@@ -53,7 +49,7 @@ export class RenderTask extends Task<RenderTaskParams> {
     // --- At this point we have just the DOM, but we want to do some checks
     await this.saveMetrics();
 
-    // In case of redirection, initialResponse is prefered since response is probably now incorrect
+    // In case of redirection, initialResponse is preferred since response is probably now incorrect
     await this.saveStatus(this.page.initialResponse || response);
 
     if (this.page.redirection) {
@@ -100,24 +96,8 @@ export class RenderTask extends Task<RenderTaskParams> {
       await this.page.ref?.waitForLoadState('networkidle', {
         timeout: timeBudget,
       });
-      // waitForLoadState('networkidle') can be flaky and return too soon:
-      // https://github.com/microsoft/playwright/issues/4664#issuecomment-742691215
-      // https://github.com/microsoft/playwright/issues/2515#issuecomment-724163391
-      // So if we still have pending requests, we manually wait.
-      while (
-        this.page.pendingRequests > 0 &&
-        Date.now() - startWaitTime < timeBudget
-      ) {
-        log.debug(
-          { pageUrl: this.page.ref?.url() },
-          `Waiting for ${
-            this.page.pendingRequests
-          } requests to complete... WaitTime:${
-            Date.now() - startWaitTime
-          }, timeBudget: ${timeBudget}`
-        );
-        await setTimeout(1000);
-      }
+      const timeWaited = Date.now() - startWaitTime;
+      await waitForPendingRequests(this.page!, timeBudget - timeWaited);
     } catch (err: any) {
       this.page.throwIfNotTimeout(err);
     } finally {

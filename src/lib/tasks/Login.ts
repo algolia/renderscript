@@ -6,6 +6,7 @@ import type {
 } from 'playwright-chromium';
 
 import { report } from 'helpers/errorReporting';
+import { waitForPendingRequests } from 'helpers/waitForPendingRequests';
 import { cleanErrorMessage } from 'lib/helpers/errors';
 import { getInput } from 'lib/helpers/getInput';
 import type { LoginTaskParams } from 'lib/types';
@@ -235,9 +236,11 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     try {
       log.debug(`Login wait for network idle`);
+      const timeBudget = this.timeBudget.get();
+      const startWaitTime = Date.now();
 
-      // After it is submit there can quite a lof ot redirections so we wait a bit more
-      // we could do it before but it's easier to split domcontentloaded and networkidle for debug
+      // After it is submitted there can quite a lof ot redirections, so we wait a bit more
+      // we could do it before, but it's easier to split domcontentloaded and networkidle for debug
       const [resAfterNetwork] = await Promise.all([
         this.page!.waitForNavigation({
           timeout: this.timeBudget.min(5000),
@@ -245,10 +248,12 @@ export class LoginTask extends Task<LoginTaskParams> {
         }),
       ]);
       if (resAfterNetwork) {
-        // if no navigation happened resAfterNetwork is nul
+        // if no navigation happened, resAfterNetwork is null
         // but we don't want to erase res because it is most of the time normal if we already reached the final page
         res = resAfterNetwork;
       }
+      const timeWaited = Date.now() - startWaitTime;
+      await waitForPendingRequests(this.page!, timeBudget - timeWaited);
     } catch (err: any) {
       report(new Error('Error waiting to submit form'), {
         err: err.message,
