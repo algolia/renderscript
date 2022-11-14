@@ -1,3 +1,5 @@
+import { setTimeout } from 'timers/promises';
+
 import type {
   ElementHandle,
   Response,
@@ -235,9 +237,11 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     try {
       log.debug(`Login wait for network idle`);
+      const timeBudget = this.timeBudget.get();
+      const startWaitTime = Date.now();
 
-      // After it is submit there can quite a lof ot redirections so we wait a bit more
-      // we could do it before but it's easier to split domcontentloaded and networkidle for debug
+      // After it is submitted there can quite a lof ot redirections, so we wait a bit more
+      // we could do it before, but it's easier to split domcontentloaded and networkidle for debug
       const [resAfterNetwork] = await Promise.all([
         this.page!.waitForNavigation({
           timeout: this.timeBudget.min(5000),
@@ -245,9 +249,27 @@ export class LoginTask extends Task<LoginTaskParams> {
         }),
       ]);
       if (resAfterNetwork) {
-        // if no navigation happened resAfterNetwork is nul
+        // if no navigation happened, resAfterNetwork is null
         // but we don't want to erase res because it is most of the time normal if we already reached the final page
         res = resAfterNetwork;
+      }
+      // waitForNavigation({ waitUntil: 'networkidle' }) can be flaky and return too soon:
+      // https://github.com/microsoft/playwright/issues/4664#issuecomment-742691215
+      // https://github.com/microsoft/playwright/issues/2515#issuecomment-724163391
+      // So if we still have pending requests, we manually wait.
+      while (
+        this.page!.pendingRequests > 0 &&
+        Date.now() - startWaitTime < timeBudget
+      ) {
+        log.debug(
+          { pageUrl: this.page!.ref?.url() },
+          `Waiting for ${
+            this.page!.pendingRequests
+          } requests to complete... WaitTime:${
+            Date.now() - startWaitTime
+          }, timeBudget: ${timeBudget}`
+        );
+        await setTimeout(1000);
       }
     } catch (err: any) {
       report(new Error('Error waiting to submit form'), {

@@ -53,7 +53,7 @@ export class RenderTask extends Task<RenderTaskParams> {
     // --- At this point we have just the DOM, but we want to do some checks
     await this.saveMetrics();
 
-    // In case of redirection, initialResponse is prefered since response is probably now incorrect
+    // In case of redirection, initialResponse is preferred since response is probably now incorrect
     await this.saveStatus(this.page.initialResponse || response);
 
     if (this.page.redirection) {
