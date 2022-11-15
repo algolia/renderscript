@@ -26,6 +26,7 @@ yarn dev
 ### Docker
 
 ```sh
+docker build . -t algolia/renderscript
 docker run -p 3000:3000 -it algolia/renderscript
 
 curl -X POST http://localhost:3000/render \
