@@ -1,3 +1,11 @@
+## [2.1.23](https://github.com/algolia/renderscript/compare/v2.1.22...v2.1.23) (2022-11-15)
+
+
+### Bug Fixes
+
+* dependencies 2022-11-14 ([#663](https://github.com/algolia/renderscript/issues/663)) ([ea8d66a](https://github.com/algolia/renderscript/commit/ea8d66a4cd7b1845c36d3acdf8a0f8eb5d002fbd)), closes [#656](https://github.com/algolia/renderscript/issues/656) [#657](https://github.com/algolia/renderscript/issues/657) [#658](https://github.com/algolia/renderscript/issues/658) [#659](https://github.com/algolia/renderscript/issues/659) [#660](https://github.com/algolia/renderscript/issues/660) [#661](https://github.com/algolia/renderscript/issues/661) [#647](https://github.com/algolia/renderscript/issues/647) [#650](https://github.com/algolia/renderscript/issues/650) [#651](https://github.com/algolia/renderscript/issues/651) [#652](https://github.com/algolia/renderscript/issues/652)
+* **login:** manually wait for pending requests ([#664](https://github.com/algolia/renderscript/issues/664)) ([e35cfa5](https://github.com/algolia/renderscript/commit/e35cfa5bc156f96bb0bfa7738a82cb3ca3445158))
+
 ## [2.1.22](https://github.com/algolia/renderscript/compare/v2.1.21...v2.1.22) (2022-10-19)
 
 
