@@ -2,6 +2,7 @@ import { report } from 'helpers/errorReporting';
 import { log as mainLog } from 'helpers/logger';
 import { stats } from 'helpers/stats';
 
+import type { BrowserEngine } from './browser/Browser';
 import { Browser } from './browser/Browser';
 import { UNHEALTHY_TASK_TTL } from './constants';
 import { cleanErrorMessage, ErrorIsHandledError } from './helpers/errors';
@@ -11,7 +12,8 @@ import type { TaskObject, TaskFinal } from './types';
 export const log = mainLog.child({ svc: 'mngr' });
 
 export class TasksManager {
-  #browser: Browser | null = null;
+  #chromium: Browser | null = null;
+  #firefox: Browser | null = null;
   #stopping: boolean = true;
   #tasks: Map<string, TaskObject> = new Map();
   #totalRun: number = 0;
@@ -43,15 +45,21 @@ export class TasksManager {
       return { ready: false, oldTasks };
     }
 
-    if (this.#browser) {
-      return { ready: this.#browser.isReady, oldTasks };
+    if (this.#chromium && this.#firefox) {
+      return {
+        ready: this.#chromium.isReady && this.#firefox.isReady,
+        oldTasks,
+      };
     }
 
     return { ready: false, oldTasks };
   }
 
-  get currentBrowser(): Browser | null {
-    return this.#browser;
+  get currentBrowsers(): Map<BrowserEngine, Browser | null> {
+    return new Map([
+      ['chromium', this.#chromium],
+      ['firefox', this.#firefox],
+    ]);
   }
 
   get currentConcurrency(): number {
@@ -63,10 +71,13 @@ export class TasksManager {
   }
 
   async launch(): Promise<void> {
-    const browser = new Browser();
-    await browser.create();
+    const chromium = new Browser('chromium');
+    await chromium.create();
+    const firefox = new Browser('firefox');
+    await firefox.create();
 
-    this.#browser = browser;
+    this.#chromium = chromium;
+    this.#firefox = firefox;
     this.#stopping = false;
     log.info('Ready');
   }
@@ -102,7 +113,10 @@ export class TasksManager {
     if (this.#stopping) {
       throw new Error('Task can not be executed: stopping');
     }
-    if (!this.#browser || !this.#browser.isReady) {
+
+    const engine: BrowserEngine = task.params.browser || 'chromium';
+    const browser = engine === 'firefox' ? this.#firefox : this.#chromium;
+    if (!browser || !browser.isReady) {
       throw new Error('Task can not be executed: no_browser');
     }
 
@@ -114,7 +128,7 @@ export class TasksManager {
     const start = Date.now();
 
     try {
-      await task.createContext(this.#browser);
+      await task.createContext(browser);
       await task.process();
     } catch (err: any) {
       /* eslint-disable no-param-reassign */
@@ -188,9 +202,13 @@ export class TasksManager {
 
     this.#tasks.clear();
 
-    if (this.#browser) {
-      await this.#browser.stop();
-      this.#browser = null;
+    if (this.#chromium) {
+      await this.#chromium.stop();
+      this.#chromium = null;
+    }
+    if (this.#firefox) {
+      await this.#firefox.stop();
+      this.#firefox = null;
     }
   }
 

@@ -2,8 +2,8 @@ import type {
   Browser as BrowserInterface,
   BrowserContext,
   BrowserContextOptions,
-} from 'playwright-chromium';
-import { chromium } from 'playwright-chromium';
+} from 'playwright';
+import { chromium, firefox } from 'playwright';
 import { v4 as uuid } from 'uuid';
 
 import { log as mainLog } from 'helpers/logger';
@@ -13,13 +13,17 @@ import { flags, HEIGHT, WIDTH } from './constants';
 
 const log = mainLog.child({ svc: 'brws' });
 
+export type BrowserEngine = 'chromium' | 'firefox';
+
 export class Browser {
   #id;
+  #engine: BrowserEngine;
   #ready: boolean = false;
   #browser: BrowserInterface | undefined;
 
-  constructor() {
+  constructor(engine?: BrowserEngine) {
     this.#id = uuid();
+    this.#engine = engine || 'chromium';
   }
 
   get isReady(): boolean {
@@ -38,15 +42,16 @@ export class Browser {
    * Create a Playwright instance.
    */
   async create(): Promise<void> {
-    log.info('Creating...', { id: this.#id });
+    log.info(`Creating ${this.#engine}...`, { id: this.#id });
 
     const env: { [s: string]: string } = {};
     if (process.env.DISPLAY) {
       env.DISPLAY = process.env.DISPLAY;
     }
 
-    let start = Date.now();
-    const browser = await chromium.launch({
+    const start = Date.now();
+    const browser = this.#engine === 'firefox' ? firefox : chromium;
+    this.#browser = await browser.launch({
       headless: true,
       env,
       handleSIGINT: false,
@@ -54,20 +59,9 @@ export class Browser {
       handleSIGTERM: false,
       args: flags,
     });
-    this.#browser = browser;
-    stats.timing('renderscript.create', Date.now() - start);
-
-    // Try to load a test page first
-    start = Date.now();
-    const context = await this.getNewContext({});
-    const testPage = await context.newPage();
-    await testPage.goto('about://settings', {
-      waitUntil: 'networkidle',
-      timeout: 2000,
+    stats.timing('renderscript.create', Date.now() - start, {
+      browser: this.#engine,
     });
-    stats.timing('renderscript.page.initial', Date.now() - start);
-    await testPage.close();
-    await context.close();
 
     this.#ready = true;
     log.info('Ready', { id: this.#id });

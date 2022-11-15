@@ -1,4 +1,4 @@
-import type { Cookie } from 'playwright-chromium';
+import type { Cookie } from 'playwright';
 
 import type { Metrics, TaskBaseParams } from 'lib/types';
 

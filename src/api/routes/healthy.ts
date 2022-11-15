@@ -16,7 +16,10 @@ export function healthy(
 ): void {
   const health = tasksManager.getHealth();
   const tasksRunning = tasksManager.currentConcurrency;
-  const pagesOpen = tasksManager.currentBrowser?.getCurrentConcurrency() || 0;
+  let pagesOpen = 0;
+  tasksManager.currentBrowsers.forEach((browser) => {
+    pagesOpen += browser?.getCurrentConcurrency() || 0;
+  });
   const totalRun = tasksManager.totalRun;
 
   // Those stats could be computed from .task.count

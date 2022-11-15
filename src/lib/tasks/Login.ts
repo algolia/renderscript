@@ -1,9 +1,4 @@
-import type {
-  ElementHandle,
-  Response,
-  Request,
-  Locator,
-} from 'playwright-chromium';
+import type { ElementHandle, Response, Request, Locator } from 'playwright';
 
 import { report } from 'helpers/errorReporting';
 import { waitForPendingRequests } from 'helpers/waitForPendingRequests';

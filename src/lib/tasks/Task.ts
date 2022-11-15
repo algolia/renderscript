@@ -1,5 +1,5 @@
 import type { Logger } from 'pino';
-import type { BrowserContext, Response } from 'playwright-chromium';
+import type { BrowserContext, Response } from 'playwright';
 import { v4 as uuid } from 'uuid';
 
 import { log } from 'helpers/logger';

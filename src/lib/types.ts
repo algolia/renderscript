@@ -1,4 +1,6 @@
-import type { Cookie } from 'playwright-chromium';
+import type { Cookie } from 'playwright';
+
+import type { BrowserEngine } from 'lib/browser/Browser';
 
 import type { Task } from './tasks/Task';
 
@@ -29,6 +31,7 @@ export interface TaskBaseParams {
   url: URL;
   userAgent: string;
   adblock?: boolean;
+  browser?: BrowserEngine;
   waitTime?: {
     min?: number;
     max?: number;
