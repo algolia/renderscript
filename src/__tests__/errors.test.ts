@@ -1,4 +1,5 @@
 import type { PostRenderSuccess } from 'api/@types/postRender';
+import type { BrowserEngine } from 'lib/browser/Browser';
 
 import { postRender } from './helpers';
 
@@ -17,18 +18,22 @@ describe('errors', () => {
     expect(json.error).toBe('dns_error');
   });
 
-  it('should catch Page Crashed', async () => {
-    const { res, body } = await postRender({
-      url: 'http://localhost:3000/test-website/page-crash.html',
-      ua: 'Algolia Crawler',
-      waitTime: {
-        max: 10000,
-      },
-    });
+  it.each(['chromium', 'firefox'])(
+    '%s should catch Page Crashed',
+    async (browser) => {
+      const { res, body } = await postRender({
+        url: 'http://localhost:3000/test-website/page-crash.html',
+        ua: 'Algolia Crawler',
+        browser: browser as BrowserEngine,
+        waitTime: {
+          max: 10000,
+        },
+      });
 
-    const json: PostRenderSuccess = JSON.parse(body);
-    expect(res.statusCode).toBe(500);
-    expect(json.body).toBeNull();
-    expect(json.error).toBe('body_serialisation_failed');
-  });
+      const json: PostRenderSuccess = JSON.parse(body);
+      expect(res.statusCode).toBe(500);
+      expect(json.body).toBeNull();
+      expect(json.error).toBe('body_serialisation_failed');
+    }
+  );
 });
