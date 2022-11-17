@@ -10,7 +10,12 @@ describe('list', () => {
 
     expect(res.statusCode).toBe(200);
     const parsed = JSON.parse(body);
-    expect(parsed).toEqual({ open: [] });
+    expect(parsed).toEqual({
+      open: {
+        chromium: [],
+        firefox: [],
+      },
+    });
   });
 
   it('should list current page', async () => {
@@ -35,7 +40,10 @@ describe('list', () => {
     const res1 = await request('http://localhost:3000/list');
     const parsed1 = JSON.parse(res1.body);
     expect(parsed1).toEqual({
-      open: ['http://localhost:3000/test-website/slow.html'],
+      open: {
+        chromium: ['http://localhost:3000/test-website/slow.html'],
+        firefox: [],
+      },
     });
 
     await r;
@@ -44,7 +52,10 @@ describe('list', () => {
     const res2 = await request('http://localhost:3000/list');
     const parsed2 = JSON.parse(res2.body);
     expect(parsed2).toEqual({
-      open: [],
+      open: {
+        chromium: [],
+        firefox: [],
+      },
     });
   });
 });

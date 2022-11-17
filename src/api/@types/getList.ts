@@ -1,3 +1,3 @@
 export interface GetListSuccess {
-  open: string[];
+  open: { [engine: string]: string[] };
 }

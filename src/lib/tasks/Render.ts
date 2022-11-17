@@ -1,4 +1,4 @@
-import type { Response } from 'playwright-chromium';
+import type { Response } from 'playwright';
 
 import {
   promiseWithTimeout,

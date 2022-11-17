@@ -1,6 +1,6 @@
 import type { IncomingHttpHeaders } from 'http';
 
-import type { Cookie } from 'playwright-chromium';
+import type { Cookie } from 'playwright';
 import { request as req } from 'undici';
 import type { ResponseData } from 'undici/types/dispatcher';
 

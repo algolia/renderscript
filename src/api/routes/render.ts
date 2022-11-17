@@ -36,7 +36,7 @@ export async function render(
   req: express.Request<any, any, any, PostRenderParams>,
   res: express.Response<Res500 | string | null>
 ): Promise<void> {
-  const { url: rawUrl, ua, waitTime, adblock } = req.query;
+  const { url: rawUrl, ua, waitTime, adblock, browser } = req.query;
   const headersToForward = getForwardedHeadersFromRequest(req);
   const url = new URL(buildUrl(rawUrl));
 
@@ -46,6 +46,7 @@ export async function render(
         url,
         headersToForward,
         userAgent: ua,
+        browser,
         waitTime,
         adblock,
       })
@@ -79,7 +80,7 @@ export async function renderJSON(
   req: express.Request<any, any, PostRenderParams>,
   res: express.Response<PostRenderResponse>
 ): Promise<void> {
-  const { url: rawUrl, ua, waitTime, adblock } = req.body;
+  const { url: rawUrl, ua, waitTime, adblock, browser } = req.body;
   const headersToForward = getForwardedHeadersFromRequest(req);
   const url = new URL(buildUrl(rawUrl));
 
@@ -89,6 +90,7 @@ export async function renderJSON(
         url,
         headersToForward,
         userAgent: ua,
+        browser,
         waitTime,
         adblock,
       })
@@ -96,7 +98,12 @@ export async function renderJSON(
 
     if (!task.error && !task.body) {
       // Tmp while trying to understand the issue.
-      report(new Error('No error but no body'), { task, url, waitTime });
+      report(new Error('No error but no body'), {
+        task,
+        url,
+        waitTime,
+        browser,
+      });
       task.error = 'body_serialisation_failed';
     }
 

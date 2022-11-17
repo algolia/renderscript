@@ -20,5 +20,6 @@ export function getDefaultParams(): Record<any, any> {
       })
     ),
     adblock: alt.boolean().cast(),
+    browser: alt.string(),
   };
 }

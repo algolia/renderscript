@@ -37,7 +37,7 @@ export async function processLogin(
   req: express.Request<any, any, PostLoginParams>,
   res: express.Response<PostLoginResponse | string | null>
 ): Promise<void> {
-  const { ua, username, password, renderHTML, waitTime } = req.body;
+  const { ua, username, password, renderHTML, waitTime, browser } = req.body;
   const headersToForward = getForwardedHeadersFromRequest(req);
   const url = new URL(buildUrl(req.body.url));
 
@@ -51,6 +51,7 @@ export async function processLogin(
           username,
           password,
         },
+        browser,
         renderHTML,
         waitTime,
       })
