@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/algolia/renderscript/compare/v2.1.23...v2.2.0) (2022-11-18)
+
+
+### Features
+
+* new 'browser' option to select the rendering engine ([#665](https://github.com/algolia/renderscript/issues/665)) ([75b6f33](https://github.com/algolia/renderscript/commit/75b6f33127c875c92274702564b9a0e67ad33f1a))
+
 ## [2.1.23](https://github.com/algolia/renderscript/compare/v2.1.22...v2.1.23) (2022-11-15)
 
 
