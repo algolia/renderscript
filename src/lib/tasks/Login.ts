@@ -94,7 +94,7 @@ export class LoginTask extends Task<LoginTaskParams> {
 
     try {
       // We first check if there is form
-      // Try mutliple selector from the most to less precise
+      // Try multiple selector from the most to less precise
       let usernameInputLoc: Locator | null = null;
       for (const usernameSel of usernameSelectors) {
         const input = await getInput(page, usernameSel);
@@ -108,9 +108,6 @@ export class LoginTask extends Task<LoginTaskParams> {
           error: 'field_not_found',
           rawError: new Error('Username field not found'),
         });
-      }
-      if ('error' in usernameInputLoc) {
-        return this.throwHandledError(usernameInputLoc);
       }
 
       log.info('Entering username...', { userName: login.username });
