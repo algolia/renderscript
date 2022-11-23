@@ -27,8 +27,9 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 # Browsers will be downloaded in `/ms-playwright`.
 # !!! MAKE SURE THE PLAYWRIGHT VERSION MATCHES THE ONE IN package.json
 RUN mkdir /ms-playwright \
-  && npx playwright@1.27.1 install --with-deps chromium \
-  && npx playwright@1.27.1 install --with-deps firefox \
+  && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=true npm install -g playwright@1.28.0 \
+  && npx playwright install --with-deps chromium \
+  && npx playwright install --with-deps firefox \
   # Clean cache
   && rm -rf /var/lib/apt/lists/* \
   && chmod -R 777 /ms-playwright
