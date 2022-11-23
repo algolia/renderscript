@@ -23,7 +23,7 @@ See `.env.example`
 
 ## Releasing
 
-> Releases are built using GitHub actions. You can release a new version by triggering the [Release Version](https://github.com/algolia/renderscript/actions/workflows/release.yml) workflow.
+Releases are built using GitHub actions. You can release a new version by triggering the [Release Version](https://github.com/algolia/renderscript/actions/workflows/release.yml) workflow.
 
 ### Manual Release Locally
 
