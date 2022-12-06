@@ -109,7 +109,7 @@ export class TasksManager {
           reason: health.reason,
         });
       } else {
-        throw new Error('Unhealthy node received a job');
+        throw new Error(`Unhealthy node received a job: ${health.reason}`);
       }
     }
 
