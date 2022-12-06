@@ -52,7 +52,7 @@
     "dotenv": "16.0.3",
     "ejs": "3.1.8",
     "eslint": "8.28.0",
-    "eslint-config-algolia": "20.0.0",
+    "eslint-config-algolia": "20.1.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-config-standard": "17.0.0",
     "eslint-import-resolver-typescript": "3.5.2",
