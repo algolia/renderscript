@@ -1,3 +1,13 @@
+## [2.2.1](https://github.com/algolia/renderscript/compare/v2.2.0...v2.2.1) (2022-12-07)
+
+
+### Bug Fixes
+
+* **build:** remove Playwright warning and bump version ([#678](https://github.com/algolia/renderscript/issues/678)) ([8c61502](https://github.com/algolia/renderscript/commit/8c61502c2eca9c071d01a6c24670ff3521cf0c8b))
+* dependencies 2022-11-21 ([#666](https://github.com/algolia/renderscript/issues/666)) ([ead50af](https://github.com/algolia/renderscript/commit/ead50afe595f2cd9abf91f118bd4b2f419ddb9fd)), closes [#667](https://github.com/algolia/renderscript/issues/667) [#668](https://github.com/algolia/renderscript/issues/668) [#669](https://github.com/algolia/renderscript/issues/669) [#670](https://github.com/algolia/renderscript/issues/670) [#675](https://github.com/algolia/renderscript/issues/675) [#673](https://github.com/algolia/renderscript/issues/673) [#671](https://github.com/algolia/renderscript/issues/671) [#674](https://github.com/algolia/renderscript/issues/674) [#672](https://github.com/algolia/renderscript/issues/672) [#676](https://github.com/algolia/renderscript/issues/676)
+* dependencies 2022-12-05 ([#690](https://github.com/algolia/renderscript/issues/690)) ([18e346b](https://github.com/algolia/renderscript/commit/18e346b912f014133400ac74cf229004370e6d51)), closes [#691](https://github.com/algolia/renderscript/issues/691) [#692](https://github.com/algolia/renderscript/issues/692) [#694](https://github.com/algolia/renderscript/issues/694)
+* handle better browser crash and unhealthy process ([#695](https://github.com/algolia/renderscript/issues/695)) ([09bc65f](https://github.com/algolia/renderscript/commit/09bc65fa84b6a570c7deb7e41f90316db7580837))
+
 # [2.2.0](https://github.com/algolia/renderscript/compare/v2.1.23...v2.2.0) (2022-11-18)
 
 
