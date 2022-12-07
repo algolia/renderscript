@@ -6,6 +6,7 @@ import type {
 import { chromium, firefox } from 'playwright';
 import { v4 as uuid } from 'uuid';
 
+import { report } from 'helpers/errorReporting';
 import { log as mainLog } from 'helpers/logger';
 import { stats } from 'helpers/stats';
 
@@ -19,6 +20,7 @@ export class Browser {
   #id;
   #engine: BrowserEngine;
   #ready: boolean = false;
+  #stopping: boolean = false;
   #browser: BrowserInterface | undefined;
 
   constructor(engine?: BrowserEngine) {
@@ -59,15 +61,26 @@ export class Browser {
       handleSIGTERM: false,
       args: flags,
     });
+    this.#browser.on('disconnected', () => {
+      if (!this.#stopping) {
+        report(
+          new Error(
+            `Browser disconnected (engine: ${this.#engine}). Relaunching...`
+          )
+        );
+        this.create();
+      }
+    });
     stats.timing('renderscript.create', Date.now() - start, {
       browser: this.#engine,
     });
 
     this.#ready = true;
-    log.info('Ready', { id: this.#id });
+    log.info('Browser ready', { id: this.#id, browser: this.#engine });
   }
 
   async stop(): Promise<void> {
+    this.#stopping = true;
     await this.#browser?.close();
   }
 
@@ -83,7 +96,7 @@ export class Browser {
 
   async getNewContext(opts: BrowserContextOptions): Promise<BrowserContext> {
     if (!this.#browser?.isConnected()) {
-      throw new Error('No browser available');
+      throw new Error(`No browser available (engine=${this.#engine})`);
     }
 
     const start = Date.now();

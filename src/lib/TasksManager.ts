@@ -18,11 +18,11 @@ export class TasksManager {
   #tasks: Map<string, TaskObject> = new Map();
   #totalRun: number = 0;
 
-  getHealth(): { ready: boolean; oldTasks: string[][] } {
+  getHealth(): { ready: boolean; reason?: string; oldTasks: string[][] } {
     const oldTasks: any[][] = [];
 
     if (this.#stopping) {
-      return { ready: false, oldTasks };
+      return { ready: false, reason: 'stopping', oldTasks };
     }
 
     // Tasks lifecycle
@@ -42,12 +42,15 @@ export class TasksManager {
     });
 
     if (oldTasks.length > 0) {
-      return { ready: false, oldTasks };
+      return { ready: false, reason: 'oldTasks', oldTasks };
     }
 
     if (this.#chromium && this.#firefox) {
       return {
         ready: this.#chromium.isReady && this.#firefox.isReady,
+        reason: `browser(s) not ready: chromium: ${
+          this.#chromium.isReady ? '✅' : '❌'
+        } ; firefox: ${this.#firefox.isReady ? '✅' : '❌'}`,
         oldTasks,
       };
     }
@@ -86,8 +89,28 @@ export class TasksManager {
    * Register and execute a task.
    */
   async task(task: Task): Promise<TaskFinal> {
-    if (!this.getHealth().ready) {
-      throw new Error('Unhealthy node received a job');
+    const health = this.getHealth();
+    if (!health.ready) {
+      // The process can be marked as not ready because one of the browsers is not up
+      // If we receive a job for a browser that is ready, only report and process it.
+      if (
+        (!task.params.browser || task.params.browser === 'chromium') &&
+        this.#chromium?.isReady
+      ) {
+        report(new Error('Unhealthy node received a job but can process it'), {
+          url: task.params.url,
+          browser: 'chromium',
+          reason: health.reason,
+        });
+      } else if (task.params.browser === 'firefox' && this.#firefox?.isReady) {
+        report(new Error('Unhealthy node received a job but can process it'), {
+          url: task.params.url,
+          browser: 'firefox',
+          reason: health.reason,
+        });
+      } else {
+        throw new Error(`Unhealthy node received a job: ${health.reason}`);
+      }
     }
 
     try {
