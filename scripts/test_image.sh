@@ -19,6 +19,13 @@ done
 logs=$(docker logs renderscript_test 2>&1)
 echo $logs
 
+if echo $logs | grep -q '"svc":"brws","msg":"Ready"'; then
+  echo "Browser ready"
+else
+  echo "Browser not ready"
+  exit 1
+fi
+
 curl --silent --request POST \
   --url http://localhost:3000/render \
   --header 'Content-Type: application/json' \
@@ -34,17 +41,12 @@ curl --silent --request POST \
 logs=$(docker logs renderscript_test 2>&1)
 echo $logs
 
-launched=$(echo $logs | grep '"svc":"brws","msg":"Ready"')
-if [ -z "$launched" ]; then
-  echo "Not ready"
-  exit 1
-fi
-
-rendered=$(echo $logs | grep '"msg":"Done","data":')
-if [ -z "$rendered" ]; then
+if echo $logs | grep -q '"msg":"Done","data":'; then
+  echo "Rendered"
+else
   echo "Not rendered"
   exit 1
 fi
 
-echo "Ready"
+echo "Image OK"
 docker stop renderscript_test && docker rm renderscript_test
