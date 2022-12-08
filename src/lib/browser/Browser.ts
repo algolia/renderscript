@@ -76,7 +76,7 @@ export class Browser {
     });
 
     this.#ready = true;
-    log.info('Browser ready', { id: this.#id, browser: this.#engine });
+    log.info('Ready', { id: this.#id, browser: this.#engine });
   }
 
   async stop(): Promise<void> {

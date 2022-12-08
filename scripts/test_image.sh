@@ -19,7 +19,7 @@ done
 logs=$(docker logs renderscript_test 2>&1)
 echo $logs
 
-if echo $logs | grep -q '"svc":"brws","msg":"Browser ready"'; then
+if echo $logs | grep -q '"svc":"brws","msg":"Ready"'; then
   echo "Browser ready"
 else
   echo "Browser not ready"
