@@ -1,3 +1,10 @@
+## [2.2.2](https://github.com/algolia/renderscript/compare/v2.2.1...v2.2.2) (2022-12-08)
+
+
+### Bug Fixes
+
+* test_image.sh ([#696](https://github.com/algolia/renderscript/issues/696)) ([3caa65b](https://github.com/algolia/renderscript/commit/3caa65b1380082367c7b5d8e47a962b50b3f292d))
+
 ## [2.2.1](https://github.com/algolia/renderscript/compare/v2.2.0...v2.2.1) (2022-12-07)
 
 
