@@ -53,7 +53,7 @@ __metadata:
     hot-shots: 9.3.0
     jest: 29.3.1
     nodemon: 2.0.20
-    pino: 8.7.0
+    pino: 8.8.0
     pino-pretty: 9.1.1
     playwright: 1.28.0
     prettier: 2.7.1
@@ -7466,9 +7466,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino@npm:8.7.0":
-  version: 8.7.0
-  resolution: "pino@npm:8.7.0"
+"pino@npm:8.8.0":
+  version: 8.8.0
+  resolution: "pino@npm:8.8.0"
   dependencies:
     atomic-sleep: ^1.0.0
     fast-redact: ^3.1.1
@@ -7483,7 +7483,7 @@ __metadata:
     thread-stream: ^2.0.0
   bin:
     pino: bin.js
-  checksum: 4aa2e320aa88f4a90fd25884ee4e3b9ef7963b3c59c514f3693b5a5c987b112cf3ab4e39a8c51efe32c861f5c058d7cfa7fcda59d964ed878f842fdbc6ab2876
+  checksum: 69256469221b332776333069d637100053eb15dc7baa3f95897d7864bf2e6fd99f15cfd9cfc94b56e7b00da2e6b349c49affcff1abaca9a3d4b7ba63ff86b4f0
   languageName: node
   linkType: hard
 
