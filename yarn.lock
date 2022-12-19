@@ -55,7 +55,7 @@ __metadata:
     nodemon: 2.0.20
     pino: 8.8.0
     pino-pretty: 9.1.1
-    playwright: 1.28.0
+    playwright: 1.29.0
     prettier: 2.7.1
     semantic-release: 19.0.5
     ts-jest: 29.0.3
@@ -7513,23 +7513,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.28.0":
-  version: 1.28.0
-  resolution: "playwright-core@npm:1.28.0"
+"playwright-core@npm:1.29.0":
+  version: 1.29.0
+  resolution: "playwright-core@npm:1.29.0"
   bin:
     playwright: cli.js
-  checksum: 4bd13bf83bca37f239f1573fcad7f3b559b3b5e28925f57fa66055446b2aef90c4403f9dbb4a9c34f6bd03a2461e61c97eb7fe5faed6b88f027c0bc3727cd096
+  checksum: 5e4b690b0b449ed27ab7f7d7c9bf778db53e6c6b37a8e7258fb070fe6e96f147ad5d66221a3953c9e4d0b2044b701c493d7a0708d7bdb6486e38a3518f62fdce
   languageName: node
   linkType: hard
 
-"playwright@npm:1.28.0":
-  version: 1.28.0
-  resolution: "playwright@npm:1.28.0"
+"playwright@npm:1.29.0":
+  version: 1.29.0
+  resolution: "playwright@npm:1.29.0"
   dependencies:
-    playwright-core: 1.28.0
+    playwright-core: 1.29.0
   bin:
     playwright: cli.js
-  checksum: c6a50efe0ed3ea92a2b6fe579ef8dcf0ad3dec753e7dbc0dc3c6b3bf4638e7aebb98c3c6046ac97ee851e23d411a15915354528ef90a586296a2f0ad6ad7f780
+  checksum: e3b7dcefde55e53d62fab26d8c069bf76c93e7a2572272ea4d19e4fb6aa7451d386541faedf1140ba45e3f69f3e37b510492f5433cfbe084d4020d61722e103e
   languageName: node
   linkType: hard
 
