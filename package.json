@@ -53,7 +53,7 @@
     "ejs": "3.1.8",
     "eslint": "8.29.0",
     "eslint-config-algolia": "20.0.0",
-    "eslint-config-prettier": "8.5.0",
+    "eslint-config-prettier": "8.6.0",
     "eslint-config-standard": "17.0.0",
     "eslint-import-resolver-typescript": "3.5.2",
     "eslint-plugin-algolia": "2.0.0",
