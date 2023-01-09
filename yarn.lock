@@ -62,7 +62,7 @@ __metadata:
     ts-node: 10.9.1
     ttypescript: 1.5.13
     typescript: 4.8.4
-    typescript-transform-paths: 3.4.4
+    typescript-transform-paths: 3.4.6
     undici: 5.10.0
     uuid: 8.3.2
   languageName: unknown
@@ -9097,14 +9097,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript-transform-paths@npm:3.4.4":
-  version: 3.4.4
-  resolution: "typescript-transform-paths@npm:3.4.4"
+"typescript-transform-paths@npm:3.4.6":
+  version: 3.4.6
+  resolution: "typescript-transform-paths@npm:3.4.6"
   dependencies:
     minimatch: ^3.0.4
   peerDependencies:
     typescript: ">=3.6.5"
-  checksum: 80a759d7ac26c681704a538e92fb93ccbd5fafe6f2c556dddd8db0ff97c826a4a829ec79d366488743ca9dc48ce4e222ef586c8c9bb9d378858e94a88c4f230a
+  checksum: 963d57f17b1be6717d8fbccf7740674b7c2919c39f1796886a4a425265b8679093b6dfc6662a64a3260ce57b6718563420deb290ab65df681641039ba6d89ab3
   languageName: node
   linkType: hard
 
