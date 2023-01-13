@@ -18,8 +18,7 @@ describe('errors', () => {
     expect(json.error).toBe('dns_error');
   });
 
-  // Firefox doesn't crash reliably one the CI ^^'
-  it.each(['chromium' /* , 'firefox' */])(
+  it.each(['chromium', 'firefox'])(
     '%s should catch Page Crashed',
     async (browser) => {
       const { res, body } = await postRender({
@@ -27,7 +26,7 @@ describe('errors', () => {
         ua: 'Algolia Crawler',
         browser: browser as BrowserEngine,
         waitTime: {
-          max: 10000,
+          max: 15000,
         },
       });
 
