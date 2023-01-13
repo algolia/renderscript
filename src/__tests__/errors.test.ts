@@ -26,7 +26,7 @@ describe('errors', () => {
         ua: 'Algolia Crawler',
         browser: browser as BrowserEngine,
         waitTime: {
-          max: 15000,
+          max: 20000,
         },
       });
 
