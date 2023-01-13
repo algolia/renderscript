@@ -6,6 +6,16 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@algolia/satellite@1.0.0-beta.105/satellite.min.css"
     integrity="sha256-7DFugxRDJ/WK/TKe1yR0Py07+PMHWiTj4A55/VBeLgM=" crossorigin="anonymous">
 
+  <script type="text/javascript">
+    window.onload = function() {
+      document.getElementById("cookie").onblur = function () {
+        const cookies = document.getElementById("cookie").value.split(';');
+        cookies.forEach(cookie => {
+          document.cookie = cookie;
+        });
+      }
+    }
+  </script>
 </head>
 
 <body class="stl-bg-grey-100">
@@ -56,6 +66,14 @@
               <option value="chromium">Chromium</option>
               <option value="firefox">Firefox</option>
             </select>
+          </div>
+        </div>
+        <div class="stl-flex stl-space-x-6 stl-mt-4">
+          <div class="stl-flex-grow">
+            <label>Cookie</label>
+            <div class="stl-input stl-input-medium">
+              <input class="stl-mx-4" id="cookie" placeholder="session=t3st; env=test" />
+            </div>
           </div>
         </div>
         <!-- <details>
