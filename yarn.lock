@@ -37,14 +37,14 @@ __metadata:
     dotenv: 16.0.3
     ejs: 3.1.8
     eslint: 8.29.0
-    eslint-config-algolia: 20.0.0
-    eslint-config-prettier: 8.5.0
+    eslint-config-algolia: 20.1.0
+    eslint-config-prettier: 8.6.0
     eslint-config-standard: 17.0.0
     eslint-import-resolver-typescript: 3.5.2
     eslint-plugin-algolia: 2.0.0
     eslint-plugin-eslint-comments: 3.2.0
     eslint-plugin-import: 2.26.0
-    eslint-plugin-jest: 27.1.5
+    eslint-plugin-jest: 27.2.1
     eslint-plugin-jsdoc: 39.6.2
     eslint-plugin-node: 11.1.0
     eslint-plugin-prettier: 4.2.1
@@ -55,14 +55,14 @@ __metadata:
     nodemon: 2.0.20
     pino: 8.7.0
     pino-pretty: 9.1.1
-    playwright: 1.28.0
-    prettier: 2.7.1
+    playwright: 1.29.2
+    prettier: 2.8.2
     semantic-release: 19.0.5
     ts-jest: 29.0.3
     ts-node: 10.9.1
     ttypescript: 1.5.13
     typescript: 4.8.4
-    typescript-transform-paths: 3.4.4
+    typescript-transform-paths: 3.4.6
     undici: 5.10.0
     uuid: 8.3.2
   languageName: unknown
@@ -3503,24 +3503,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-algolia@npm:20.0.0":
-  version: 20.0.0
-  resolution: "eslint-config-algolia@npm:20.0.0"
+"eslint-config-algolia@npm:20.1.0":
+  version: 20.1.0
+  resolution: "eslint-config-algolia@npm:20.1.0"
   peerDependencies:
     eslint: ^5.16.0 || ^6.8.0 || ^7.2.0 || ^8.0.0
     prettier: ^2.2.1
-  checksum: d50b249f65c535c7f34dfd773d36b7057b2cfbd6406631af67550ac22e6d00018be38a499e11c8dbb8f163911098a4b0ab20a7933393eaaa17968b308dd726ef
+  checksum: 19f6bf27b5600972afeeb29984b1353b6aee85745d1db657a2f2e733e89fddcbaf60d8b592734c6eec8d90890a8eeef02570511e7a6bab26ad413cb51555890d
   languageName: node
   linkType: hard
 
-"eslint-config-prettier@npm:8.5.0":
-  version: 8.5.0
-  resolution: "eslint-config-prettier@npm:8.5.0"
+"eslint-config-prettier@npm:8.6.0":
+  version: 8.6.0
+  resolution: "eslint-config-prettier@npm:8.6.0"
   peerDependencies:
     eslint: ">=7.0.0"
   bin:
     eslint-config-prettier: bin/cli.js
-  checksum: 0d0f5c32e7a0ad91249467ce71ca92394ccd343178277d318baf32063b79ea90216f4c81d1065d60f96366fdc60f151d4d68ae7811a58bd37228b84c2083f893
+  checksum: ff0d0dfc839a556355422293428637e8d35693de58dabf8638bf0b6529131a109d0b2ade77521aa6e54573bb842d7d9d322e465dd73dd61c7590fa3834c3fa81
   languageName: node
   linkType: hard
 
@@ -3630,9 +3630,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jest@npm:27.1.5":
-  version: 27.1.5
-  resolution: "eslint-plugin-jest@npm:27.1.5"
+"eslint-plugin-jest@npm:27.2.1":
+  version: 27.2.1
+  resolution: "eslint-plugin-jest@npm:27.2.1"
   dependencies:
     "@typescript-eslint/utils": ^5.10.0
   peerDependencies:
@@ -3643,7 +3643,7 @@ __metadata:
       optional: true
     jest:
       optional: true
-  checksum: 7c9de765793f7161afa0bdcdce67f4d072944152880fa638b25d228188dcee47a4b4aada26c57db72bc10193c96a1979e17afb8a7c3e400e961d8adfbf23ddbe
+  checksum: 579a4d26304cc6748b2e6dff6c965ea7a21b618d8b051eb02727d25cf5c7767f6db8ef5237531635ff77e242b983b973e7cb8c820a4d20d5bda73358c452a8ab
   languageName: node
   linkType: hard
 
@@ -7501,23 +7501,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.28.0":
-  version: 1.28.0
-  resolution: "playwright-core@npm:1.28.0"
+"playwright-core@npm:1.29.2":
+  version: 1.29.2
+  resolution: "playwright-core@npm:1.29.2"
   bin:
     playwright: cli.js
-  checksum: 4bd13bf83bca37f239f1573fcad7f3b559b3b5e28925f57fa66055446b2aef90c4403f9dbb4a9c34f6bd03a2461e61c97eb7fe5faed6b88f027c0bc3727cd096
+  checksum: 19e00e162a24eb99878408518930346c1d2c8ce83bb02993e3dd890c99df4530240cfebe4ec4e5aca01656462695b6328fb8f913cf2e229c2c73941623ac524e
   languageName: node
   linkType: hard
 
-"playwright@npm:1.28.0":
-  version: 1.28.0
-  resolution: "playwright@npm:1.28.0"
+"playwright@npm:1.29.2":
+  version: 1.29.2
+  resolution: "playwright@npm:1.29.2"
   dependencies:
-    playwright-core: 1.28.0
+    playwright-core: 1.29.2
   bin:
     playwright: cli.js
-  checksum: c6a50efe0ed3ea92a2b6fe579ef8dcf0ad3dec753e7dbc0dc3c6b3bf4638e7aebb98c3c6046ac97ee851e23d411a15915354528ef90a586296a2f0ad6ad7f780
+  checksum: 6909483b440ad936cf413efeb30f4541e801f93f9a87797dda263264e29170a38e0741d65274bc26ffcbbfaa12f044938d65ccdfc04ca960c16b9383ed4cbb0e
   languageName: node
   linkType: hard
 
@@ -7547,12 +7547,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:2.7.1":
-  version: 2.7.1
-  resolution: "prettier@npm:2.7.1"
+"prettier@npm:2.8.2":
+  version: 2.8.2
+  resolution: "prettier@npm:2.8.2"
   bin:
     prettier: bin-prettier.js
-  checksum: 55a4409182260866ab31284d929b3cb961e5fdb91fe0d2e099dac92eaecec890f36e524b4c19e6ceae839c99c6d7195817579cdffc8e2c80da0cb794463a748b
+  checksum: 740c56c2128d587d656ea1dde9bc9c3503dfc94db4f3ac387259215eeb2e216680bdad9d18a0c9feecc6b42cfa188d6fa777df4c36c1d00cedd4199074fbfbd2
   languageName: node
   linkType: hard
 
@@ -9097,14 +9097,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript-transform-paths@npm:3.4.4":
-  version: 3.4.4
-  resolution: "typescript-transform-paths@npm:3.4.4"
+"typescript-transform-paths@npm:3.4.6":
+  version: 3.4.6
+  resolution: "typescript-transform-paths@npm:3.4.6"
   dependencies:
     minimatch: ^3.0.4
   peerDependencies:
     typescript: ">=3.6.5"
-  checksum: 80a759d7ac26c681704a538e92fb93ccbd5fafe6f2c556dddd8db0ff97c826a4a829ec79d366488743ca9dc48ce4e222ef586c8c9bb9d378858e94a88c4f230a
+  checksum: 963d57f17b1be6717d8fbccf7740674b7c2919c39f1796886a4a425265b8679093b6dfc6662a64a3260ce57b6718563420deb290ab65df681641039ba6d89ab3
   languageName: node
   linkType: hard
 
