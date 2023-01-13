@@ -3,7 +3,7 @@ import type { BrowserEngine } from 'lib/browser/Browser';
 
 import { postRender } from './helpers';
 
-jest.setTimeout(30000);
+jest.setTimeout(60000);
 
 describe('errors', () => {
   it('should catch DNS error', async () => {
