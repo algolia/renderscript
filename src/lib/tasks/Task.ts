@@ -112,7 +112,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
 
     await page.create();
 
-    if (this.params.headersToForward?.cookies) {
+    if (this.params.headersToForward?.cookie) {
       await page.setCookies(this.params);
     }
 
