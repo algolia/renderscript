@@ -68,7 +68,7 @@
     "nodemon": "2.0.20",
     "pino-pretty": "9.1.1",
     "prettier": "2.8.2",
-    "semantic-release": "19.0.5",
+    "semantic-release": "20.0.2",
     "ts-jest": "29.0.5",
     "ts-node": "10.9.1",
     "ttypescript": "1.5.13",
