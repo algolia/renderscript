@@ -55,10 +55,10 @@
     "eslint-config-algolia": "20.1.0",
     "eslint-config-prettier": "8.6.0",
     "eslint-config-standard": "17.0.0",
-    "eslint-import-resolver-typescript": "3.5.2",
+    "eslint-import-resolver-typescript": "3.5.3",
     "eslint-plugin-algolia": "2.0.0",
     "eslint-plugin-eslint-comments": "3.2.0",
-    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-import": "2.27.4",
     "eslint-plugin-jest": "27.2.1",
     "eslint-plugin-jsdoc": "39.6.2",
     "eslint-plugin-node": "11.1.0",
@@ -68,8 +68,8 @@
     "nodemon": "2.0.20",
     "pino-pretty": "9.1.1",
     "prettier": "2.8.2",
-    "semantic-release": "19.0.5",
-    "ts-jest": "29.0.3",
+    "semantic-release": "20.0.2",
+    "ts-jest": "29.0.5",
     "ts-node": "10.9.1",
     "ttypescript": "1.5.13",
     "typescript": "4.8.4",
@@ -86,11 +86,11 @@
     "hot-shots": "9.3.0",
     "pino": "8.7.0",
     "playwright": "1.29.2",
-    "undici": "5.10.0",
+    "undici": "5.15.0",
     "uuid": "8.3.2"
   },
   "resolutions": {
     "chalk": "4.1.2"
   },
-  "packageManager": "yarn@3.3.0"
+  "packageManager": "yarn@3.3.1"
 }
