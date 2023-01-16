@@ -143,6 +143,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       // Find the input
       const passwordInputLoc = await getInput(page, passwordSel);
       if (!('error' in passwordInputLoc)) {
+        this.log.info('Entering password...');
         await passwordInputLoc.type(login.password, {
           noWaitAfter: true,
           timeout: this.timeBudget.getRange(2000, 3000),

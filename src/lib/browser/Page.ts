@@ -109,8 +109,23 @@ export class BrowserPage {
       log.debug('request_failed', { url: req.url(), pageUrl: page.url() });
       this.#metrics.requests.pending -= 1;
     });
-    page.on('requestfinished', (req) => {
-      log.debug('request_finished', { url: req.url(), pageUrl: page.url() });
+    page.on('requestfinished', async (req) => {
+      if (log.isLevelEnabled('trace')) {
+        const response = await req.response();
+        log.trace('request_finished', {
+          url: req.url(),
+          pageUrl: page.url(),
+          requestHeaders: req.headers(),
+          responseStatus: response?.status(),
+        });
+      } else if (log.isLevelEnabled('debug')) {
+        const response = await req.response();
+        log.debug('request_finished', {
+          url: req.url(),
+          pageUrl: page.url(),
+          responseStatus: response?.status(),
+        });
+      }
       this.#metrics.requests.pending -= 1;
     });
   }

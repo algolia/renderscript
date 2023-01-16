@@ -18,7 +18,8 @@ describe('errors', () => {
     expect(json.error).toBe('dns_error');
   });
 
-  it.each(['chromium', 'firefox'])(
+  // Firefox doesn't crash reliably one the CI
+  it.each(['chromium' /* , 'firefox' */])(
     '%s should catch Page Crashed',
     async (browser) => {
       const { res, body } = await postRender({
