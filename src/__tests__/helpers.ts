@@ -2,7 +2,7 @@ import type { IncomingHttpHeaders } from 'http';
 
 import type { Cookie } from 'playwright';
 import { request as req } from 'undici';
-import type { ResponseData } from 'undici/types/dispatcher';
+import type Dispatcher from 'undici/types/dispatcher';
 
 import type { PostLoginParams, PostLoginSuccess } from 'api/@types/postLogin';
 import type { PostRenderParams } from 'api/@types/postRender';
@@ -10,7 +10,7 @@ import type { PostRenderParams } from 'api/@types/postRender';
 export async function request(
   url: string,
   params?: Parameters<typeof req>[1]
-): Promise<{ res: ResponseData; body: string }> {
+): Promise<{ res: Dispatcher.ResponseData; body: string }> {
   const res = await req(url, params);
 
   let body = '';
@@ -24,7 +24,7 @@ export async function request(
 export async function postRender(
   opts: Partial<PostRenderParams>,
   headers?: IncomingHttpHeaders
-): Promise<{ res: ResponseData; body: string }> {
+): Promise<{ res: Dispatcher.ResponseData; body: string }> {
   return await request('http://localhost:3000/render', {
     method: 'POST',
     headers: {
@@ -40,7 +40,7 @@ export async function postRender(
 
 export async function sendLoginRequest(
   opts: Partial<PostLoginParams>
-): Promise<{ res: ResponseData; body: string }> {
+): Promise<{ res: Dispatcher.ResponseData; body: string }> {
   return await request('http://localhost:3000/login', {
     method: 'POST',
     headers: {
