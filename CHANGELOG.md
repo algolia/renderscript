@@ -1,3 +1,12 @@
+## [2.2.3](https://github.com/algolia/renderscript/compare/v2.2.2...v2.2.3) (2023-01-17)
+
+
+### Bug Fixes
+
+* cookies were not set on the page ([#732](https://github.com/algolia/renderscript/issues/732)) ([02dccd7](https://github.com/algolia/renderscript/commit/02dccd71cb2b4a66b0f68e3bc9453b205fb6e588))
+* dependencies 2023-01-09 ([#723](https://github.com/algolia/renderscript/issues/723)) ([3cbf18c](https://github.com/algolia/renderscript/commit/3cbf18c2ab37f639749aa94c5e211617ae9813d1)), closes [#724](https://github.com/algolia/renderscript/issues/724) [#727](https://github.com/algolia/renderscript/issues/727) [#730](https://github.com/algolia/renderscript/issues/730) [#728](https://github.com/algolia/renderscript/issues/728) [#729](https://github.com/algolia/renderscript/issues/729)
+* dependencies 2023-01-16 ([#731](https://github.com/algolia/renderscript/issues/731)) ([532bd28](https://github.com/algolia/renderscript/commit/532bd28ecb4aa7e1701c90cbe6c6e8fea86baacb)), closes [#733](https://github.com/algolia/renderscript/issues/733) [#735](https://github.com/algolia/renderscript/issues/735) [#736](https://github.com/algolia/renderscript/issues/736) [#737](https://github.com/algolia/renderscript/issues/737) [#740](https://github.com/algolia/renderscript/issues/740) [#738](https://github.com/algolia/renderscript/issues/738) [#739](https://github.com/algolia/renderscript/issues/739)
+
 ## [2.2.2](https://github.com/algolia/renderscript/compare/v2.2.1...v2.2.2) (2022-12-08)
 
 
