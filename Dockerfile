@@ -22,12 +22,14 @@ RUN apt-get update && \
   adduser pwuser
 
 # === BAKE BROWSERS INTO IMAGE ===
+ARG PLAYWRIGHT_VERSION
+ENV PLAYWRIGHT_VERSION ${PLAYWRIGHT_VERSION}
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 # Browsers will be downloaded in `/ms-playwright`.
 # !!! MAKE SURE THE PLAYWRIGHT VERSION MATCHES THE ONE IN package.json
 RUN mkdir /ms-playwright \
-  && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=true npm install -g playwright@1.29.2 \
+  && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=true npm install -g playwright@$PLAYWRIGHT_VERSION \
   && npx playwright install --with-deps chromium \
   && npx playwright install --with-deps firefox \
   # Clean cache
