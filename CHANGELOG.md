@@ -1,3 +1,12 @@
+## [2.2.4](https://github.com/algolia/renderscript/compare/v2.2.3...v2.2.4) (2023-01-18)
+
+
+### Bug Fixes
+
+* align playwright version in Dockerfile ([95e3338](https://github.com/algolia/renderscript/commit/95e3338eb3a832eec14f36b5112b44d7aa367457))
+* **build:** align playwright version ([#742](https://github.com/algolia/renderscript/issues/742)) ([c3049bc](https://github.com/algolia/renderscript/commit/c3049bcc445878c7dccc58b6222813605a4b5ed4))
+* set cookies for the whole domain ([#743](https://github.com/algolia/renderscript/issues/743)) ([01a63a7](https://github.com/algolia/renderscript/commit/01a63a7b9b3f9ef4be4d6c938bd690fb064460cd))
+
 ## [2.2.3](https://github.com/algolia/renderscript/compare/v2.2.2...v2.2.3) (2023-01-17)
 
 
