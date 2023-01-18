@@ -280,9 +280,7 @@ export class BrowserPage {
   async setCookies({ url, headersToForward }: TaskBaseParams): Promise<void> {
     const cookies = headersToForward!.cookie.split('; ').map((cookie) => {
       const [key, ...v] = cookie.split('=');
-      // url attribute is required because it is not possible set cookies on a blank page
-      // so page.setCookie would crash if no url is provided, since we start with a blank page
-      return { url: url.href, name: key, value: v.join('=') };
+      return { domain: url.hostname, path: '/', name: key, value: v.join('=') };
     });
 
     try {
