@@ -9,9 +9,10 @@ ATTEMPTS=10
 until $(curl -o /dev/null -s -f http://localhost:3000/ready); do
   echo "waiting for docker..."
   sleep 1
-  ((ATTEMPTS=ATTEMPTS-1))
+  ATTEMPTS=$((ATTEMPTS-1))
   if [[ $ATTEMPTS -eq "0" ]]; then
-    echo "Timed out, check the logs of renderscript_test container"
+    echo "Timed out, check the logs of renderscript_test container:"
+    docker logs renderscript_test -n 50
     exit 1
   fi
 done

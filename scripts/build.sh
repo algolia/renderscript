@@ -4,7 +4,8 @@ set -ex
 
 hash=$(git rev-parse HEAD)
 current=$(node -e "console.log(require('./package.json').version)")
-echo "Releasing: $current"
+playwright_version=$(node -e 'console.log(require("./package.json").dependencies.playwright)')
+echo "Releasing: $current ; Playwright version: $playwright_version"
 echo ""
 
 # Build renderscript
@@ -19,5 +20,6 @@ docker buildx build \
   -t "algolia/renderscript:${hash}" \
   -t "algolia/renderscript:latest" \
   --build-arg "VERSION=${current}" \
+  --build-arg "PLAYWRIGHT_VERSION=${playwright_version}" \
   --load \
   .
