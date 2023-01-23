@@ -6,6 +6,7 @@
   "baseBranches": [
     "chore/renovateBaseBranch"
   ],
-  "prHourlyLimit": 5,
-  "prConcurrentLimit": 10
+  "automergeType": "branch",
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 5
 }
