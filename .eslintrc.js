@@ -44,5 +44,6 @@ module.exports = {
 
     // TMP
     'jsdoc/check-examples': ['off'],
+    '@typescript-eslint/prefer-optional-chain': ['off'], // to re-enable when this is fixed: https://github.com/typescript-eslint/typescript-eslint/issues/6024
   },
 };
