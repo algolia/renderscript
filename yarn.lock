@@ -27,7 +27,7 @@ __metadata:
     "@types/express": 4.17.16
     "@types/jest": 29.4.0
     "@types/node": 18.11.18
-    "@types/uuid": 8.3.4
+    "@types/uuid": 9.0.0
     "@typescript-eslint/eslint-plugin": 5.49.0
     "@typescript-eslint/parser": 5.49.0
     altheia-async-data-validator: 5.0.15
@@ -64,7 +64,7 @@ __metadata:
     typescript: 4.9.4
     typescript-transform-paths: 3.4.6
     undici: 5.16.0
-    uuid: 8.3.2
+    uuid: 9.0.0
   languageName: unknown
   linkType: soft
 
@@ -1784,10 +1784,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/uuid@npm:8.3.4":
-  version: 8.3.4
-  resolution: "@types/uuid@npm:8.3.4"
-  checksum: 6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f
+"@types/uuid@npm:9.0.0":
+  version: 9.0.0
+  resolution: "@types/uuid@npm:9.0.0"
+  checksum: 59ae56d9547c8758588659da2a2b4c97cce79c2aae1798c892bb29452ef08e87859dea2ec3a66bfa88d0d2153147520be2b1893be920f9f0bc9c53a3207ea6aa
   languageName: node
   linkType: hard
 
@@ -9601,12 +9601,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:8.3.2":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
+"uuid@npm:9.0.0":
+  version: 9.0.0
+  resolution: "uuid@npm:9.0.0"
   bin:
     uuid: dist/bin/uuid
-  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
+  checksum: 8dd2c83c43ddc7e1c71e36b60aea40030a6505139af6bee0f382ebcd1a56f6cd3028f7f06ffb07f8cf6ced320b76aea275284b224b002b289f89fe89c389b028
   languageName: node
   linkType: hard
 
