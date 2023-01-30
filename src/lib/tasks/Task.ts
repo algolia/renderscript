@@ -32,6 +32,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     cookies: [],
   };
   log: Logger;
+  timeBudget: TimeBudget;
   #metrics: Metrics = {
     timings: {
       context: null,
@@ -49,7 +50,6 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     },
     page: null,
   };
-  timeBudget: TimeBudget;
 
   #closed: boolean = false;
   #context?: BrowserContext;
