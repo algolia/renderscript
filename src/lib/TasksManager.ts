@@ -128,6 +128,32 @@ export class TasksManager {
   }
 
   /**
+   * Stop the task manager.
+   */
+  async stop(): Promise<void> {
+    this.#stopping = true;
+    log.info('[Manager] stopping...');
+
+    // We wait for all tasks to finish before closing
+    const promises: Array<Promise<void>> = [];
+    this.#tasks.forEach((task) => {
+      promises.push(this.#removeTask(task.ref.id));
+    });
+    await Promise.all(promises);
+
+    this.#tasks.clear();
+
+    if (this.#chromium) {
+      await this.#chromium.stop();
+      this.#chromium = null;
+    }
+    if (this.#firefox) {
+      await this.#firefox.stop();
+      this.#firefox = null;
+    }
+  }
+
+  /**
    * Actual execution of a task.
    * It will create a browser, a page, launch the task (render, login), close everything.
    * Any unexpected error will be thrown.
@@ -207,32 +233,6 @@ export class TasksManager {
       timeout: task.page?.hasTimeout || false,
       metrics: task.metrics,
     };
-  }
-
-  /**
-   * Stop the task manager.
-   */
-  async stop(): Promise<void> {
-    this.#stopping = true;
-    log.info('[Manager] stopping...');
-
-    // We wait for all tasks to finish before closing
-    const promises: Array<Promise<void>> = [];
-    this.#tasks.forEach((task) => {
-      promises.push(this.#removeTask(task.ref.id));
-    });
-    await Promise.all(promises);
-
-    this.#tasks.clear();
-
-    if (this.#chromium) {
-      await this.#chromium.stop();
-      this.#chromium = null;
-    }
-    if (this.#firefox) {
-      await this.#firefox.stop();
-      this.#firefox = null;
-    }
   }
 
   async #removeTask(id: string): Promise<void> {
