@@ -50,7 +50,7 @@ __metadata:
     eslint-plugin-prettier: 4.2.1
     eslint-plugin-promise: 6.1.1
     express: 4.18.2
-    hot-shots: 9.3.0
+    hot-shots: 10.0.0
     jest: 29.4.1
     nodemon: 2.0.20
     pino: 8.8.0
@@ -4787,15 +4787,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hot-shots@npm:9.3.0":
-  version: 9.3.0
-  resolution: "hot-shots@npm:9.3.0"
+"hot-shots@npm:10.0.0":
+  version: 10.0.0
+  resolution: "hot-shots@npm:10.0.0"
   dependencies:
     unix-dgram: 2.x
   dependenciesMeta:
     unix-dgram:
       optional: true
-  checksum: bfc874abcb6da71afe0fc3b63c5872e5b7183c1bbea83e9c6e4a4d3fe399567420057a8a3e090fa0c6689b0cfb24d15d917e6f627ad8e022c45240f2d2b17f28
+  checksum: b37f611190e897bbd2d8d07542cd24c98f2dcca01813f25cd8ba36155c0fa26db5216e01058a2b47142c2be8e45e6d80965358d69a7f0d85a6878ca27951813e
   languageName: node
   linkType: hard
 
