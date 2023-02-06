@@ -48,7 +48,7 @@ jobs:
           platforms: arm64
 
       - name: Build Image
-        uses: docker/build-push-action@v3.3.0
+        uses: docker/build-push-action@v4.0.0
         with:
           file: Dockerfile
           context: .
@@ -71,7 +71,7 @@ jobs:
       # Cache should be reused from prev execution
       - name: Push
         if: (github.event_name == 'release') || (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run != 'true')
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           file: Dockerfile
           context: .
