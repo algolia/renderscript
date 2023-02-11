@@ -54,7 +54,7 @@ __metadata:
     jest: 29.4.2
     nodemon: 2.0.20
     pino: 8.8.0
-    pino-pretty: 9.1.1
+    pino-pretty: 9.2.0
     playwright: 1.30.0
     prettier: 2.8.4
     semantic-release: 20.1.0
@@ -7718,9 +7718,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino-pretty@npm:9.1.1":
-  version: 9.1.1
-  resolution: "pino-pretty@npm:9.1.1"
+"pino-pretty@npm:9.2.0":
+  version: 9.2.0
+  resolution: "pino-pretty@npm:9.2.0"
   dependencies:
     colorette: ^2.0.7
     dateformat: ^4.6.3
@@ -7738,7 +7738,7 @@ __metadata:
     strip-json-comments: ^3.1.1
   bin:
     pino-pretty: bin.js
-  checksum: c1d148aa0c5f2d1034cf76c0b397cf9725923d16343e9dff78d56b564090c1c86208aae94f1208f0fb936f456eece7eab6264095337540f42d91aaa13e5b8935
+  checksum: 28fc4eca16931419a0a8a5696ce511f37d1e57ad67b4b06510b3fd2772a3e6335eb137630b5186c0410980093a7e05d2f55175b2cda540a638f692aba2a2dc20
   languageName: node
   linkType: hard
 
