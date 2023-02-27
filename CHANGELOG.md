@@ -1,3 +1,15 @@
+## [2.2.5](https://github.com/algolia/renderscript/compare/v2.2.4...v2.2.5) (2023-02-27)
+
+
+### Bug Fixes
+
+* dependencies 2023-01-23 ([#744](https://github.com/algolia/renderscript/issues/744)) ([ce5d91c](https://github.com/algolia/renderscript/commit/ce5d91c59b700bf73774c976fff98d0c18ea4b9a)), closes [#745](https://github.com/algolia/renderscript/issues/745) [#746](https://github.com/algolia/renderscript/issues/746) [#747](https://github.com/algolia/renderscript/issues/747) [#748](https://github.com/algolia/renderscript/issues/748) [#749](https://github.com/algolia/renderscript/issues/749) [#751](https://github.com/algolia/renderscript/issues/751) [#752](https://github.com/algolia/renderscript/issues/752) [#753](https://github.com/algolia/renderscript/issues/753) [#755](https://github.com/algolia/renderscript/issues/755) [#756](https://github.com/algolia/renderscript/issues/756) [#754](https://github.com/algolia/renderscript/issues/754)
+* dependencies 2023-01-30 ([#758](https://github.com/algolia/renderscript/issues/758)) ([494ef46](https://github.com/algolia/renderscript/commit/494ef46172ed8891e9b687a794fd1f5881938cac)), closes [#759](https://github.com/algolia/renderscript/issues/759)
+* dependencies 2023-02-06 ([#762](https://github.com/algolia/renderscript/issues/762)) ([2928f7f](https://github.com/algolia/renderscript/commit/2928f7f7e864fe60da156c2817573e5dc1a4983c)), closes [#763](https://github.com/algolia/renderscript/issues/763) [#764](https://github.com/algolia/renderscript/issues/764) [#765](https://github.com/algolia/renderscript/issues/765)
+* dependencies 2023-02-13 ([#766](https://github.com/algolia/renderscript/issues/766)) ([a8048cf](https://github.com/algolia/renderscript/commit/a8048cf11372eb93d859e33db31da6597f7115d3)), closes [#767](https://github.com/algolia/renderscript/issues/767) [#768](https://github.com/algolia/renderscript/issues/768)
+* dependencies 2023-02-20 ([#770](https://github.com/algolia/renderscript/issues/770)) ([a9ca840](https://github.com/algolia/renderscript/commit/a9ca8406498ddf79a1f151a0e0657c83776108f1))
+* dependencies 2023-02-27 ([#771](https://github.com/algolia/renderscript/issues/771)) ([ad64c4f](https://github.com/algolia/renderscript/commit/ad64c4f5f3299fb882d251a768802f8f41c63d87)), closes [#772](https://github.com/algolia/renderscript/issues/772) [#773](https://github.com/algolia/renderscript/issues/773)
+
 ## [2.2.4](https://github.com/algolia/renderscript/compare/v2.2.3...v2.2.4) (2023-01-18)
 
 
