@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/algolia/renderscript#readme",
   "devDependencies": {
-    "@semantic-release/changelog": "6.0.2",
+    "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
     "@types/cookie-parser": "1.4.3",
     "@types/csurf": "1.11.2",
