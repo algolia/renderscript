@@ -63,7 +63,7 @@ __metadata:
     ttypescript: 1.5.15
     typescript: 4.9.5
     typescript-transform-paths: 3.4.6
-    undici: 5.21.1
+    undici: 5.21.2
     uuid: 9.0.0
   languageName: unknown
   linkType: soft
@@ -9555,12 +9555,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:5.21.1":
-  version: 5.21.1
-  resolution: "undici@npm:5.21.1"
+"undici@npm:5.21.2":
+  version: 5.21.2
+  resolution: "undici@npm:5.21.2"
   dependencies:
     busboy: ^1.6.0
-  checksum: a6cfaf209643cfc49aa66e00bd5b231715210869318ef9dabf9cb9cb645f1be7fbda0822d0254294ccdf528bbb4f164670bf51e17e216c7983cd29cbe24c0db5
+  checksum: baceaa9e610966631e86ad2869b657556dd465438eed55e8079cec2a306ecbeecfde2d6e37e43baf96a4c59588ebef50476131e96e018dcc0a7f5db7e6a06c85
   languageName: node
   linkType: hard
 
