@@ -45,7 +45,7 @@ __metadata:
     eslint-plugin-eslint-comments: 3.2.0
     eslint-plugin-import: 2.27.5
     eslint-plugin-jest: 27.2.1
-    eslint-plugin-jsdoc: 40.3.0
+    eslint-plugin-jsdoc: 41.1.1
     eslint-plugin-node: 11.1.0
     eslint-plugin-prettier: 4.2.1
     eslint-plugin-promise: 6.1.1
@@ -2141,6 +2141,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"are-docs-informative@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "are-docs-informative@npm:0.0.2"
+  checksum: 7a48ca90d66e29afebc4387d7029d86cfe97bad7e796c8e7de01309e02dcfc027250231c02d4ca208d2984170d09026390b946df5d3d02ac638ab35f74501c74
+  languageName: node
+  linkType: hard
+
 "are-we-there-yet@npm:^3.0.0":
   version: 3.0.1
   resolution: "are-we-there-yet@npm:3.0.1"
@@ -3711,11 +3718,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:40.3.0":
-  version: 40.3.0
-  resolution: "eslint-plugin-jsdoc@npm:40.3.0"
+"eslint-plugin-jsdoc@npm:41.1.1":
+  version: 41.1.1
+  resolution: "eslint-plugin-jsdoc@npm:41.1.1"
   dependencies:
     "@es-joy/jsdoccomment": ~0.37.0
+    are-docs-informative: ^0.0.2
     comment-parser: 1.3.1
     debug: ^4.3.4
     escape-string-regexp: ^4.0.0
@@ -3724,7 +3732,7 @@ __metadata:
     spdx-expression-parse: ^3.0.1
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0
-  checksum: 7671ac3cc7165cd894cc2fc4c67ddf075f01502c25bbdc649559e7dfd6a525126debe756c83e11887972ffbe57d0d10d3bb17c7269594823654f55be3a3ca5ef
+  checksum: 101ea430e0399dbb41afc5f2abb3856e1d066191db1dd738c0be1eadfc36cd790cdc0208cf249b07cf2eb3915b066eaa6d398c12f67f5e8fdb7db9b179c00296
   languageName: node
   linkType: hard
 
