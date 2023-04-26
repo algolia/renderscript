@@ -37,7 +37,7 @@ __metadata:
     dotenv: 16.0.3
     ejs: 3.1.9
     eslint: 8.39.0
-    eslint-config-algolia: 20.1.0
+    eslint-config-algolia: 21.0.0
     eslint-config-prettier: 8.8.0
     eslint-config-standard: 17.0.0
     eslint-import-resolver-typescript: 3.5.5
@@ -45,7 +45,7 @@ __metadata:
     eslint-plugin-eslint-comments: 3.2.0
     eslint-plugin-import: 2.27.5
     eslint-plugin-jest: 27.2.1
-    eslint-plugin-jsdoc: 41.1.2
+    eslint-plugin-jsdoc: 43.0.7
     eslint-plugin-node: 11.1.0
     eslint-plugin-prettier: 4.2.1
     eslint-plugin-promise: 6.1.1
@@ -489,7 +489,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@es-joy/jsdoccomment@npm:~0.37.0":
+"@es-joy/jsdoccomment@npm:~0.37.1":
   version: 0.37.1
   resolution: "@es-joy/jsdoccomment@npm:0.37.1"
   dependencies:
@@ -3578,13 +3578,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-algolia@npm:20.1.0":
-  version: 20.1.0
-  resolution: "eslint-config-algolia@npm:20.1.0"
+"eslint-config-algolia@npm:21.0.0":
+  version: 21.0.0
+  resolution: "eslint-config-algolia@npm:21.0.0"
   peerDependencies:
     eslint: ^5.16.0 || ^6.8.0 || ^7.2.0 || ^8.0.0
     prettier: ^2.2.1
-  checksum: 19f6bf27b5600972afeeb29984b1353b6aee85745d1db657a2f2e733e89fddcbaf60d8b592734c6eec8d90890a8eeef02570511e7a6bab26ad413cb51555890d
+  checksum: ea3091982476d554ac25d3ca3b32ceb6bcad220d6d678208aba1521341dd626fbcd24372a854bbdeb07327b453183835c71cf53ec866dadf8568f3276118b7f4
   languageName: node
   linkType: hard
 
@@ -3726,21 +3726,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:41.1.2":
-  version: 41.1.2
-  resolution: "eslint-plugin-jsdoc@npm:41.1.2"
+"eslint-plugin-jsdoc@npm:43.0.7":
+  version: 43.0.7
+  resolution: "eslint-plugin-jsdoc@npm:43.0.7"
   dependencies:
-    "@es-joy/jsdoccomment": ~0.37.0
+    "@es-joy/jsdoccomment": ~0.37.1
     are-docs-informative: ^0.0.2
     comment-parser: 1.3.1
     debug: ^4.3.4
     escape-string-regexp: ^4.0.0
     esquery: ^1.5.0
-    semver: ^7.3.8
+    semver: ^7.5.0
     spdx-expression-parse: ^3.0.1
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0
-  checksum: 9105e5235c2163f5c7217a4b8555cb899ef4387a9bb29d21234d7135c4bd801ddf1bf4aee1ca41e383015fb94a3d373051568d4647edd762aca6e1134bb81afe
+  checksum: 9e4b84783a2d0358d435869a8b401aa10e38a33bcdbd5cb3d55413f745f4fd579a20cebfd25f76be172cac49fc2d2c5202a9afaf13616900f536a0d1d7fc7944
   languageName: node
   linkType: hard
 
@@ -8499,7 +8499,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:7.x, semver@npm:^7.0.0, semver@npm:^7.1.1, semver@npm:^7.1.2, semver@npm:^7.3.2, semver@npm:^7.3.4, semver@npm:^7.3.5, semver@npm:^7.3.7, semver@npm:^7.3.8, semver@npm:^7.5.0":
+"semver@npm:7.x, semver@npm:^7.0.0, semver@npm:^7.1.1, semver@npm:^7.1.2, semver@npm:^7.3.2, semver@npm:^7.3.4, semver@npm:^7.3.5, semver@npm:^7.3.7, semver@npm:^7.5.0":
   version: 7.5.0
   resolution: "semver@npm:7.5.0"
   dependencies:
