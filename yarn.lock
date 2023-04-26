@@ -37,7 +37,7 @@ __metadata:
     dotenv: 16.0.3
     ejs: 3.1.9
     eslint: 8.39.0
-    eslint-config-algolia: 20.1.0
+    eslint-config-algolia: 21.0.0
     eslint-config-prettier: 8.8.0
     eslint-config-standard: 17.0.0
     eslint-import-resolver-typescript: 3.5.5
@@ -3648,13 +3648,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-algolia@npm:20.1.0":
-  version: 20.1.0
-  resolution: "eslint-config-algolia@npm:20.1.0"
+"eslint-config-algolia@npm:21.0.0":
+  version: 21.0.0
+  resolution: "eslint-config-algolia@npm:21.0.0"
   peerDependencies:
     eslint: ^5.16.0 || ^6.8.0 || ^7.2.0 || ^8.0.0
     prettier: ^2.2.1
-  checksum: 19f6bf27b5600972afeeb29984b1353b6aee85745d1db657a2f2e733e89fddcbaf60d8b592734c6eec8d90890a8eeef02570511e7a6bab26ad413cb51555890d
+  checksum: ea3091982476d554ac25d3ca3b32ceb6bcad220d6d678208aba1521341dd626fbcd24372a854bbdeb07327b453183835c71cf53ec866dadf8568f3276118b7f4
   languageName: node
   linkType: hard
 
