@@ -281,7 +281,7 @@ export class BrowserPage {
           throw err;
         }
       }
-      report(err, { url: this.ref?.url() });
+      report(err, { url: this.ref?.url(), browser: this.#engine });
     }
     return null;
   }
@@ -468,7 +468,12 @@ export class BrowserPage {
           return;
         }
 
-        report(err, { context: 'onRequest', url: url.href, with: reqUrl });
+        report(err, {
+          context: 'onRequest',
+          url: url.href,
+          with: reqUrl,
+          browser: this.#engine,
+        });
       }
     };
   }

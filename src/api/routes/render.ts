@@ -72,7 +72,7 @@ export async function render(
     res.status(500).json({
       error: err.message,
     });
-    report(err, { type: 'render', url: rawUrl });
+    report(err, { type: 'render', url: rawUrl, browser });
   }
 }
 
@@ -126,6 +126,6 @@ export async function renderJSON(
     });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
-    report(err, { type: 'renderJSON', url: rawUrl });
+    report(err, { type: 'renderJSON', url: rawUrl, browser });
   }
 }
