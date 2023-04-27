@@ -106,7 +106,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     context.setDefaultTimeout(WAIT_TIME.min);
     context.setDefaultNavigationTimeout(WAIT_TIME.max);
 
-    const page = new BrowserPage(context);
+    const page = new BrowserPage(context, this.params.browser);
     this.page = page;
     this.#context = context;
 

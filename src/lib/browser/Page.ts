@@ -14,6 +14,8 @@ import type { PageMetrics, Perf, TaskBaseParams } from 'lib/types';
 
 import { DATA_REGEXP, IGNORED_RESOURCES } from '../constants';
 
+import type { BrowserEngine } from './Browser';
+import { DEFAULT_ENGINE } from './Browser';
 import {
   METRICS_IGNORED_ERRORS,
   REQUEST_IGNORED_ERRORS,
@@ -26,6 +28,7 @@ import {
 export class BrowserPage {
   #ref: Page | undefined;
   #context: BrowserContext | undefined;
+  #engine: BrowserEngine;
   #metrics: PageMetrics = {
     timings: {
       download: 0,
@@ -80,8 +83,9 @@ export class BrowserPage {
     return this.#metrics.requests.pending;
   }
 
-  constructor(context: BrowserContext) {
+  constructor(context: BrowserContext, engine?: BrowserEngine) {
     this.#context = context;
+    this.#engine = engine || DEFAULT_ENGINE;
   }
 
   /**
@@ -262,14 +266,22 @@ export class BrowserPage {
     try {
       return await promiseWithTimeout(
         (async (): Promise<string | null> => {
-          return (await this.#ref?.content()) || null;
+          const start = Date.now();
+          const content = await this.#ref?.content();
+          stats.timing('renderscript.renderBody', Date.now() - start, {
+            browser: this.#engine as string,
+          });
+          return content || null;
         })(),
         10000 // this is the most important part so we try hard
       );
-    } catch (err) {
-      if (!(err instanceof PromiseWithTimeoutError) && !silent) {
-        throw err;
+    } catch (err: any) {
+      if (!(err instanceof PromiseWithTimeoutError)) {
+        if (!silent) {
+          throw err;
+        }
       }
+      report(err, { url: this.ref?.url() });
     }
     return null;
   }

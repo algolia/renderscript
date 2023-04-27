@@ -15,6 +15,7 @@ import { flags, HEIGHT, WIDTH } from './constants';
 const log = mainLog.child({ svc: 'brws' });
 
 export type BrowserEngine = 'chromium' | 'firefox';
+export const DEFAULT_ENGINE: BrowserEngine = 'chromium';
 
 export class Browser {
   #id;
