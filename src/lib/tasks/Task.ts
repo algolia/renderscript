@@ -179,6 +179,9 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   throwHandledError(res: ErrorReturn): void {
     this.results.error = res.error;
     this.results.rawError = res.rawError || null;
+    stats.increment('renderscript.task.handlederror', {
+      error: res.error || 'no_error',
+    });
     throw new ErrorIsHandledError();
   }
 
