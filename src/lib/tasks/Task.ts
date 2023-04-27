@@ -106,7 +106,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
     context.setDefaultTimeout(WAIT_TIME.min);
     context.setDefaultNavigationTimeout(WAIT_TIME.max);
 
-    const page = new BrowserPage(context);
+    const page = new BrowserPage(context, this.params.browser);
     this.page = page;
     this.#context = context;
 
@@ -179,6 +179,9 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   throwHandledError(res: ErrorReturn): void {
     this.results.error = res.error;
     this.results.rawError = res.rawError || null;
+    stats.increment('renderscript.task.handlederror', {
+      error: res.error || 'no_error',
+    });
     throw new ErrorIsHandledError();
   }
 

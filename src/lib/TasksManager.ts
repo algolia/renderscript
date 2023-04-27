@@ -184,8 +184,8 @@ export class TasksManager {
       if (!(err instanceof ErrorIsHandledError)) {
         task.results.error = task.results.error || cleanErrorMessage(err);
         task.results.rawError = err;
+        report(err, { url });
       }
-      report(err, { url });
       /* eslint-enable no-param-reassign */
     }
 
