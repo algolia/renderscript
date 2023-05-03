@@ -266,6 +266,7 @@ export class BrowserPage {
     { silent }: { silent: boolean } = { silent: false }
   ): Promise<string | null> {
     try {
+      console.log(process.env.NODE_ENV);
       return await promiseWithTimeout(
         (async (): Promise<string | null> => {
           const startUsage = cpuUsage();
@@ -284,7 +285,7 @@ export class BrowserPage {
           }
           return content || null;
         })(),
-        20000 // this is the most important part so we try hard
+        process.env.NODE_ENV !== 'production' ? 10000 : 20000 // this is the most important part so we try hard
       );
     } catch (err: any) {
       if (!(err instanceof PromiseWithTimeoutError)) {
