@@ -1,4 +1,4 @@
-import { memoryUsage } from 'node:process';
+import { cpuUsage, memoryUsage } from 'node:process';
 
 import type { BrowserContext, Page, Route, Response } from 'playwright';
 
@@ -268,6 +268,7 @@ export class BrowserPage {
     try {
       return await promiseWithTimeout(
         (async (): Promise<string | null> => {
+          const startUsage = cpuUsage();
           const start = Date.now();
           const content = await this.#ref?.content();
           const renderTime = Date.now() - start;
@@ -279,6 +280,7 @@ export class BrowserPage {
               url: this.ref?.url(),
             });
             log.info('Memory usage:', memoryUsage());
+            log.info('CPU used since rendering started:', cpuUsage(startUsage));
           }
           return content || null;
         })(),
