@@ -1,3 +1,5 @@
+import { memoryUsage } from 'node:process';
+
 import type { BrowserContext, Page, Route, Response } from 'playwright';
 
 import { report } from 'helpers/errorReporting';
@@ -268,12 +270,19 @@ export class BrowserPage {
         (async (): Promise<string | null> => {
           const start = Date.now();
           const content = await this.#ref?.content();
-          stats.timing('renderscript.renderBody', Date.now() - start, {
+          const renderTime = Date.now() - start;
+          stats.timing('renderscript.renderBody', renderTime, {
             browser: this.#engine as string,
           });
+          if (renderTime > 10000) {
+            log.warn(`Content took ${renderTime}ms to render`, {
+              url: this.ref?.url(),
+            });
+            log.info('Memory usage:', memoryUsage());
+          }
           return content || null;
         })(),
-        10000 // this is the most important part so we try hard
+        20000 // this is the most important part so we try hard
       );
     } catch (err: any) {
       if (!(err instanceof PromiseWithTimeoutError)) {
@@ -281,7 +290,11 @@ export class BrowserPage {
           throw err;
         }
       }
-      report(err, { url: this.ref?.url(), browser: this.#engine });
+      report(err, {
+        url: this.ref?.url(),
+        browser: this.#engine,
+        action: 'renderBody',
+      });
     }
     return null;
   }
