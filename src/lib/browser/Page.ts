@@ -281,7 +281,11 @@ export class BrowserPage {
           throw err;
         }
       }
-      report(err, { url: this.ref?.url(), browser: this.#engine });
+      report(err, {
+        url: this.ref?.url(),
+        browser: this.#engine,
+        action: 'renderBody',
+      });
     }
     return null;
   }
