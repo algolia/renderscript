@@ -53,25 +53,30 @@ export class Browser {
     }
 
     const start = Date.now();
-    const browser = this.#engine === 'firefox' ? firefox : chromium;
-    this.#browser = await browser.launch({
-      headless: true,
-      env,
-      handleSIGINT: false,
-      handleSIGHUP: false,
-      handleSIGTERM: false,
-      args: flags,
-    });
-    this.#browser.on('disconnected', () => {
-      if (!this.#stopping) {
-        report(
-          new Error(
-            `Browser disconnected (engine: ${this.#engine}). Relaunching...`
-          )
-        );
-        this.create();
-      }
-    });
+    try {
+      const browser = this.#engine === 'firefox' ? firefox : chromium;
+      this.#browser = await browser.launch({
+        headless: true,
+        env,
+        handleSIGINT: false,
+        handleSIGHUP: false,
+        handleSIGTERM: false,
+        args: flags,
+      });
+      this.#browser.on('disconnected', () => {
+        if (!this.#stopping) {
+          this.#ready = false;
+          report(
+            new Error(
+              `Browser disconnected (engine: ${this.#engine}). Relaunching...`
+            )
+          );
+          this.create();
+        }
+      });
+    } catch (e: any) {
+      report(e, { browser: this.#engine });
+    }
     stats.timing('renderscript.create', Date.now() - start, {
       browser: this.#engine,
     });
