@@ -1,3 +1,11 @@
+## [2.2.8](https://github.com/algolia/renderscript/compare/v2.2.7...v2.2.8) (2023-05-09)
+
+
+### Bug Fixes
+
+* catch browser crash on start ([#804](https://github.com/algolia/renderscript/issues/804)) ([137ca42](https://github.com/algolia/renderscript/commit/137ca42603a8364f471cda6267ec489b9de97393))
+* dependencies 2023-05-01 ([#801](https://github.com/algolia/renderscript/issues/801)) ([e5ac31a](https://github.com/algolia/renderscript/commit/e5ac31ad8d298c64f1401afe1ae7623441f47ec1)), closes [#802](https://github.com/algolia/renderscript/issues/802)
+
 ## [2.2.7](https://github.com/algolia/renderscript/compare/v2.2.6...v2.2.7) (2023-04-27)
 
 
