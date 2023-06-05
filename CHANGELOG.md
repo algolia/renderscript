@@ -1,3 +1,13 @@
+## [2.2.9](https://github.com/algolia/renderscript/compare/v2.2.8...v2.2.9) (2023-06-05)
+
+
+### Bug Fixes
+
+* dependencies 2023-05-15 ([#805](https://github.com/algolia/renderscript/issues/805)) ([539ed2a](https://github.com/algolia/renderscript/commit/539ed2ae2bec2ba18cf7b5719ad388dc1b5663cd)), closes [#806](https://github.com/algolia/renderscript/issues/806)
+* dependencies 2023-05-22 ([#807](https://github.com/algolia/renderscript/issues/807)) ([d7756fb](https://github.com/algolia/renderscript/commit/d7756fb8c4f59adeda43fed8452c1dcfc5a8cc6e)), closes [#808](https://github.com/algolia/renderscript/issues/808)
+* dependencies 2023-05-29 ([#809](https://github.com/algolia/renderscript/issues/809)) ([cc24593](https://github.com/algolia/renderscript/commit/cc24593f8429966d78639ec648023bd4a20842a8)), closes [#811](https://github.com/algolia/renderscript/issues/811) [#810](https://github.com/algolia/renderscript/issues/810)
+* dependencies 2023-06-05 ([#812](https://github.com/algolia/renderscript/issues/812)) ([746b413](https://github.com/algolia/renderscript/commit/746b413a70fc0c185a2d2156584fe4258cf16053)), closes [#813](https://github.com/algolia/renderscript/issues/813)
+
 ## [2.2.8](https://github.com/algolia/renderscript/compare/v2.2.7...v2.2.8) (2023-05-09)
 
 
