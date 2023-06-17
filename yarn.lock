@@ -34,7 +34,7 @@ __metadata:
     body-parser: 1.20.2
     cookie-parser: 1.4.6
     csurf: 1.11.0
-    dotenv: 16.1.4
+    dotenv: 16.3.0
     ejs: 3.1.9
     eslint: 8.42.0
     eslint-config-algolia: 21.0.0
@@ -3527,10 +3527,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:16.1.4":
-  version: 16.1.4
-  resolution: "dotenv@npm:16.1.4"
-  checksum: c1b2e13df4d374a6a29e134c56c7b040ba20500677fe8b9939ea654f3b3badb9aaa0b172e40e4dfa1233a4177dbb8fb79d84cc79a50ac9c9641fe2ad98c14876
+"dotenv@npm:16.3.0":
+  version: 16.3.0
+  resolution: "dotenv@npm:16.3.0"
+  checksum: 43a90ec87868c8b962a028b69cbe86e71621c76837249a9d65fb131b03ee69817b019d34a5456174cb04095052a496b4e1b5da72e4af2393df6083513ab62d4b
   languageName: node
   linkType: hard
 
