@@ -20,7 +20,7 @@ jobs:
     name: Build Dockers
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Node
         uses: actions/setup-node@v3
@@ -48,7 +48,7 @@ jobs:
           platforms: arm64
 
       - name: Build Image
-        uses: docker/build-push-action@v4.1.1
+        uses: docker/build-push-action@v4.2.1
         with:
           file: Dockerfile
           context: .
