@@ -6,6 +6,7 @@
   "baseBranches": [
     "chore/renovateBaseBranch"
   ],
+  "lockFileMaintenance": { "enabled": false },
   "automergeType": "branch",
   "prHourlyLimit": 2,
   "prConcurrentLimit": 5
