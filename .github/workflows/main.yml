@@ -44,6 +44,8 @@ jobs:
           cache: yarn
 
       - run: yarn install
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps firefox
 
       - name: Build
         run: yarn build
@@ -54,4 +56,3 @@ jobs:
 
       - name: Run test
         run: yarn test
-
