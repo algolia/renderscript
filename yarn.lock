@@ -33,7 +33,7 @@ __metadata:
     "@types/csurf": 1.11.3
     "@types/express": 4.17.18
     "@types/jest": 29.5.5
-    "@types/node": 18.17.19
+    "@types/node": 18.18.4
     "@types/uuid": 9.0.5
     "@typescript-eslint/eslint-plugin": 5.62.0
     "@typescript-eslint/parser": 5.62.0
@@ -1849,10 +1849,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:18.17.19":
-  version: 18.17.19
-  resolution: "@types/node@npm:18.17.19"
-  checksum: 6ab47127cd7534511aa199550659d56b44e5a6dbec9df054d0cde279926b4d43f0e6438f92c8392b039ab4e2a85aa0f698b95926430aff860e23bfc36c96576c
+"@types/node@npm:18.18.4":
+  version: 18.18.4
+  resolution: "@types/node@npm:18.18.4"
+  checksum: 4901e91c4cc479bb58acbcd79236a97a0ad6db4a53cb1f4ba4cf32af15324c61b16faa6e31c1b09bf538a20feb5f5274239157ce5237f5741db0b9ab71e69c52
   languageName: node
   linkType: hard
 
