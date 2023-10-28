@@ -35,7 +35,7 @@
   },
   "engines": {
     "node": "18.18.2",
-    "yarn": "^3.0.0"
+    "yarn": "^4.0.0"
   },
   "homepage": "https://github.com/algolia/renderscript#readme",
   "devDependencies": {
@@ -93,5 +93,5 @@
     "chalk": "4.1.2",
     "@semantic-release/npm": "10.0.6"
   },
-  "packageManager": "yarn@3.6.4"
+  "packageManager": "yarn@4.0.1"
 }
