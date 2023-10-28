@@ -70,7 +70,7 @@ __metadata:
     ttypescript: 1.5.15
     typescript: 4.9.5
     typescript-transform-paths: 3.4.6
-    undici: 5.26.4
+    undici: 5.27.0
     uuid: 9.0.1
   languageName: unknown
   linkType: soft
@@ -9931,12 +9931,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:5.26.4":
-  version: 5.26.4
-  resolution: "undici@npm:5.26.4"
+"undici@npm:5.27.0":
+  version: 5.27.0
+  resolution: "undici@npm:5.27.0"
   dependencies:
     "@fastify/busboy": ^2.0.0
-  checksum: 4d37f14ce56837d332ab1623be751f2a5b439069705671cc60b441133300b05bcb8803668132e7b3f98800db19cd6cb76b48831facbdbc2d73271b12383ab3cd
+  checksum: 3acad25bfe5957aa5edc24eb160b5da7a9c67a5061e2e001929bef4bafed07d93a2accb36d407179c35b3ae56adbe89b49e1dd80d8cea9fdc44dca2037174330
   languageName: node
   linkType: hard
 
