@@ -30,7 +30,7 @@ __metadata:
     "@semantic-release/git": 10.0.1
     "@sentry/node": 7.74.0
     "@types/cookie-parser": 1.4.5
-    "@types/csurf": 1.11.3
+    "@types/csurf": 1.11.4
     "@types/express": 4.17.19
     "@types/jest": 29.5.5
     "@types/node": 18.18.5
@@ -1725,12 +1725,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/csurf@npm:1.11.3":
-  version: 1.11.3
-  resolution: "@types/csurf@npm:1.11.3"
+"@types/csurf@npm:1.11.4":
+  version: 1.11.4
+  resolution: "@types/csurf@npm:1.11.4"
   dependencies:
     "@types/express-serve-static-core": "*"
-  checksum: 5db4b4f4adabc592846d2efe7c1c95de541adf6b536a7d6f523f1583e480a381418d3841ae2f159d81a863cc1c047559c311a0853e915e301cc717c7d0ff08f7
+  checksum: 6f80b6e7d5f7e54386ef23b400aeaec1e36fb72eb2a02617fed229c997bd34dad0dca4351a52d53c95b3e3b24ed6c9a8537293662cb9a10e897be2526f1f6c1c
   languageName: node
   linkType: hard
 
