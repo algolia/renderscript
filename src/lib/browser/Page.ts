@@ -188,9 +188,10 @@ export class BrowserPage {
   /**
    * Wait for navigation with timeout handling.
    */
-  async waitForNavigation(
-    opts: Parameters<Page['waitForNavigation']>[0]
-  ): Promise<Response | null> {
+  async waitForNavigation(opts: {
+    timeout: number;
+    waitUntil: Parameters<Page['waitForLoadState']>[0];
+  }): Promise<Response | null> {
     let response: Response | null = null;
     function onResponse(res: Response): void {
       // We listen to response because "goto" will throw on timeout but we still want to process the doc in that case
@@ -202,7 +203,11 @@ export class BrowserPage {
 
     try {
       if (this.#ref) {
-        response = await this.#ref.waitForNavigation(opts);
+        await this.#ref.waitForLoadState(opts.waitUntil, opts);
+        response = await this.#ref.waitForResponse(
+          (res) => res.status() >= 200 && res.status() < 400,
+          opts
+        );
       }
     } catch (err: any) {
       this.throwIfNotTimeout(err);
