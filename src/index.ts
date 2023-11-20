@@ -1,8 +1,8 @@
-import { Api } from 'api/index';
-import { report } from 'helpers/errorReporting';
-import { gracefulClose } from 'helpers/gracefulClose';
-import { log } from 'helpers/logger';
-import * as singletons from 'lib/singletons';
+import { Api } from './api/index';
+import { report } from './helpers/errorReporting';
+import { gracefulClose } from './helpers/gracefulClose';
+import { log } from './helpers/logger';
+import * as singletons from './lib/singletons';
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 

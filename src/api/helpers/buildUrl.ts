@@ -1,4 +1,4 @@
-import { report } from 'helpers/errorReporting';
+import { report } from '../../helpers/errorReporting';
 
 const DOCKER_LOCALHOST = 'host.docker.internal';
 

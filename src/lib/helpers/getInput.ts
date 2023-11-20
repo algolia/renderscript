@@ -1,7 +1,7 @@
 import type { Locator } from 'playwright';
 
-import type { BrowserPage } from 'lib/browser/Page';
-import type { HandledError } from 'lib/types';
+import type { BrowserPage } from '../browser/Page';
+import type { HandledError } from '../types';
 
 /**
  * Get input for selector.

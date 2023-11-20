@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 
-import { DELETE_COOKIE, SESSION_COOKIE } from 'api/constants';
-import { log } from 'api/helpers/logger';
+import { DELETE_COOKIE, SESSION_COOKIE } from '../../constants';
+import { log } from '../../helpers/logger';
 
 export function getLogin(req: Request, res: Response): void {
   res.render('login', {

@@ -1,7 +1,7 @@
 import type { Cookie } from 'playwright';
 
-import type { PostLoginSuccess } from 'api/@types/postLogin';
-import type { PostRenderSuccess } from 'api/@types/postRender';
+import type { PostLoginSuccess } from '../api/@types/postLogin';
+import type { PostRenderSuccess } from '../api/@types/postRender';
 
 import {
   cleanCookies,

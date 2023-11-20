@@ -1,19 +1,19 @@
 import type express from 'express';
 
+import { report } from '../../helpers/errorReporting';
+import { retryableErrors } from '../../lib/helpers/errors';
+import { tasksManager } from '../../lib/singletons';
+import { RenderTask } from '../../lib/tasks/Render';
 import type {
   PostRenderParams,
   PostRenderResponse,
-} from 'api/@types/postRender';
-import type { Res500 } from 'api/@types/responses';
-import { CSP_HEADERS } from 'api/constants';
-import { getDefaultParams, alt } from 'api/helpers/alt';
-import { buildUrl, revertUrl } from 'api/helpers/buildUrl';
-import { badRequest } from 'api/helpers/errors';
-import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
-import { report } from 'helpers/errorReporting';
-import { retryableErrors } from 'lib/helpers/errors';
-import { tasksManager } from 'lib/singletons';
-import { RenderTask } from 'lib/tasks/Render';
+} from '../@types/postRender';
+import type { Res500 } from '../@types/responses';
+import { CSP_HEADERS } from '../constants';
+import { getDefaultParams, alt } from '../helpers/alt';
+import { buildUrl, revertUrl } from '../helpers/buildUrl';
+import { badRequest } from '../helpers/errors';
+import { getForwardedHeadersFromRequest } from '../helpers/getForwardedHeaders';
 
 export async function validate(
   req: express.Request<any, any, any, any>,

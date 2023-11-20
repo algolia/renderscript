@@ -1,10 +1,10 @@
 import type { ElementHandle, Response, Request, Locator } from 'playwright';
 
-import { report } from 'helpers/errorReporting';
-import { waitForPendingRequests } from 'helpers/waitForPendingRequests';
-import { cleanErrorMessage } from 'lib/helpers/errors';
-import { getInput } from 'lib/helpers/getInput';
-import type { LoginTaskParams } from 'lib/types';
+import { report } from '../../helpers/errorReporting';
+import { waitForPendingRequests } from '../../helpers/waitForPendingRequests';
+import { cleanErrorMessage } from '../helpers/errors';
+import { getInput } from '../helpers/getInput';
+import type { LoginTaskParams } from '../types';
 
 import { Task } from './Task';
 

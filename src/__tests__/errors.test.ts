@@ -1,5 +1,5 @@
-import type { PostRenderSuccess } from 'api/@types/postRender';
-import type { BrowserEngine } from 'lib/browser/Browser';
+import type { PostRenderSuccess } from '../api/@types/postRender';
+import type { BrowserEngine } from '../lib/browser/Browser';
 
 import { postRender } from './helpers';
 

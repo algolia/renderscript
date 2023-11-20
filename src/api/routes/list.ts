@@ -1,7 +1,7 @@
 import type express from 'express';
 
-import type { GetListSuccess } from 'api/@types/getList';
-import { tasksManager } from 'lib/singletons';
+import { tasksManager } from '../../lib/singletons';
+import type { GetListSuccess } from '../@types/getList';
 
 /**
  * List currently opened pages.

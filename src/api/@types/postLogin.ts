@@ -1,6 +1,6 @@
 import type { Cookie } from 'playwright';
 
-import type { Metrics, TaskBaseParams } from 'lib/types';
+import type { Metrics, TaskBaseParams } from '../../lib/types';
 
 import type { Res500 } from './responses';
 

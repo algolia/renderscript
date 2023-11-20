@@ -1,7 +1,7 @@
 import { nextTick } from 'process';
 
-import type { Api } from 'api/index';
-import type { TasksManager } from 'lib/TasksManager';
+import type { Api } from '../api/index';
+import type { TasksManager } from '../lib/TasksManager';
 
 import * as reporting from './errorReporting';
 import { log } from './logger';

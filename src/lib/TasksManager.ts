@@ -1,6 +1,6 @@
-import { report } from 'helpers/errorReporting';
-import { log as mainLog } from 'helpers/logger';
-import { stats } from 'helpers/stats';
+import { report } from '../helpers/errorReporting';
+import { log as mainLog } from '../helpers/logger';
+import { stats } from '../helpers/stats';
 
 import type { BrowserEngine } from './browser/Browser';
 import { Browser } from './browser/Browser';

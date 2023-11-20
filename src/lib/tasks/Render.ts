@@ -3,10 +3,10 @@ import type { Response } from 'playwright';
 import {
   promiseWithTimeout,
   PromiseWithTimeoutError,
-} from 'helpers/promiseWithTimeout';
-import { waitForPendingRequests } from 'helpers/waitForPendingRequests';
-import { cleanErrorMessage } from 'lib/helpers/errors';
-import type { RenderTaskParams } from 'lib/types';
+} from '../../helpers/promiseWithTimeout';
+import { waitForPendingRequests } from '../../helpers/waitForPendingRequests';
+import { cleanErrorMessage } from '../helpers/errors';
+import type { RenderTaskParams } from '../types';
 
 import { Task } from './Task';
 
