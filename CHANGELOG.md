@@ -1,3 +1,10 @@
+## [2.2.14](https://github.com/algolia/renderscript/compare/v2.2.13...v2.2.14) (2023-11-20)
+
+
+### Bug Fixes
+
+* use waitForLoadState instead of waitForNavigation ([#873](https://github.com/algolia/renderscript/issues/873)) ([e54b118](https://github.com/algolia/renderscript/commit/e54b1183d75e619331cdd6524a58df36934ff02a))
+
 ## [2.2.13](https://github.com/algolia/renderscript/compare/v2.2.12...v2.2.13) (2023-11-06)
 
 
