@@ -4,8 +4,11 @@ import type { Cookie } from 'playwright';
 import { request as req } from 'undici';
 import type Dispatcher from 'undici/types/dispatcher';
 
-import type { PostLoginParams, PostLoginSuccess } from 'api/@types/postLogin';
-import type { PostRenderParams } from 'api/@types/postRender';
+import type {
+  PostLoginParams,
+  PostLoginSuccess,
+} from '../api/@types/postLogin';
+import type { PostRenderParams } from '../api/@types/postRender';
 
 export async function request(
   url: string,

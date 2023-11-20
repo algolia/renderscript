@@ -1,4 +1,4 @@
-import type { HandledError, UnhandledError } from 'lib/types';
+import type { HandledError, UnhandledError } from '../types';
 
 export const retryableErrors: Array<HandledError | UnhandledError> = [
   'body_serialisation_failed',

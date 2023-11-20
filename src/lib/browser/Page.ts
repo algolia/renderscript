@@ -1,18 +1,17 @@
 import type { BrowserContext, Page, Route, Response } from 'playwright';
 
-import { report } from 'helpers/errorReporting';
-import { log } from 'helpers/logger';
+import { report } from '../../helpers/errorReporting';
+import { log } from '../../helpers/logger';
 import {
   promiseWithTimeout,
   PromiseWithTimeoutError,
-} from 'helpers/promiseWithTimeout';
-import { stats } from 'helpers/stats';
-import { cleanErrorMessage } from 'lib/helpers/errors';
-import { isURLAllowed } from 'lib/helpers/validateURL';
-import { adblocker } from 'lib/singletons';
-import type { PageMetrics, Perf, TaskBaseParams } from 'lib/types';
-
+} from '../../helpers/promiseWithTimeout';
+import { stats } from '../../helpers/stats';
 import { DATA_REGEXP, IGNORED_RESOURCES } from '../constants';
+import { cleanErrorMessage } from '../helpers/errors';
+import { isURLAllowed } from '../helpers/validateURL';
+import { adblocker } from '../singletons';
+import type { PageMetrics, Perf, TaskBaseParams } from '../types';
 
 import type { BrowserEngine } from './Browser';
 import { DEFAULT_ENGINE } from './Browser';

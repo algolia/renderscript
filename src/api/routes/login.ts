@@ -1,15 +1,15 @@
 import type express from 'express';
 
-import type { PostLoginParams, PostLoginResponse } from 'api/@types/postLogin';
-import { CSP_HEADERS } from 'api/constants';
-import { getDefaultParams, alt } from 'api/helpers/alt';
-import { buildUrl, revertUrl } from 'api/helpers/buildUrl';
-import { badRequest } from 'api/helpers/errors';
-import { getForwardedHeadersFromRequest } from 'api/helpers/getForwardedHeaders';
-import { report } from 'helpers/errorReporting';
-import { retryableErrors } from 'lib/helpers/errors';
-import { tasksManager } from 'lib/singletons';
-import { LoginTask } from 'lib/tasks/Login';
+import { report } from '../../helpers/errorReporting';
+import { retryableErrors } from '../../lib/helpers/errors';
+import { tasksManager } from '../../lib/singletons';
+import { LoginTask } from '../../lib/tasks/Login';
+import type { PostLoginParams, PostLoginResponse } from '../@types/postLogin';
+import { CSP_HEADERS } from '../constants';
+import { getDefaultParams, alt } from '../helpers/alt';
+import { buildUrl, revertUrl } from '../helpers/buildUrl';
+import { badRequest } from '../helpers/errors';
+import { getForwardedHeadersFromRequest } from '../helpers/getForwardedHeaders';
 
 export async function validate(
   req: express.Request<any, any, PostLoginParams>,

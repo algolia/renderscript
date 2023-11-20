@@ -2,19 +2,19 @@ import type { Logger } from 'pino';
 import type { BrowserContext, Response } from 'playwright';
 import { v4 as uuid } from 'uuid';
 
-import { log } from 'helpers/logger';
-import { stats } from 'helpers/stats';
-import type { Browser } from 'lib/browser/Browser';
-import { BrowserPage } from 'lib/browser/Page';
-import { TimeBudget } from 'lib/browser/TimeBudget';
-import { WAIT_TIME } from 'lib/constants';
-import { ErrorIsHandledError } from 'lib/helpers/errors';
+import { log } from '../../helpers/logger';
+import { stats } from '../../helpers/stats';
+import type { Browser } from '../browser/Browser';
+import { BrowserPage } from '../browser/Page';
+import { TimeBudget } from '../browser/TimeBudget';
+import { WAIT_TIME } from '../constants';
+import { ErrorIsHandledError } from '../helpers/errors';
 import type {
   ErrorReturn,
   Metrics,
   TaskBaseParams,
   TaskResult,
-} from 'lib/types';
+} from '../types';
 
 export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   id: string;

@@ -1,6 +1,6 @@
 import type { Cookie } from 'playwright';
 
-import type { PostLoginSuccess } from 'api/@types/postLogin';
+import type { PostLoginSuccess } from '../api/@types/postLogin';
 
 import { sendLoginRequest } from './helpers';
 

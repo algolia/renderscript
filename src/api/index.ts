@@ -6,15 +6,13 @@ import cookieParser from 'cookie-parser';
 import csurf from 'csurf';
 import express, { static as expressStatic } from 'express';
 
-import { requestLogger } from 'api/helpers/requestLogger';
-import { healthy } from 'api/routes/healthy';
-import * as routeLogin from 'api/routes/login';
-import { ready } from 'api/routes/ready';
-import * as routeRender from 'api/routes/render';
-import projectRoot from 'helpers/projectRoot';
+import projectRoot from '../helpers/projectRoot';
 
 import { log } from './helpers/logger';
+import { requestLogger } from './helpers/requestLogger';
+import { healthy } from './routes/healthy';
 import { list } from './routes/list';
+import * as routeLogin from './routes/login';
 import {
   getLogin,
   getStep1,
@@ -23,6 +21,8 @@ import {
   postLogin,
   postStep2,
 } from './routes/privates/login';
+import { ready } from './routes/ready';
+import * as routeRender from './routes/render';
 import { root } from './routes/root';
 
 export class Api {

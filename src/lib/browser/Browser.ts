@@ -6,9 +6,9 @@ import type {
 import { chromium, firefox } from 'playwright';
 import { v4 as uuid } from 'uuid';
 
-import { report } from 'helpers/errorReporting';
-import { log as mainLog } from 'helpers/logger';
-import { stats } from 'helpers/stats';
+import { report } from '../../helpers/errorReporting';
+import { log as mainLog } from '../../helpers/logger';
+import { stats } from '../../helpers/stats';
 
 import { flags, HEIGHT, WIDTH } from './constants';
 

@@ -2,11 +2,11 @@ import os from 'os';
 
 import type express from 'express';
 
-import type { GetHealthySuccess } from 'api/@types/getHealthy';
-import { report } from 'helpers/errorReporting';
-import { stats } from 'helpers/stats';
-import { UNHEALTHY_TASK_TTL } from 'lib/constants';
-import { tasksManager } from 'lib/singletons';
+import { report } from '../../helpers/errorReporting';
+import { stats } from '../../helpers/stats';
+import { UNHEALTHY_TASK_TTL } from '../../lib/constants';
+import { tasksManager } from '../../lib/singletons';
+import type { GetHealthySuccess } from '../@types/getHealthy';
 
 const hostname = os.hostname();
 

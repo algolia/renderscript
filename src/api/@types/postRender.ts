@@ -3,7 +3,7 @@ import type {
   Metrics,
   TaskBaseParams,
   UnhandledError,
-} from 'lib/types';
+} from '../../lib/types';
 
 import type { Res500 } from './responses';
 

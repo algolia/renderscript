@@ -1,6 +1,6 @@
 import { request } from 'undici';
 
-import { log as mainLog } from 'helpers/logger';
+import { log as mainLog } from '../../helpers/logger';
 
 // TO DO: copy this at compile time.
 const list =

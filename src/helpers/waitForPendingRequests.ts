@@ -1,7 +1,8 @@
 import { setTimeout } from 'timers/promises';
 
-import { log } from 'helpers/logger';
-import type { BrowserPage } from 'lib/browser/Page';
+import type { BrowserPage } from '../lib/browser/Page';
+
+import { log } from './logger';
 
 // waitForNavigation({ waitUntil: 'networkidle' }) or waitForLoadState('networkidle')
 // can be flaky and return too soon:

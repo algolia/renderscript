@@ -1,5 +1,5 @@
-import { report } from 'helpers/errorReporting';
-import { log } from 'helpers/logger';
+import { report } from '../helpers/errorReporting';
+import { log } from '../helpers/logger';
 
 import { TasksManager } from './TasksManager';
 import { Adblocker } from './browser/Adblocker';

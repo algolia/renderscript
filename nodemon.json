@@ -8,6 +8,6 @@
   "watch": [
     "src"
   ],
-  "exec": "npm run dev:run",
+  "exec": "yarn dev:run",
   "ext": "ts"
 }

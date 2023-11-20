@@ -1,4 +1,4 @@
-import type { GetHealthySuccess } from 'api/@types/getHealthy';
+import type { GetHealthySuccess } from '../api/@types/getHealthy';
 
 import { postRender, request } from './helpers';
 

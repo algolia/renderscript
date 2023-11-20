@@ -1,6 +1,6 @@
 import type express from 'express';
 
-import { HEADERS_TO_FORWARD } from 'api/constants';
+import { HEADERS_TO_FORWARD } from '../constants';
 
 export function getForwardedHeadersFromRequest(
   req: express.Request<any, any, any, any>
