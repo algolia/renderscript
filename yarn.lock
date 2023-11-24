@@ -33,7 +33,7 @@ __metadata:
     "@types/csurf": "npm:1.11.5"
     "@types/express": "npm:4.17.21"
     "@types/jest": "npm:29.5.10"
-    "@types/node": "npm:18.18.10"
+    "@types/node": "npm:18.18.13"
     "@types/uuid": "npm:9.0.7"
     "@typescript-eslint/eslint-plugin": "npm:6.11.0"
     "@typescript-eslint/parser": "npm:6.11.0"
@@ -1824,12 +1824,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:18.18.10":
-  version: 18.18.10
-  resolution: "@types/node@npm:18.18.10"
+"@types/node@npm:18.18.13":
+  version: 18.18.13
+  resolution: "@types/node@npm:18.18.13"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 6f5bca390970ac42ed073490127edc9822e030def4f5ec7dd71e2dcf5a9dd622be984ef6676b698db126d986229ef5b02c65dac7cfc09cc2c1d94eaefe32a805
+  checksum: 5dcab799e39570a858741a13373a584529d0e6b81120c8a2118e158749d9ace291748644d760af554fe73ab3cebdd91500314bf1ecd17a746fabcae06ebf9eea
   languageName: node
   linkType: hard
 
