@@ -61,7 +61,7 @@ __metadata:
     jest: "npm:29.7.0"
     nodemon: "npm:3.0.2"
     pino: "npm:8.16.2"
-    pino-pretty: "npm:10.3.0"
+    pino-pretty: "npm:10.3.1"
     playwright: "npm:1.37.1"
     prettier: "npm:3.1.1"
     semantic-release: "npm:22.0.12"
@@ -8065,9 +8065,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pino-pretty@npm:10.3.0":
-  version: 10.3.0
-  resolution: "pino-pretty@npm:10.3.0"
+"pino-pretty@npm:10.3.1":
+  version: 10.3.1
+  resolution: "pino-pretty@npm:10.3.1"
   dependencies:
     colorette: "npm:^2.0.7"
     dateformat: "npm:^4.6.3"
@@ -8085,7 +8085,7 @@ __metadata:
     strip-json-comments: "npm:^3.1.1"
   bin:
     pino-pretty: bin.js
-  checksum: 2cbcb440b03e220b69720278ff28625417dd6ca851a7a5b8fc73978fb36e4438b9ac33f287a94fe779cf893bf47b585b44d91f3693527f766ac22b760028ef48
+  checksum: 4284f125f7e8a5a10e856c8fd591ba34c30c0a0071a0b265a9eda43c3e447ba11d40b06cc67108675586358a5d1213a6ac3a92f6abd2896abfbab9a5b4c17072
   languageName: node
   linkType: hard
 
