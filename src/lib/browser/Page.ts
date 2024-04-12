@@ -271,15 +271,15 @@ export class BrowserPage {
       return await promiseWithTimeout(
         (async (): Promise<string | null> => {
           const start = Date.now();
-          // `getInnerHTML` unstable: https://github.com/whatwg/html/issues/8867
           const content = await this.#ref?.evaluate(() => {
             const doctype = document.doctype
               ? new XMLSerializer().serializeToString(document.doctype)
               : '';
-            if (!('getInnerHTML' in Element.prototype)) {
+            // https://html.spec.whatwg.org/#dom-parsing-and-serialization
+            if (!('getHTML' in Element.prototype)) {
               return `${doctype}${document.documentElement.outerHTML}`;
             }
-            const body = (document.body as any).getInnerHTML();
+            const body = (document.body as any).getHTML({ serializableShadowRoots: true });
             const uid = crypto.randomUUID();
             document.body.innerHTML = uid;
             return `${doctype}${document.documentElement.outerHTML.replace(
