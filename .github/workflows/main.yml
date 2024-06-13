@@ -14,8 +14,6 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     name: Lint
-    env:
-      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 'false'
     steps:
       - uses: actions/checkout@v4
 
