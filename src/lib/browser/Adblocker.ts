@@ -1,11 +1,7 @@
-import { request } from 'undici';
+import { promises as fs } from 'fs';
 
 import { report } from '../../helpers/errorReporting';
 import { log as mainLog } from '../../helpers/logger';
-
-// TO DO: Cronjob to update this list on our servers
-const list =
-  'https://raw.githubusercontent.com/badmojr/1Hosts/master/Pro/domains.txt';
 
 const log = mainLog.child({ svc: 'adbk' });
 
@@ -17,15 +13,8 @@ export class Adblocker {
 
   async load(): Promise<void> {
     try {
-      const res = await request(list, {
-        method: 'GET',
-      });
-
-      let body = '';
-      for await (const chunk of res.body) {
-        body += chunk.toString();
-      }
-      const lines = body.split(/[\r\n]+/);
+      const data = await fs.readFile('./adblock_hosts.txt', 'utf8');
+      const lines = data.split(/[\r\n]+/);
 
       for (const line of lines) {
         if (!line.startsWith('#')) {
@@ -35,7 +24,6 @@ export class Adblocker {
 
       log.info('Ready', {
         entries: this.#hostnames.size,
-        lastMod: res.headers['last-modified'],
       });
     } catch (err: any) {
       report(new Error('Error while setting up adblocker'), { err });
