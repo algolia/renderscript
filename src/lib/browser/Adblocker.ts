@@ -13,7 +13,7 @@ export class Adblocker {
 
   async load(): Promise<void> {
     try {
-      const data = await fs.readFile('./adblock_hosts.txt', 'utf8');
+      const data = await fs.readFile(`${__dirname}/adblock_hosts.txt`, 'utf8');
       const lines = data.split(/[\r\n]+/);
 
       for (const line of lines) {
