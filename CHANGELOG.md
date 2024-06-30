@@ -1,3 +1,10 @@
+## [2.2.16](https://github.com/algolia/renderscript/compare/v2.2.15...v2.2.16) (2024-06-30)
+
+
+### Bug Fixes
+
+* save adblock hosts at compile time ([#882](https://github.com/algolia/renderscript/issues/882)) ([7ec6f28](https://github.com/algolia/renderscript/commit/7ec6f28316b5bb7e14d18bff3e59efa6d046288d))
+
 ## [2.2.15](https://github.com/algolia/renderscript/compare/v2.2.14...v2.2.15) (2024-06-27)
 
 
