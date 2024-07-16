@@ -1,3 +1,19 @@
+## [2.2.16](https://github.com/algolia/renderscript/compare/v2.2.15...v2.2.16) (2024-06-30)
+
+
+### Bug Fixes
+
+* save adblock hosts at compile time ([#882](https://github.com/algolia/renderscript/issues/882)) ([7ec6f28](https://github.com/algolia/renderscript/commit/7ec6f28316b5bb7e14d18bff3e59efa6d046288d))
+
+## [2.2.15](https://github.com/algolia/renderscript/compare/v2.2.14...v2.2.15) (2024-06-27)
+
+
+### Bug Fixes
+
+* dependencies 2023-11-13 ([#870](https://github.com/algolia/renderscript/issues/870)) ([93fad22](https://github.com/algolia/renderscript/commit/93fad220411ba79c58c188299329c08ecabb344b)), closes [#871](https://github.com/algolia/renderscript/issues/871)
+* make the service load independent of adblocker ([#880](https://github.com/algolia/renderscript/issues/880)) ([8d6512b](https://github.com/algolia/renderscript/commit/8d6512b8794fbc1c688f2b66eee567d348d09c4e))
+* use old lockfile ([#881](https://github.com/algolia/renderscript/issues/881)) ([4ae8d80](https://github.com/algolia/renderscript/commit/4ae8d80afc828ac7825371ffc3f187177bd37586))
+
 ## [2.2.14](https://github.com/algolia/renderscript/compare/v2.2.13...v2.2.14) (2023-11-20)
 
 
