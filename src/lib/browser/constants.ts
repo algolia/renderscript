@@ -39,7 +39,7 @@ export const flags = [
   "--proxy-server='direct://'",
   '--proxy-bypass-list=*',
   // Disable cache
-  '--disk-cache-dir=/dev/null',
+  // '--disk-cache-dir=/dev/null',
   '--media-cache-size=1',
   '--disk-cache-size=1',
   // Disable useless UI features
@@ -52,6 +52,7 @@ export const flags = [
   '--no-first-run', // screen on very first run
   '--noerrdialogs',
   '--disable-background-timer-throttling',
+  '--disable-backgrounding-occluded-windows',
   '--disable-password-generation',
   '--disable-prompt-on-repos',
   '--disable-save-password-bubble',
@@ -68,6 +69,11 @@ export const flags = [
   // Disable dev-shm
   // See https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#tips
   '--disable-dev-shm-usage',
+
+  '--enable-automation',
+  '--disable-print-preview',
+  // https://github.com/cypress-io/cypress/issues/5132
+  '--disable-ipc-flooding-protection',
 
   // Taken from https://github.com/cypress-io/cypress/blob/develop/packages/server/lib/browsers/chrome.ts
   // "--disable-background-networking"

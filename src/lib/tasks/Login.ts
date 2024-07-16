@@ -115,7 +115,8 @@ export class LoginTask extends Task<LoginTaskParams> {
       const usernameInput = await usernameInputLoc.elementHandle({
         timeout: 500,
       });
-      await usernameInput?.type(login.username, {
+      // https://playwright.dev/docs/release-notes#version-138
+      await usernameInput?.fill(login.username, {
         noWaitAfter: true,
         timeout: this.timeBudget.getRange(2000, 3000),
       });
@@ -144,7 +145,7 @@ export class LoginTask extends Task<LoginTaskParams> {
       const passwordInputLoc = await getInput(page, passwordSel);
       if (!('error' in passwordInputLoc)) {
         this.log.info('Entering password...');
-        await passwordInputLoc.type(login.password, {
+        await passwordInputLoc.fill(login.password, {
           noWaitAfter: true,
           timeout: this.timeBudget.getRange(2000, 3000),
         });
