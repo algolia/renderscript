@@ -68,7 +68,7 @@ __metadata:
     ts-jest: "npm:29.1.1"
     ts-node: "npm:10.9.2"
     typescript: "npm:5.3.3"
-    undici: "npm:5.28.2"
+    undici: "npm:6.19.5"
     uuid: "npm:9.0.1"
   languageName: unknown
   linkType: soft
@@ -542,13 +542,6 @@ __metadata:
   version: 8.56.0
   resolution: "@eslint/js@npm:8.56.0"
   checksum: 97a4b5ccf7e24f4d205a1fb0f21cdcd610348ecf685f6798a48dd41ba443f2c1eedd3050ff5a0b8f30b8cf6501ab512aa9b76e531db15e59c9ebaa41f3162e37
-  languageName: node
-  linkType: hard
-
-"@fastify/busboy@npm:^2.0.0":
-  version: 2.1.0
-  resolution: "@fastify/busboy@npm:2.1.0"
-  checksum: f22c1e5c52dc350ddf9ba8be9f87b48d3ea5af00a37fd0a0d1e3e4b37f94d96763e514c68a350c7f570260fdd2f08b55ee090cdd879f92a03249eb0e3fd19113
   languageName: node
   linkType: hard
 
@@ -9878,12 +9871,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:5.28.2":
-  version: 5.28.2
-  resolution: "undici@npm:5.28.2"
-  dependencies:
-    "@fastify/busboy": "npm:^2.0.0"
-  checksum: 07ab8b812c7322f5faba55268562e3626463171ace8a2e5861e5793e69f8901e809bcdeb4013126fe8d1602baac247ea3c0c996073dbf9709516295b0a4dd18f
+"undici@npm:6.19.5":
+  version: 6.19.5
+  resolution: "undici@npm:6.19.5"
+  checksum: ea7752b1f989095d940d89c7b4f17ae64f4619c946621d065ca1a49549af7d50bd461f1e1090aa8a766f6b86a092ae63587eac2bf6c7aefd3e8571b245e89f2d
   languageName: node
   linkType: hard
 
