@@ -3,8 +3,8 @@ name: Renderscript
 on:
   push:
     branches:
-      - "master"
-      - "renovate/**"
+      - 'master'
+      - 'renovate/**'
   pull_request:
 
 env:
@@ -14,8 +14,6 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     name: Lint
-    env:
-      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "true"
     steps:
       - uses: actions/checkout@v4
 
@@ -25,7 +23,7 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
 
-      - run: yarn install
+      - run: yarn install --frozen-lockfile
 
       - name: Run Linter
         run: yarn lint
@@ -43,7 +41,10 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
 
-      - run: yarn install
+      - run: yarn install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: yarn playwright install
 
       - name: Build
         run: yarn build
@@ -54,4 +55,3 @@ jobs:
 
       - name: Run test
         run: yarn test
-
