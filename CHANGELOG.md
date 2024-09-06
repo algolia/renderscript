@@ -1,3 +1,10 @@
+## [2.2.17](https://github.com/algolia/renderscript/compare/v2.2.16...v2.2.17) (2024-09-06)
+
+
+### Bug Fixes
+
+* upgrade playwright and deps ([#879](https://github.com/algolia/renderscript/issues/879)) ([0ab0095](https://github.com/algolia/renderscript/commit/0ab00959bba2ab452472614e05b47d3b0120f69a))
+
 ## [2.2.16](https://github.com/algolia/renderscript/compare/v2.2.15...v2.2.16) (2024-06-30)
 
 
