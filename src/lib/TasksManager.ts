@@ -1,4 +1,8 @@
-import { report } from '../helpers/errorReporting';
+import {
+  RENDERSCRIPT_TASK_TYPE_TAG,
+  RENDERSCRIPT_TASK_URL_TAG,
+  report,
+} from '../helpers/errorReporting';
 import { log as mainLog } from '../helpers/logger';
 import { stats } from '../helpers/stats';
 
@@ -184,7 +188,16 @@ export class TasksManager {
       if (!(err instanceof ErrorIsHandledError)) {
         task.results.error = task.results.error || cleanErrorMessage(err);
         task.results.rawError = err;
-        report(err, { url });
+        report(err, { url }, [
+          {
+            key: RENDERSCRIPT_TASK_URL_TAG,
+            value: url,
+          },
+          {
+            key: RENDERSCRIPT_TASK_TYPE_TAG,
+            value: type,
+          },
+        ]);
       }
       /* eslint-enable no-param-reassign */
     }

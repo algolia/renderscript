@@ -2,6 +2,14 @@ import * as Sentry from '@sentry/node';
 
 import { log } from './logger';
 
+export const RENDERSCRIPT_TASK_URL_TAG = 'renderscript:task:url';
+export const RENDERSCRIPT_TASK_TYPE_TAG = 'renderscript:task:type';
+
+type SentryTag = {
+  key: string;
+  value: string;
+};
+
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   release: process.env.npm_package_version,
@@ -11,7 +19,11 @@ Sentry.init({
   maxBreadcrumbs: 10,
 });
 
-export function report(err: Error, extra: any = {}): void {
+export function report(
+  err: Error,
+  extra: any = {},
+  tags: SentryTag[] = []
+): void {
   if (!process.env.SENTRY_DSN) {
     console.error({ err, extra });
     return;
@@ -19,6 +31,10 @@ export function report(err: Error, extra: any = {}): void {
 
   log.error(err.message, extra);
   Sentry.withScope((scope) => {
+    tags.forEach((tag) => {
+      Sentry.setTag(tag.key, tag.value);
+    });
+
     scope.setExtras(extra);
     Sentry.captureException(err);
   });
