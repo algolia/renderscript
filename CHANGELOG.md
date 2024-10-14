@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/algolia/renderscript/compare/v2.2.17...v2.3.0) (2024-10-14)
+
+
+### Features
+
+* Add tagging to Sentry ([#885](https://github.com/algolia/renderscript/issues/885)) ([fe31488](https://github.com/algolia/renderscript/commit/fe31488bf34cb35be46c15984a42f499bb67d897))
+
 ## [2.2.17](https://github.com/algolia/renderscript/compare/v2.2.16...v2.2.17) (2024-09-06)
 
 
