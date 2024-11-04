@@ -10,7 +10,7 @@ export async function getInput(
   page: BrowserPage | undefined,
   sel: string
 ): Promise<Locator | { error: HandledError; rawError: Error }> {
-  const textInputLoc = page?.ref?.locator(sel);
+  const textInputLoc = page?.ref?.locator(sel).locator('visible=true');
   const count = textInputLoc ? await textInputLoc.count() : 0;
   if (!textInputLoc || count <= 0) {
     return {
