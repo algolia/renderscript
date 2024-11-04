@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/algolia/renderscript/compare/v2.3.0...v2.3.1) (2024-11-04)
+
+
+### Bug Fixes
+
+* ensure the input is a visible element ([#886](https://github.com/algolia/renderscript/issues/886)) ([bd082d0](https://github.com/algolia/renderscript/commit/bd082d03152c659bdc0189089213015c5ceebc4f))
+
 # [2.3.0](https://github.com/algolia/renderscript/compare/v2.2.17...v2.3.0) (2024-10-14)
 
 
