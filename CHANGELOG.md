@@ -1,3 +1,10 @@
+## [2.3.2](https://github.com/algolia/renderscript/compare/v2.3.1...v2.3.2) (2024-11-05)
+
+
+### Bug Fixes
+
+* account for invisible password input fields ([#887](https://github.com/algolia/renderscript/issues/887)) ([25a8d9e](https://github.com/algolia/renderscript/commit/25a8d9ea00d5a9ad560b5b23352c7f79fd1cf20b))
+
 ## [2.3.1](https://github.com/algolia/renderscript/compare/v2.3.0...v2.3.1) (2024-11-04)
 
 
