@@ -15,7 +15,6 @@ export type HandledError =
   | 'no_cookies'
   | 'page_closed_too_soon'
   | 'page_crashed'
-  | 'page_timeout'
   | 'redirection'
   | 'timedout'
   | 'wrong_redirection';
