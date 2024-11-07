@@ -1,3 +1,10 @@
+## [2.3.3](https://github.com/algolia/renderscript/compare/v2.3.2...v2.3.3) (2024-11-07)
+
+
+### Bug Fixes
+
+* update playwright ([#888](https://github.com/algolia/renderscript/issues/888)) ([0e2b171](https://github.com/algolia/renderscript/commit/0e2b17125b96cfddc6bf13c6102bc93b8639e511))
+
 ## [2.3.2](https://github.com/algolia/renderscript/compare/v2.3.1...v2.3.2) (2024-11-05)
 
 
