@@ -82,7 +82,7 @@
     "express": "4.20.0",
     "hot-shots": "10.0.0",
     "pino": "8.16.2",
-    "playwright": "1.37.1",
+    "playwright": "1.48.2",
     "undici": "5.28.4",
     "uuid": "9.0.1"
   },
