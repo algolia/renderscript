@@ -55,6 +55,13 @@ export class Browser {
     const start = Date.now();
     try {
       const browser = this.#engine === 'firefox' ? firefox : chromium;
+      let executablePath = undefined;
+
+      if (process.env.USE_LATEST_CHROME) {
+        executablePath =
+          this.#engine === 'chromium' ? '/usr/bin/google-chrome' : undefined;
+      }
+
       this.#browser = await browser.launch({
         headless: true,
         env,
@@ -62,6 +69,7 @@ export class Browser {
         handleSIGHUP: false,
         handleSIGTERM: false,
         args: flags,
+        executablePath,
       });
       this.#browser.on('disconnected', () => {
         if (!this.#stopping) {
@@ -82,7 +90,11 @@ export class Browser {
     });
 
     this.#ready = true;
-    log.info('Ready', { id: this.#id, browser: this.#engine });
+    log.info('Ready', {
+      id: this.#id,
+      browser: this.#engine,
+      version: this.#browser?.version(),
+    });
   }
 
   async stop(): Promise<void> {
