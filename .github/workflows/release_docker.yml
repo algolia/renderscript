@@ -64,6 +64,7 @@ jobs:
           build-args: |
             VERSION=${{ steps.env_var.outputs.RENDERSCRIPT_VERSION }}
             PLAYWRIGHT_VERSION=${{ steps.env_var.outputs.PLAYWRIGHT_VERSION }}
+            USE_LATEST_CHROME=true
 
       - name: Test Image
         run: ./scripts/test_image.sh ${{ env.COMMIT_SHA }}
@@ -85,3 +86,4 @@ jobs:
           build-args: |
             VERSION=${{ steps.env_var.outputs.RENDERSCRIPT_VERSION }}
             PLAYWRIGHT_VERSION=${{ steps.env_var.outputs.PLAYWRIGHT_VERSION }}
+            USE_LATEST_CHROME=true
