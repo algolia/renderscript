@@ -1,3 +1,10 @@
+## [2.3.4](https://github.com/algolia/renderscript/compare/v2.3.3...v2.3.4) (2024-11-21)
+
+
+### Bug Fixes
+
+* update ts-node ([#891](https://github.com/algolia/renderscript/issues/891)) ([70a774b](https://github.com/algolia/renderscript/commit/70a774b5e2fa7ab55f8616ee56c28822075114a5))
+
 ## [2.3.3](https://github.com/algolia/renderscript/compare/v2.3.2...v2.3.3) (2024-11-07)
 
 
