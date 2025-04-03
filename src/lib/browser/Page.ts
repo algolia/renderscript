@@ -490,55 +490,91 @@ export class BrowserPage {
     url,
   }: TaskBaseParams): (res: Response) => Promise<void> {
     return async (res: Response) => {
-      if (this.#hasTimeout) {
-        // If the page was killed in the meantime we don't want to process anything else
-        return;
-      }
-
-      if (this.isClosed) {
-        return;
-      }
-
-      const reqUrl = res.url();
-      const headers = await res.allHeaders();
-      let length = 0;
-
-      // Store initial response in case of navigation
-      if (!this.#initialResponse) {
-        this.#initialResponse = res;
-      }
-
-      if (headers['content-length']) {
-        length = parseInt(headers['content-length'], 10);
-      }
-
-      const status = res.status();
-
-      // Redirections do not have a body
-      if (status > 300 && status < 400) {
-        return;
-      }
-
       try {
-        if (length === 0 && !this.isClosed) {
-          // Not every request has the content-length header, the byteLength match perfectly
-          // but does not necessarly represent what was transfered (if it was gzipped for example)
-          length = (await res.body()).byteLength;
-        }
-
-        if (reqUrl === url.href) {
-          // If this is our original URL we log it to a dedicated metric
-          this.#metrics.contentLength.main = length;
-        }
-
-        this.#metrics.contentLength.total += length;
-      } catch (err: any) {
-        if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+        if (this.#hasTimeout) {
+          // If the page was killed in the meantime we don't want to process anything else
           return;
         }
 
-        // We can not throw in callback, it will go directly into unhandled
-        report(err, { context: 'onResponse', pageUrl: url.href, reqUrl });
+        if (this.isClosed) {
+          return;
+        }
+
+        // Check if response is still valid before accessing properties
+        if (!res.request().response()) {
+          // Response is no longer valid
+          return;
+        }
+
+        const reqUrl = res.url();
+        
+        // Check if headers can be accessed safely
+        let headers;
+        try {
+          headers = await res.allHeaders();
+        } catch (err: any) {
+          if (err.message.includes('Target closed') || 
+              err.message.includes('Target page, context or browser has been closed')) {
+            // Page was closed while we were processing, just return
+            return;
+          }
+          throw err;
+        }
+        
+        let length = 0;
+
+        // Store initial response in case of navigation
+        if (!this.#initialResponse) {
+          this.#initialResponse = res;
+        }
+
+        if (headers['content-length']) {
+          length = parseInt(headers['content-length'], 10);
+        }
+
+        const status = res.status();
+
+        // Redirections do not have a body
+        if (status > 300 && status < 400) {
+          return;
+        }
+
+        try {
+          if (length === 0 && !this.isClosed) {
+            // Not every request has the content-length header, the byteLength match perfectly
+            // but does not necessarly represent what was transfered (if it was gzipped for example)
+            try {
+              length = (await res.body()).byteLength;
+            } catch (bodyErr: any) {
+              if (bodyErr.message.includes('Target closed') || 
+                  bodyErr.message.includes('Target page, context or browser has been closed')) {
+                // Page was closed while we were processing, just return
+                return;
+              }
+              throw bodyErr;
+            }
+          }
+
+          if (reqUrl === url.href) {
+            // If this is our original URL we log it to a dedicated metric
+            this.#metrics.contentLength.main = length;
+          }
+
+          this.#metrics.contentLength.total += length;
+        } catch (err: any) {
+          if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+            return;
+          }
+
+          // We can not throw in callback, it will go directly into unhandled
+          report(err, { context: 'onResponse', pageUrl: url.href, reqUrl });
+        }
+      } catch (err: any) {
+        // Add the missing catch block to handle any errors in the outer try block
+        if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+          return;
+        }
+        report(err, { context: 'onResponseHandler', pageUrl: url.href });
       }
     };
   }

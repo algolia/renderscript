@@ -167,9 +167,21 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
    */
   async saveMetrics(): Promise<void> {
     try {
-      this.#metrics.page = await this.page!.saveMetrics();
-    } catch (err) {
+      if (!this.page || this.page.isClosed) {
+        // page has been closed
+        return;
+      }
+      this.#metrics.page = await this.page.saveMetrics();
+    } catch (err: any) {
       // Can happen if target is already closed or redirection
+      if (err.message && (
+          err.message.includes('Target closed') || 
+          err.message.includes('Target page, context or browser has been closed'))) {
+        // Expected error when page is closed, no need to report
+        return;
+      }
+      // Report other unexpected errors
+      report(err, { context: 'saveMetrics' });
     }
   }
 
