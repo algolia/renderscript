@@ -15,6 +15,7 @@ import type {
   TaskBaseParams,
   TaskResult,
 } from '../types';
+import { RESPONSE_IGNORED_ERRORS } from '../browser/constants';
 
 export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
   id: string;
@@ -174,9 +175,7 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
       this.#metrics.page = await this.page.saveMetrics();
     } catch (err: any) {
       // Can happen if target is already closed or redirection
-      if (err.message && (
-          err.message.includes('Target closed') || 
-          err.message.includes('Target page, context or browser has been closed'))) {
+      if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
         // Expected error when page is closed, no need to report
         return;
       }
