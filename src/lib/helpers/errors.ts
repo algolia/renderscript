@@ -42,7 +42,10 @@ export function cleanErrorMessage(error: Error): HandledError | UnhandledError {
   }
   if (
     error.message.includes('Navigation failed because page was closed') ||
-    error.message.includes('Target closed')
+    error.message.includes('Target closed') ||
+    error.message.includes('Target page, context or browser has been closed') ||
+    error.message.includes('Target has been closed') ||
+    error.message.includes('Browser has been disconnected')
   ) {
     return 'page_closed_too_soon';
   }

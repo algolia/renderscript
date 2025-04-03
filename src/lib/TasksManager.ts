@@ -213,8 +213,17 @@ export class TasksManager {
     try {
       await task.close();
       this.#tasks.delete(id);
-    } catch (err) {
-      report(new Error('Error during close'), { err, url });
+    } catch (err: any) {
+      // Don't let close errors crash the process
+      if (err.message && (
+          err.message.includes('Target closed') || 
+          err.message.includes('Target page, context or browser has been closed') ||
+          err.message.includes('Browser has been disconnected'))) {
+        // Expected error when browser is already closed
+        log.debug('Expected close error', { err: err.message, url });
+      } else {
+        report(new Error('Error during close'), { err, url });
+      }
     }
 
     // ---- Reporting
