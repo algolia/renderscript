@@ -1,12 +1,12 @@
 import type { Response } from 'playwright';
 
-import { RESPONSE_IGNORED_ERRORS } from '../browser/constants';
-import { cleanErrorMessage } from '../helpers/errors';
 import {
   promiseWithTimeout,
   PromiseWithTimeoutError,
 } from '../../helpers/promiseWithTimeout';
 import { waitForPendingRequests } from '../../helpers/waitForPendingRequests';
+import { RESPONSE_IGNORED_ERRORS } from '../browser/constants';
+import { cleanErrorMessage } from '../helpers/errors';
 import type { RenderTaskParams } from '../types';
 
 import { Task } from './Task';
@@ -100,9 +100,7 @@ export class RenderTask extends Task<RenderTaskParams> {
         });
       } catch (waitErr: any) {
         if (
-          RESPONSE_IGNORED_ERRORS.some((msg) => 
-            waitErr.message.includes(msg)
-          )
+          RESPONSE_IGNORED_ERRORS.some((msg) => waitErr.message.includes(msg))
         ) {
           // Page was closed while waiting
           return this.throwHandledError({
@@ -112,7 +110,7 @@ export class RenderTask extends Task<RenderTaskParams> {
         }
         throw waitErr; // Re-throw if it's not a target closed error
       }
-      
+
       const timeWaited = Date.now() - startWaitTime;
       await waitForPendingRequests(this.page!, timeBudget - timeWaited);
     } catch (err: any) {

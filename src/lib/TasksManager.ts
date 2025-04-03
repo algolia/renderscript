@@ -1,4 +1,3 @@
-import { RESPONSE_IGNORED_ERRORS } from './browser/constants';
 import {
   RENDERSCRIPT_TASK_TYPE_TAG,
   RENDERSCRIPT_TASK_URL_TAG,
@@ -9,6 +8,7 @@ import { stats } from '../helpers/stats';
 
 import type { BrowserEngine } from './browser/Browser';
 import { Browser } from './browser/Browser';
+import { RESPONSE_IGNORED_ERRORS } from './browser/constants';
 import { UNHEALTHY_TASK_TTL } from './constants';
 import { cleanErrorMessage, ErrorIsHandledError } from './helpers/errors';
 import type { Task } from './tasks/Task';

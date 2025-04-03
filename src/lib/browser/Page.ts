@@ -507,7 +507,7 @@ export class BrowserPage {
         }
 
         const reqUrl = res.url();
-        
+
         // Check if headers can be accessed safely
         let headers;
         try {
@@ -518,7 +518,7 @@ export class BrowserPage {
           }
           throw err;
         }
-        
+
         let length = 0;
 
         // Store initial response in case of navigation
@@ -544,7 +544,12 @@ export class BrowserPage {
             try {
               length = (await res.body()).byteLength;
             } catch (bodyErr: any) {
-              if (REQUEST_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+              // eslint-disable-next-line max-depth
+              if (
+                REQUEST_IGNORED_ERRORS.some((msg) =>
+                  bodyErr.message.includes(msg)
+                )
+              ) {
                 return;
               }
               throw bodyErr;
@@ -558,7 +563,9 @@ export class BrowserPage {
 
           this.#metrics.contentLength.total += length;
         } catch (err: any) {
-          if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+          if (
+            RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))
+          ) {
             return;
           }
 
