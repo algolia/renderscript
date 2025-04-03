@@ -108,9 +108,12 @@ export async function renderJSON(
     }
 
     const resolvedUrl = revertUrl(task.resolvedUrl)?.href || null;
-    const code = task.error && 
-                 retryableErrors.includes(task.error) && 
-                 task.error !== 'redirection' ? 500 : 200;
+    const code =
+      task.error &&
+      retryableErrors.includes(task.error) &&
+      task.error !== 'redirection'
+        ? 500
+        : 200;
     res.status(code).json({
       body: task.body,
       headers: task.headers,
