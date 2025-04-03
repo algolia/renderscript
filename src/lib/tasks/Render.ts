@@ -99,6 +99,15 @@ export class RenderTask extends Task<RenderTaskParams> {
           timeout: timeBudget,
         });
       } catch (waitErr: any) {
+        // Check if this is a redirection first
+        if (this.page.redirection) {
+          this.results.resolvedUrl =
+            this.results.resolvedUrl || this.page.redirection;
+          return this.throwHandledError({
+            error: this.results.error || 'redirection',
+            rawError: waitErr,
+          });
+        }
         if (
           RESPONSE_IGNORED_ERRORS.some((msg) => waitErr.message.includes(msg))
         ) {
