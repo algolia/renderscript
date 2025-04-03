@@ -14,6 +14,7 @@ export const retryableErrors: Array<HandledError | UnhandledError> = [
   'error_reading_response',
 ];
 
+// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable complexity */
 export function cleanErrorMessage(error: Error): HandledError | UnhandledError {
   if (
