@@ -513,9 +513,7 @@ export class BrowserPage {
         try {
           headers = await res.allHeaders();
         } catch (err: any) {
-          if (err.message.includes('Target closed') || 
-              err.message.includes('Target page, context or browser has been closed')) {
-            // Page was closed while we were processing, just return
+          if (REQUEST_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
             return;
           }
           throw err;
@@ -546,9 +544,7 @@ export class BrowserPage {
             try {
               length = (await res.body()).byteLength;
             } catch (bodyErr: any) {
-              if (bodyErr.message.includes('Target closed') || 
-                  bodyErr.message.includes('Target page, context or browser has been closed')) {
-                // Page was closed while we were processing, just return
+              if (REQUEST_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
                 return;
               }
               throw bodyErr;
