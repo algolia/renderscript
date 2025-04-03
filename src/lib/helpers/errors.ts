@@ -14,6 +14,7 @@ export const retryableErrors: Array<HandledError | UnhandledError> = [
   'error_reading_response',
 ];
 
+/* eslint-disable complexity */
 export function cleanErrorMessage(error: Error): HandledError | UnhandledError {
   if (
     error.message.includes('ERR_NAME_NOT_RESOLVED') ||
