@@ -1,13 +1,13 @@
 import type { Response } from 'playwright';
 
+import { RESPONSE_IGNORED_ERRORS } from '../browser/constants';
+import { cleanErrorMessage } from '../helpers/errors';
 import {
   promiseWithTimeout,
   PromiseWithTimeoutError,
 } from '../../helpers/promiseWithTimeout';
 import { waitForPendingRequests } from '../../helpers/waitForPendingRequests';
-import { cleanErrorMessage } from '../helpers/errors';
 import type { RenderTaskParams } from '../types';
-import { RESPONSE_IGNORED_ERRORS } from '../browser/constants';
 
 import { Task } from './Task';
 
@@ -99,8 +99,12 @@ export class RenderTask extends Task<RenderTaskParams> {
           timeout: timeBudget,
         });
       } catch (waitErr: any) {
-        if (RESPONSE_IGNORED_ERRORS.some((msg) => waitErr.message.includes(msg))) {
-          // Page was closed while waiting, just return with appropriate error
+        if (
+          RESPONSE_IGNORED_ERRORS.some((msg) => 
+            waitErr.message.includes(msg)
+          )
+        ) {
+          // Page was closed while waiting
           return this.throwHandledError({
             error: 'page_closed_too_soon',
             rawError: waitErr,

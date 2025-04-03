@@ -1,3 +1,4 @@
+import { RESPONSE_IGNORED_ERRORS } from './browser/constants';
 import {
   RENDERSCRIPT_TASK_TYPE_TAG,
   RENDERSCRIPT_TASK_URL_TAG,
@@ -12,7 +13,6 @@ import { UNHEALTHY_TASK_TTL } from './constants';
 import { cleanErrorMessage, ErrorIsHandledError } from './helpers/errors';
 import type { Task } from './tasks/Task';
 import type { TaskObject, TaskFinal } from './types';
-import { RESPONSE_IGNORED_ERRORS } from './browser/constants';
 
 export const log = mainLog.child({ svc: 'mngr' });
 

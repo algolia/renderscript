@@ -566,7 +566,6 @@ export class BrowserPage {
           report(err, { context: 'onResponse', pageUrl: url.href, reqUrl });
         }
       } catch (err: any) {
-        // Add the missing catch block to handle any errors in the outer try block
         if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
           return;
         }
