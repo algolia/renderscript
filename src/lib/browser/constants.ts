@@ -22,6 +22,9 @@ export const VALIDATE_URL_IGNORED_ERRORS = ['ENOTFOUND', 'EAI_AGAIN'];
 export const METRICS_IGNORED_ERRORS = [
   // Navigation or page closed, okay for metrics
   'Target closed',
+  'Target page, context or browser has been closed',
+  'Target has been closed',
+  'Browser has been disconnected',
   'Execution context was destroyed',
   'Renderscript Controlled Timeout',
 ];

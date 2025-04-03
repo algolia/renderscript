@@ -93,9 +93,24 @@ export class RenderTask extends Task<RenderTaskParams> {
       const timeBudget = this.timeBudget.get();
       const startWaitTime = Date.now();
 
-      await this.page.ref?.waitForLoadState('networkidle', {
-        timeout: timeBudget,
-      });
+      try {
+        await this.page.ref?.waitForLoadState('networkidle', {
+          timeout: timeBudget,
+        });
+      } catch (waitErr: any) {
+        if (waitErr.message.includes('Target closed') || 
+            waitErr.message.includes('Target page, context or browser has been closed') ||
+            waitErr.message.includes('Target has been closed') ||
+            waitErr.message.includes('Browser has been disconnected')) {
+          // Page was closed while waiting, just return with appropriate error
+          return this.throwHandledError({
+            error: 'page_closed_too_soon',
+            rawError: waitErr,
+          });
+        }
+        throw waitErr; // Re-throw if it's not a target closed error
+      }
+      
       const timeWaited = Date.now() - startWaitTime;
       await waitForPendingRequests(this.page!, timeBudget - timeWaited);
     } catch (err: any) {
