@@ -501,7 +501,8 @@ export class BrowserPage {
         }
 
         // Check if response is still valid before accessing properties
-        if (!res.request().response()) {
+        const reqRes = await res.request().response();
+        if (!reqRes) {
           // Response is no longer valid
           return;
         }
