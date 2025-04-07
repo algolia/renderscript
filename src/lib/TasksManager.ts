@@ -8,6 +8,7 @@ import { stats } from '../helpers/stats';
 
 import type { BrowserEngine } from './browser/Browser';
 import { Browser } from './browser/Browser';
+import { RESPONSE_IGNORED_ERRORS } from './browser/constants';
 import { UNHEALTHY_TASK_TTL } from './constants';
 import { cleanErrorMessage, ErrorIsHandledError } from './helpers/errors';
 import type { Task } from './tasks/Task';
@@ -213,8 +214,14 @@ export class TasksManager {
     try {
       await task.close();
       this.#tasks.delete(id);
-    } catch (err) {
-      report(new Error('Error during close'), { err, url });
+    } catch (err: any) {
+      // Don't let close errors crash the process
+      if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+        // Expected error when browser is already closed
+        log.debug('Expected close error', { err: err.message, url });
+      } else {
+        report(new Error('Error during close'), { err, url });
+      }
     }
 
     // ---- Reporting

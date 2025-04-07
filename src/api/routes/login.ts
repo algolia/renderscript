@@ -67,7 +67,12 @@ export async function processLogin(
     }
 
     const resolvedUrl = revertUrl(task.resolvedUrl)?.href || null;
-    const code = task.error && retryableErrors.includes(task.error) ? 500 : 200;
+    const code =
+      task.error &&
+      retryableErrors.includes(task.error) &&
+      task.error !== 'redirection'
+        ? 500
+        : 200;
 
     res.status(code).json({
       headers: task.headers,

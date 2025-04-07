@@ -5,6 +5,7 @@ import {
   PromiseWithTimeoutError,
 } from '../../helpers/promiseWithTimeout';
 import { waitForPendingRequests } from '../../helpers/waitForPendingRequests';
+import { RESPONSE_IGNORED_ERRORS } from '../browser/constants';
 import { cleanErrorMessage } from '../helpers/errors';
 import type { RenderTaskParams } from '../types';
 
@@ -93,9 +94,32 @@ export class RenderTask extends Task<RenderTaskParams> {
       const timeBudget = this.timeBudget.get();
       const startWaitTime = Date.now();
 
-      await this.page.ref?.waitForLoadState('networkidle', {
-        timeout: timeBudget,
-      });
+      try {
+        await this.page.ref?.waitForLoadState('networkidle', {
+          timeout: timeBudget,
+        });
+      } catch (waitErr: any) {
+        // Check if this is a redirection first
+        if (this.page.redirection) {
+          this.results.resolvedUrl =
+            this.results.resolvedUrl || this.page.redirection;
+          return this.throwHandledError({
+            error: this.results.error || 'redirection',
+            rawError: waitErr,
+          });
+        }
+        if (
+          RESPONSE_IGNORED_ERRORS.some((msg) => waitErr.message.includes(msg))
+        ) {
+          // Page was closed while waiting
+          return this.throwHandledError({
+            error: 'page_closed_too_soon',
+            rawError: waitErr,
+          });
+        }
+        throw waitErr; // Re-throw if it's not a target closed error
+      }
+
       const timeWaited = Date.now() - startWaitTime;
       await waitForPendingRequests(this.page!, timeBudget - timeWaited);
     } catch (err: any) {

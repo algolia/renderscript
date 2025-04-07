@@ -14,6 +14,8 @@ export const retryableErrors: Array<HandledError | UnhandledError> = [
   'error_reading_response',
 ];
 
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable complexity */
 export function cleanErrorMessage(error: Error): HandledError | UnhandledError {
   if (
     error.message.includes('ERR_NAME_NOT_RESOLVED') ||
@@ -42,7 +44,10 @@ export function cleanErrorMessage(error: Error): HandledError | UnhandledError {
   }
   if (
     error.message.includes('Navigation failed because page was closed') ||
-    error.message.includes('Target closed')
+    error.message.includes('Target closed') ||
+    error.message.includes('Target page, context or browser has been closed') ||
+    error.message.includes('Target has been closed') ||
+    error.message.includes('Browser has been disconnected')
   ) {
     return 'page_closed_too_soon';
   }

@@ -2,11 +2,13 @@ import type { Logger } from 'pino';
 import type { BrowserContext, Response } from 'playwright';
 import { v4 as uuid } from 'uuid';
 
+import { report } from '../../helpers/errorReporting';
 import { log } from '../../helpers/logger';
 import { stats } from '../../helpers/stats';
 import type { Browser } from '../browser/Browser';
 import { BrowserPage } from '../browser/Page';
 import { TimeBudget } from '../browser/TimeBudget';
+import { RESPONSE_IGNORED_ERRORS } from '../browser/constants';
 import { WAIT_TIME } from '../constants';
 import { ErrorIsHandledError } from '../helpers/errors';
 import type {
@@ -167,9 +169,19 @@ export abstract class Task<TTaskType extends TaskBaseParams = TaskBaseParams> {
    */
   async saveMetrics(): Promise<void> {
     try {
-      this.#metrics.page = await this.page!.saveMetrics();
-    } catch (err) {
+      if (!this.page || this.page.isClosed) {
+        // page has been closed
+        return;
+      }
+      this.#metrics.page = await this.page.saveMetrics();
+    } catch (err: any) {
       // Can happen if target is already closed or redirection
+      if (RESPONSE_IGNORED_ERRORS.some((msg) => err.message.includes(msg))) {
+        // Expected error when page is closed, no need to report
+        return;
+      }
+      // Report other unexpected errors
+      report(err, { context: 'saveMetrics' });
     }
   }
 
