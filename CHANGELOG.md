@@ -1,3 +1,10 @@
+## [2.3.5](https://github.com/algolia/renderscript/compare/v2.3.4...v2.3.5) (2025-04-07)
+
+
+### Bug Fixes
+
+* unhandled exceptions causing crash loops ([#893](https://github.com/algolia/renderscript/issues/893)) ([f85ba34](https://github.com/algolia/renderscript/commit/f85ba343a549159631dbf02b3a3623e7fe2de6fc))
+
 ## [2.3.4](https://github.com/algolia/renderscript/compare/v2.3.3...v2.3.4) (2024-11-21)
 
 
