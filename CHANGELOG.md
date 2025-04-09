@@ -1,3 +1,10 @@
+## [2.3.6](https://github.com/algolia/renderscript/compare/v2.3.5...v2.3.6) (2025-04-09)
+
+
+### Bug Fixes
+
+* invalid url catch ([#894](https://github.com/algolia/renderscript/issues/894)) ([9010a0e](https://github.com/algolia/renderscript/commit/9010a0ee290fcf35b5e3ca9c6310461b84c845ae))
+
 ## [2.3.5](https://github.com/algolia/renderscript/compare/v2.3.4...v2.3.5) (2025-04-07)
 
 
