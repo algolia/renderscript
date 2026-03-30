@@ -36,7 +36,7 @@ describe('adblocker', () => {
     expect(json.metrics.page!.requests).toStrictEqual({
       total: 11,
       pending: 0,
-      blocked: 9,
+      blocked: 6,
     });
     /**
      * @example

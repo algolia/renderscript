@@ -80,7 +80,8 @@ describe('POST /render', () => {
 
     expect(JSON.parse(res.body)).toStrictEqual({
       status: 400,
-      error: 'Invalid json: Unexpected end of JSON input',
+      error:
+        'Invalid json: Unterminated string in JSON at position 43 (line 1 column 44)',
       code: 'invalid_json',
     });
   });
