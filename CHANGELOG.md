@@ -3,6 +3,20 @@
 
 ### Bug Fixes
 
+* docker file ([cfc7348](https://github.com/algolia/renderscript/commit/cfc7348f1461fce5bd4c994cfe9a91bc1608957b))
+* release pipeline ([b28bf26](https://github.com/algolia/renderscript/commit/b28bf261d53bbf899c9bbf06338a61fedc3773fe))
+* remove tests from release ci ([bf7f5bd](https://github.com/algolia/renderscript/commit/bf7f5bde7e1c251be7b7bf56331addd2f0dcbbcc))
+
+
+### Performance Improvements
+
+* faster startup, leaner Docker image, Node 22 ([#898](https://github.com/algolia/renderscript/issues/898)) ([6ab05ae](https://github.com/algolia/renderscript/commit/6ab05aee4989b1891fc97a43fa2fbff03238e3dd))
+
+## [2.3.7](https://github.com/algolia/renderscript/compare/v2.3.6...v2.3.7) (2026-03-30)
+
+
+### Bug Fixes
+
 * release pipeline ([b28bf26](https://github.com/algolia/renderscript/commit/b28bf261d53bbf899c9bbf06338a61fedc3773fe))
 
 
