@@ -1,7 +1,7 @@
 # ------------------
 # Stage 1: Build
 # ------------------
-FROM mcr.microsoft.com/playwright:v1.49.0-noble AS builder
+FROM mcr.microsoft.com/playwright:v1.58.2-noble AS builder
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ RUN yarn build \
 # ------------------
 # Stage 2: Production
 # ------------------
-FROM mcr.microsoft.com/playwright:v1.49.0-noble
+FROM mcr.microsoft.com/playwright:v1.58.2-noble
 
 ARG VERSION
 ENV VERSION=${VERSION:-dev}
