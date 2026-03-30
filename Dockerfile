@@ -11,7 +11,7 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=true
 COPY package.json yarn.lock .yarnrc.yml ./
 COPY .yarn .yarn
 
-RUN yarn install
+RUN corepack enable && yarn install --immutable
 
 # Copy source code (invalidates cache on code changes only)
 COPY . .

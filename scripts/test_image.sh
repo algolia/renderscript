@@ -1,33 +1,47 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-hash=$1 # the last commit change because of semantic-release
-docker run -d --name renderscript_test -p 3000:3000 algolia/renderscript:$hash
+hash="${1:?missing docker image tag}"
+container_name="renderscript_test"
+log_file="${RENDERSCRIPT_TEST_LOG:-renderscript_test.log}"
 
-ATTEMPTS=10
-until $(curl -o /dev/null -s -f http://localhost:3000/ready); do
+cleanup() {
+  docker rm -f "${container_name}" >/dev/null 2>&1 || true
+}
+
+capture_logs() {
+  docker logs "${container_name}" > "${log_file}" 2>&1 || true
+}
+
+trap 'capture_logs; cleanup' EXIT
+
+docker run -d --name "${container_name}" -p 3000:3000 "algolia/renderscript:${hash}"
+
+attempts=30
+until curl --output /dev/null --silent --fail http://localhost:3000/ready; do
   echo "waiting for docker..."
   sleep 1
-  ATTEMPTS=$((ATTEMPTS-1))
-  if [[ $ATTEMPTS -eq "0" ]]; then
-    echo "Timed out, check the logs of renderscript_test container:"
-    docker logs renderscript_test -n 50
+  attempts=$((attempts - 1))
+  if [[ "${attempts}" -eq 0 ]]; then
+    echo "Timed out waiting for the docker image to become ready."
+    capture_logs
+    sed -n '1,200p' "${log_file}"
     exit 1
   fi
 done
 
-logs=$(docker logs renderscript_test 2>&1)
-echo $logs
+capture_logs
+sed -n '1,120p' "${log_file}"
 
-if echo $logs | grep -q '"svc":"brws","msg":"Ready"'; then
+if grep -q '"svc":"brws","msg":"Ready"' "${log_file}"; then
   echo "Browser ready"
 else
   echo "Browser not ready"
   exit 1
 fi
 
-curl --silent --request POST \
+curl --silent --show-error --fail --request POST \
   --url http://localhost:3000/render \
   --header 'Content-Type: application/json' \
   --data '{
@@ -39,10 +53,10 @@ curl --silent --request POST \
 	}
 }' >/dev/null
 
-logs=$(docker logs renderscript_test 2>&1)
-echo $logs
+capture_logs
+sed -n '1,200p' "${log_file}"
 
-if echo $logs | grep -q '"msg":"Done","data":'; then
+if grep -q '"msg":"Done","data":' "${log_file}"; then
   echo "Rendered"
 else
   echo "Not rendered"
@@ -50,4 +64,3 @@ else
 fi
 
 echo "Image OK"
-docker stop renderscript_test && docker rm renderscript_test

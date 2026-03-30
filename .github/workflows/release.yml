@@ -8,13 +8,22 @@ on:
         default: true
         description: 'DryRun?'
 
-env:
-  COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+permissions:
+  contents: read
+
+concurrency:
+  group: release-version-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   release:
     runs-on: ubuntu-latest
     name: Release
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     env:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       GIT_AUTHOR_NAME: ${{ secrets.GH_USER_NAME }}
@@ -25,23 +34,87 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           # Make sure the release step uses its own credentials.
           persist-credentials: false
 
       - name: Install Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: yarn
 
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Release diagnostics
+        run: |
+          {
+            echo '## Release diagnostics'
+            echo "- ref: ${GITHUB_REF}"
+            echo "- sha: ${GITHUB_SHA}"
+            echo "- actor: ${GITHUB_ACTOR}"
+            echo "- dry_run: ${{ github.event.inputs.dry_run }}"
+            echo "- node: $(node --version)"
+            echo "- yarn: $(yarn --version)"
+            echo '- recent tags:'
+            git tag --sort=-v:refname | sed -n '1,10p'
+          } >> "$GITHUB_STEP_SUMMARY"
+          git describe --tags --always || true
+          git status --short
+
+      - name: Run linter
+        run: yarn lint
+
+      - name: Install Playwright browsers
+        run: yarn playwright install
+
+      - name: Build
+        run: yarn build
+
+      - name: Start service
+        run: |
+          yarn ci:start > renderscript.log 2>&1 &
+          echo "RENDERSCRIPT_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Wait for service
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://localhost:3000/ready >/dev/null; then
+              echo "Service ready after ${attempt}s"
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo 'Service failed to become ready'
+          sed -n '1,200p' renderscript.log || true
+          exit 1
+
+      - name: Run tests
+        run: yarn test
+
       - name: Release (--dry-run)
         if: (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true')
         run: |
-          yarn install
-          yarn semantic-release --dry-run
+          set -o pipefail
+          yarn semantic-release --dry-run 2>&1 | tee semantic-release.log
 
       - name: Release
         if: (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run != 'true')
         run: |
-          yarn install
-          yarn semantic-release
+          set -o pipefail
+          yarn semantic-release 2>&1 | tee semantic-release.log
+
+      - name: Upload release logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-logs-${{ github.run_id }}
+          path: |
+            renderscript.log
+            semantic-release.log
+          if-no-files-found: ignore
