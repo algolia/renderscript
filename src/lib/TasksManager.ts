@@ -16,9 +16,12 @@ import type { TaskObject, TaskFinal } from './types';
 
 export const log = mainLog.child({ svc: 'mngr' });
 
+const EAGER_FIREFOX = process.env.EAGER_FIREFOX === 'true';
+
 export class TasksManager {
   #chromium: Browser | null = null;
   #firefox: Browser | null = null;
+  #firefoxLaunchPromise: Promise<void> | null = null;
   #stopping: boolean = true;
   #tasks: Map<string, TaskObject> = new Map();
   #totalRun: number = 0;
@@ -50,17 +53,22 @@ export class TasksManager {
       return { ready: false, reason: 'oldTasks', oldTasks };
     }
 
-    if (this.#chromium && this.#firefox) {
-      return {
-        ready: this.#chromium.isReady && this.#firefox.isReady,
-        reason: `browser(s) not ready: chromium: ${
-          this.#chromium.isReady ? '✅' : '❌'
-        } ; firefox: ${this.#firefox.isReady ? '✅' : '❌'}`,
-        oldTasks,
-      };
+    const chromiumReady = this.#chromium?.isReady ?? false;
+    // Firefox is lazily initialized — only block readiness if it was started but isn't ready
+    const firefoxReady = this.#firefox ? this.#firefox.isReady : true;
+
+    let firefoxStatus = '💤';
+    if (this.#firefox) {
+      firefoxStatus = this.#firefox.isReady ? '✅' : '❌';
     }
 
-    return { ready: false, oldTasks };
+    return {
+      ready: chromiumReady && firefoxReady,
+      reason: `browser(s) not ready: chromium: ${
+        chromiumReady ? '✅' : '❌'
+      } ; firefox: ${firefoxStatus}`,
+      oldTasks,
+    };
   }
 
   get currentBrowsers(): Map<BrowserEngine, Browser | null> {
@@ -81,11 +89,12 @@ export class TasksManager {
   async launch(): Promise<void> {
     const chromium = new Browser('chromium');
     await chromium.create();
-    const firefox = new Browser('firefox');
-    await firefox.create();
-
     this.#chromium = chromium;
-    this.#firefox = firefox;
+
+    if (EAGER_FIREFOX) {
+      await this.#ensureFirefox();
+    }
+
     this.#stopping = false;
     log.info('Ready');
   }
@@ -158,6 +167,19 @@ export class TasksManager {
     }
   }
 
+  async #ensureFirefox(): Promise<void> {
+    if (this.#firefox?.isReady) return;
+    if (!this.#firefoxLaunchPromise) {
+      this.#firefoxLaunchPromise = (async (): Promise<void> => {
+        const firefox = new Browser('firefox');
+        await firefox.create();
+        this.#firefox = firefox;
+        log.info('Firefox ready (lazy init)');
+      })();
+    }
+    await this.#firefoxLaunchPromise;
+  }
+
   /**
    * Actual execution of a task.
    * It will create a browser, a page, launch the task (render, login), close everything.
@@ -169,6 +191,9 @@ export class TasksManager {
     }
 
     const engine: BrowserEngine = task.params.browser || 'chromium';
+    if (engine === 'firefox') {
+      await this.#ensureFirefox();
+    }
     const browser = engine === 'firefox' ? this.#firefox : this.#chromium;
     if (!browser || !browser.isReady) {
       throw new Error('Task can not be executed: no_browser');

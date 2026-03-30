@@ -63,13 +63,10 @@ export const flags = [
   '--disable-save-password-bubble',
   '--disable-single-click-autofill',
   '--disable-restore-session-state',
-  '--disable-translate',
   '--disable-new-profile-management',
   '--disable-new-avatar-menu',
-  '--disable-infobars',
   '--disable-device-discovery-notifications',
   '--disable-client-side-phishing-detection',
-  '--disable-notifications',
   '--disable-component-extensions-with-background-pages',
   // Disable dev-shm
   // See https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#tips
@@ -85,7 +82,6 @@ export const flags = [
   '--disable-web-resources',
   '--safebrowsing-disable-auto-update',
   '--safebrowsing-disable-download-protection',
-  '--disable-client-side-phishing-detection',
   '--disable-component-update',
   '--disable-default-apps',
 

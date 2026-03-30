@@ -148,6 +148,11 @@ export class BrowserPage {
     url: string,
     opts: Parameters<Page['goto']>[1]
   ): Promise<Response> {
+    const page = this.#ref;
+    if (!page) {
+      throw new Error('goto_no_page');
+    }
+
     let response: Response | null = null;
 
     function onResponse(res: Response): void {
@@ -156,19 +161,19 @@ export class BrowserPage {
         response = res;
       }
     }
-    this.#ref!.once('response', onResponse);
+    page.once('response', onResponse);
 
     const start = Date.now();
     try {
       // Response can be assigned here or on('response')
-      response = await this.#ref!.goto(url, opts);
+      response = await page.goto(url, opts);
     } catch (err: any) {
       if (!this.redirection && !err.message.includes('ERR_ABORTED')) {
         this.throwIfNotTimeout(err);
       }
     } finally {
       // We remove listener, because we don't want more response
-      this.#ref!.removeListener('response', onResponse);
+      page.removeListener('response', onResponse);
     }
 
     stats.timing('renderscript.page.goto', Date.now() - start, undefined, {
@@ -191,6 +196,11 @@ export class BrowserPage {
     timeout: number;
     waitUntil: Parameters<Page['waitForLoadState']>[0];
   }): Promise<Response | null> {
+    const page = this.#ref;
+    if (!page) {
+      return null;
+    }
+
     let response: Response | null = null;
     function onResponse(res: Response): void {
       // We listen to response because "goto" will throw on timeout but we still want to process the doc in that case
@@ -198,21 +208,19 @@ export class BrowserPage {
         response = res;
       }
     }
-    this.#ref!.once('response', onResponse);
+    page.once('response', onResponse);
 
     try {
-      if (this.#ref) {
-        await this.#ref.waitForLoadState(opts.waitUntil, opts);
-        response = await this.#ref.waitForResponse(
-          (res) => res.status() >= 200 && res.status() < 400,
-          opts
-        );
-      }
+      await page.waitForLoadState(opts.waitUntil, opts);
+      response = await page.waitForResponse(
+        (res) => res.status() >= 200 && res.status() < 400,
+        opts
+      );
     } catch (err: any) {
       this.throwIfNotTimeout(err);
     } finally {
       // We remove listener, because we don't want more response
-      this.#ref!.removeListener('response', onResponse);
+      page.removeListener('response', onResponse);
     }
 
     return response;
