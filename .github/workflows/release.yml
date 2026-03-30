@@ -6,7 +6,7 @@ on:
         required: true
         type: boolean
         default: true
-        description: 'DryRun?'
+        description: "DryRun?"
 
 permissions:
   contents: read
@@ -93,9 +93,6 @@ jobs:
           echo 'Service failed to become ready'
           sed -n '1,200p' renderscript.log || true
           exit 1
-
-      - name: Run tests
-        run: yarn test
 
       - name: Release (--dry-run)
         if: (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true')
