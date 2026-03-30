@@ -16,7 +16,10 @@ export async function request(
   url: string,
   params?: RequestInit
 ): Promise<{ res: TestResponse; body: string }> {
-  const raw = await fetch(url, params);
+  const raw = await fetch(url, {
+    redirect: 'manual',
+    ...params,
+  });
   const body = await raw.text();
 
   // Convert to a plain object matching the shape tests expect (undici style)
