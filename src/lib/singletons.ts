@@ -9,8 +9,7 @@ export const adblocker = new Adblocker();
 
 export async function init(): Promise<void> {
   try {
-    await tasksManager.launch();
-    await adblocker.load();
+    await Promise.all([tasksManager.launch(), adblocker.load()]);
   } catch (err: any) {
     report(new Error('Error during launch'), { err });
 

@@ -1,4 +1,5 @@
 import { promises as fs } from 'fs';
+import path from 'path';
 
 import { report } from '../../helpers/errorReporting';
 import { log as mainLog } from '../../helpers/logger';
@@ -13,12 +14,20 @@ export class Adblocker {
 
   async load(): Promise<void> {
     try {
-      const data = await fs.readFile(`${__dirname}/adblock_hosts.txt`, 'utf8');
+      const data = await fs.readFile(
+        path.join(process.cwd(), 'dist/lib/browser/adblock_hosts.txt'),
+        'utf8'
+      );
       const lines = data.split(/[\r\n]+/);
 
       for (const line of lines) {
-        if (!line.startsWith('#')) {
-          this.#hostnames.add(line);
+        // Skip comments (! or #) and empty lines
+        if (!line || line.startsWith('!') || line.startsWith('#')) {
+          continue;
+        }
+        // Parse adblock filter syntax: ||domain.com^
+        if (line.startsWith('||') && line.endsWith('^')) {
+          this.#hostnames.add(line.slice(2, -1));
         }
       }
 
