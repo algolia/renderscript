@@ -1,5 +1,3 @@
-import { request } from 'undici';
-
 import { wait } from './src/helpers/wait';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -10,10 +8,10 @@ export default async function setup() {
   while (curr < max) {
     curr += 1;
     try {
-      const { statusCode } = await request('http://localhost:3000/ready');
-      console.log('API statusCode:', statusCode, `(retries: ${curr})`);
+      const res = await fetch('http://localhost:3000/ready');
+      console.log('API statusCode:', res.status, `(retries: ${curr})`);
 
-      if (statusCode === 200) {
+      if (res.status === 200) {
         console.log('API Ready');
         return;
       }

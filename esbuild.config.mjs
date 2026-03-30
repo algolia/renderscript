@@ -6,6 +6,6 @@ await build({
   platform: 'node',
   target: 'node22',
   outfile: 'dist/index.js',
-  external: ['playwright'], // must stay external for binary resolution
+  external: ['playwright', 'pino', 'pino-pretty'], // must stay external: playwright for binary resolution, pino for worker_threads
   format: 'cjs',
 });

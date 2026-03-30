@@ -1,8 +1,4 @@
-import type { IncomingHttpHeaders } from 'http';
-
 import type { Cookie } from 'playwright';
-import { request as req } from 'undici';
-import type Dispatcher from 'undici/types/dispatcher';
 
 import type {
   PostLoginParams,
@@ -10,24 +6,38 @@ import type {
 } from '../api/@types/postLogin';
 import type { PostRenderParams } from '../api/@types/postRender';
 
+interface TestResponse {
+  statusCode: number;
+  status: number;
+  headers: Record<string, string>;
+}
+
 export async function request(
   url: string,
-  params?: Parameters<typeof req>[1]
-): Promise<{ res: Dispatcher.ResponseData; body: string }> {
-  const res = await req(url, params);
+  params?: RequestInit
+): Promise<{ res: TestResponse; body: string }> {
+  const raw = await fetch(url, params);
+  const body = await raw.text();
 
-  let body = '';
-  for await (const chunk of res.body) {
-    body += chunk.toString();
-  }
+  // Convert to a plain object matching the shape tests expect (undici style)
+  const headers: Record<string, string> = {};
+  raw.headers.forEach((value, key) => {
+    headers[key] = value;
+  });
+
+  const res: TestResponse = {
+    statusCode: raw.status,
+    status: raw.status,
+    headers,
+  };
 
   return { res, body };
 }
 
 export async function postRender(
   opts: Partial<PostRenderParams>,
-  headers?: IncomingHttpHeaders
-): Promise<{ res: Dispatcher.ResponseData; body: string }> {
+  headers?: Record<string, string>
+): Promise<{ res: TestResponse; body: string }> {
   return await request('http://localhost:3000/render', {
     method: 'POST',
     headers: {
@@ -43,7 +53,7 @@ export async function postRender(
 
 export async function sendLoginRequest(
   opts: Partial<PostLoginParams>
-): Promise<{ res: Dispatcher.ResponseData; body: string }> {
+): Promise<{ res: TestResponse; body: string }> {
   return await request('http://localhost:3000/login', {
     method: 'POST',
     headers: {
