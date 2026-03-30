@@ -38,8 +38,7 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=true
 LABEL org.opencontainers.image.source=https://github.com/algolia/renderscript
 LABEL org.opencontainers.image.revision=$VERSION
 
-# Create non-root user
-RUN adduser --disabled-password pwuser
+# Playwright images already provide the non-root pwuser account.
 
 USER pwuser
 
