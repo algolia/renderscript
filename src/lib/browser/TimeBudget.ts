@@ -13,9 +13,10 @@ export class TimeBudget {
    * @returns Number - What was consumed compared to prev call.
    */
   consume(): number {
-    const consumed = Date.now() - this.lastConsumption;
+    const now = Date.now();
+    const consumed = now - this.lastConsumption;
     this.consumed += consumed;
-    this.lastConsumption = Date.now();
+    this.lastConsumption = now;
     return consumed;
   }
 
