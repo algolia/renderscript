@@ -1,3 +1,10 @@
+## [2.3.8](https://github.com/algolia/renderscript/compare/v2.3.7...v2.3.8) (2026-03-31)
+
+
+### Bug Fixes
+
+* revert to custom image ([dba9815](https://github.com/algolia/renderscript/commit/dba981539ccce4cfd97519c048c85d619793c014))
+
 ## [2.3.7](https://github.com/algolia/renderscript/compare/v2.3.6...v2.3.7) (2026-03-30)
 
 
