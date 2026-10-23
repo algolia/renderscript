@@ -1,7 +1,7 @@
 # ------------------
 # Stage 1: Build
 # ------------------
-FROM node:22-bookworm-slim AS builder
+FROM node:22.23.4-bookworm-slim AS builder
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ RUN yarn build \
 # ------------------
 # Stage 2: Production
 # ------------------
-FROM node:22-bookworm-slim
+FROM node:22.23.4-bookworm-slim
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=America/Los_Angeles
