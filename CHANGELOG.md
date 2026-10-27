@@ -1,3 +1,10 @@
+## [2.3.9](https://github.com/algolia/renderscript/compare/v2.3.8...v2.3.9) (2026-10-27)
+
+
+### Bug Fixes
+
+* **docker:** bump node to 22.23.4 ([#903](https://github.com/algolia/renderscript/issues/903)) ([092e891](https://github.com/algolia/renderscript/commit/092e891712492ca65c02ce8120840fb21e267e03))
+
 ## [2.3.8](https://github.com/algolia/renderscript/compare/v2.3.7...v2.3.8) (2026-03-31)
 
 
